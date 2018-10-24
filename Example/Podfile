@@ -1,0 +1,15 @@
+use_frameworks!
+
+platform :ios, '12.0'
+
+pod 'CBitcoin', :path => '../../CBitcoin'
+
+target 'Bitcoin_Example' do
+      pod 'Bitcoin', :path => '../'
+      pod 'WolfPipe'
+      pod 'WolfStrings'
+
+      target 'Bitcoin_Tests' do
+          inherit! :search_paths
+    end
+end
