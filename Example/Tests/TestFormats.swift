@@ -44,11 +44,32 @@ class TestFormats: XCTestCase {
     func testBase58() {
         XCTAssert(Character("c").isBase58)
         XCTAssertFalse(Character("?").isBase58)
-        XCTAssert("c5LMZEgh".isBase58)
-        XCTAssertFalse("F00bar".isBase58)
-        XCTAssert("Foobar" |> toUTF8 |> toBase58 == "c5LMZEgh")
-        XCTAssertNoThrow(try "c5LMZEgh" |> base58ToData |> fromUTF8 == "Foobar")
+
+        let testData = try! "007680adec8eabcabac676be9e83854ade0bd22cdb0bb960de" |> fromHex
+        let base58Encoded = "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
+        XCTAssert(base58Encoded.isBase58)
+        XCTAssertFalse("F00bar".isBase58) // Invalid format
+        XCTAssert(testData |> toBase58 == base58Encoded)
+        XCTAssertNoThrow(try base58Encoded |> base58ToData == testData)
         XCTAssertNoThrow(try "" |> base58ToData |> fromUTF8 == "") // Empty string
-        XCTAssertThrowsError(try "c5LMZEgh0" |> base58ToData |> fromUTF8 == "Foobar") // Invalid character
+        XCTAssertThrowsError(try "1BoatSLRHtKNngkdXEeobR76b53LETtpy!" |> base58ToData == testData) // Invalid character
+    }
+
+    func testBase64() {
+        let testString = "Foobar"
+        let base64Encoded = "Rm9vYmFy"
+        XCTAssert(testString |> toUTF8 |> Bitcoin.toBase64 == base64Encoded)
+        XCTAssertNoThrow(try base64Encoded |> base64ToData |> fromUTF8 == testString)
+        XCTAssertNoThrow(try "" |> base64ToData |> fromUTF8 == "") // Empty string
+        XCTAssertThrowsError(try "Rm9vYmFy0" |> base64ToData |> fromUTF8 == testString) // Invalid character
+    }
+
+    func testBase85() {
+        let testString = "Hello World!"
+        let base85Encoded = "SGVsbG8gV29ybGQh"
+        XCTAssert(testString |> toUTF8 |> Bitcoin.toBase85 == base85Encoded)
+        XCTAssertNoThrow(try base85Encoded |> base85ToData |> fromUTF8 == testString)
+        XCTAssertNoThrow(try "" |> base85ToData |> fromUTF8 == "") // Empty string
+        XCTAssertThrowsError(try "SGVsbG8gV29ybGQ'" |> base85ToData |> fromUTF8 == testString) // Invalid character
     }
 }
