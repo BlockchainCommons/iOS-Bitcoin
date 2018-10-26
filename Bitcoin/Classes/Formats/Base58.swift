@@ -5,14 +5,13 @@
 //  Created by Wolf McNally on 10/23/18.
 //
 
-import WolfPipe
 import CBitcoin
 
 extension Character {
     /// Returns true if the character is a valid base58 character, false otherwise.
     public var isBase58: Bool {
         guard let a = self.ascii else { return false }
-        return a |> _isBase58Char
+        return _isBase58Char(a)
     }
 }
 
@@ -20,7 +19,7 @@ extension String {
     /// Returns true if the string is a valid base58 character, false otherwise.
     public var isBase58: Bool {
         return self.withCString {
-            $0 |> _isBase58String
+            _isBase58String($0)
         }
     }
 }

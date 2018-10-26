@@ -23,5 +23,4 @@ Pod::Spec.new do |s|
     s.module_name = 'Bitcoin'
 
     s.dependency 'CBitcoin'
-    s.dependency 'WolfPipe'
 end
