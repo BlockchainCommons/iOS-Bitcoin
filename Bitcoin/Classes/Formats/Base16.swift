@@ -8,11 +8,11 @@
 import CBitcoin
 
 /// Encodes the data as a base16 (hex) string.
-public func toBase16(_ data: Data) -> String {
+public func base16Encode(_ data: Data) -> String {
     return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeBase16(dataBytes, data.count, &bytes, &count)
+        _base16Encode(dataBytes, data.count, &bytes, &count)
         return receiveString(bytes: bytes, count: count)
     }
 }
@@ -20,11 +20,11 @@ public func toBase16(_ data: Data) -> String {
 /// Decodes the base16 (hex) format string.
 ///
 /// Throws if the string is not valid base16.
-public func base16ToData(_ string: String) throws -> Data {
+public func base16Decode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>?
         var count: Int = 0
-        _decodeBase16(stringBytes, &bytes, &count)
+        _base16Decode(stringBytes, &bytes, &count)
         guard let dataBytes = bytes else {
             throw BitcoinError("Invalid Base16 format.")
         }
@@ -36,14 +36,14 @@ public func base16ToData(_ string: String) throws -> Data {
 ///
 /// The bitcoin hash format is like base16, but with the bytes reversed.
 /// Throws if the input data is not exactly 32 bytes long.
-public func toHash(_ data: Data) throws -> String {
+public func bitcoinHashEncode(_ data: Data) throws -> String {
     guard data.count == 32 else {
         throw BitcoinError("Invalid bitcoin hash.")
     }
     return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeHash(dataBytes, &bytes, &count)
+        _bitcoinHashEncode(dataBytes, &bytes, &count)
         return receiveString(bytes: bytes, count: count)
     }
 }
@@ -52,11 +52,11 @@ public func toHash(_ data: Data) throws -> String {
 ///
 /// The bitcoin hash format is like base16, but with the bytes reversed.
 /// Throws if the string is not valid base16.
-public func hashToData(_ string: String) throws -> Data {
+public func bitcoinHashDecode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>?
         var count: Int = 0
-        _decodeHash(stringBytes, &bytes, &count)
+        _bitcoinHashDecode(stringBytes, &bytes, &count)
         guard let dataBytes = bytes else {
             throw BitcoinError("Invalid bitcoin hash format.")
         }

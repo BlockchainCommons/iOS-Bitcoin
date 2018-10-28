@@ -85,40 +85,47 @@
 
 ## Encoding Commands
 
+* address-encode
 * address-decode
 * address-embed
-* address-encode
-* ✅ base16-decode (base16ToData)
-* ✅ base16-encode (toBase16)
-* ✅ (base32ToData)
-* ✅ (toBase32)
-* ✅ base58-decode (base58ToData)
-* ✅ base58-encode (toBase58)
-* ✅ base64-decode (base64ToData)
-* ✅ base64-encode (toBase64)
-* ✅ (base85ToData)
-* ✅ (toBase85)
-* ✅ base58check-decode (base58CheckToData)
-* ✅ base58check-encode (toBase58Check)
-* wrap-decode
+* ✅ (bitcoinHashEncode)
+* ✅ (bitcoinHashDecode)
+* ✅ (encodeBase10)
+* ✅ (decodeBase10)
+* ✅ base16-encode (base16Encode)
+* ✅ base16-decode (base16Decode)
+* ✅ (base32Encode)
+* ✅ (base32Decode)
+* ✅ base58-encode (base58Encode)
+* ✅ base58-decode (base58Decode)
+* ✅ base64-encode (base64Encode)
+* ✅ base64-decode (base64Decode)
+* ✅ (base85Encode)
+* ✅ (base85Decode)
+* ✅ base58check-encode (base58CheckEncode)
+* ✅ base58check-decode (base58CheckDecode)
 * wrap-encode
+* wrap-decode
 
 ## Hash Commands
 
-* ✅ bitcoin160 (bitcoinShortHash)
-* ✅ bitcoin256 (bitcoinHash)
-* ✅ ripemd160 (RIPEMD160Hash)
-* ✅ sha160 (SHA1Hash)
-* ✅ sha256 (SHA256Hash)
-* ✅ sha512 (SHA512Hash)
+* ✅ bitcoin160 (bitcoin160)
+* ✅ bitcoin256 (bitcoin256)
+* ✅ ripemd160 (ripemd160)
+* ✅ sha160 (sha160)
+* ✅ sha256 (sha256)
+* ✅ sha512 (sha512)
+* ✅ (sha256HMAC)
+* ✅ (sha512HMAC)
+* ✅ (pkcs5PBKDF2HMACSHA512)
 
 ## Math Commands
 
-* btc-to-satoshi
+* ✅ btc-to-satoshi (btcToSatoshi)
+* ✅ satoshi-to-btc (satoshiToBTC)
 * cert-new
 * cert-public
 * ec-add
 * ec-add-secrets
 * ec-multiply
 * ec-multiply-secrets
-* satoshi-to-btc
