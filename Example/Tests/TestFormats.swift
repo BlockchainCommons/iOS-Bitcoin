@@ -41,6 +41,20 @@ class TestFormats: XCTestCase {
         XCTAssertThrowsError(try (hashString + "x") |> hashToData == hashData) // Invalid character
     }
 
+    func testBase32() {
+        func test(prefix: String, payload: String, expected: String) throws -> Bool {
+            let payloadData = try payload |> fromHex
+            let encoded = payloadData |> toBase32WithPrefix(prefix)
+            guard encoded == expected else { return false }
+            let (decodedPrefix, decodedPayload) = try encoded |> base32ToData
+            guard decodedPrefix == prefix, decodedPayload == payloadData else { return false }
+            return true
+        }
+        XCTAssertNoThrow(try test(prefix: "a", payload: "", expected: "a12uel5l"))
+        XCTAssertNoThrow(try test(prefix: "abcdef", payload: "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", expected: "abcdef1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw"))
+        XCTAssertNoThrow(try test(prefix: "split", payload: "18171918161c01100b1d0819171d130d10171d16191c01100b03191d1b1903031d130b190303190d181d01190303190d", expected: "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w"))
+    }
+
     func testBase58() {
         XCTAssert(Character("c").isBase58)
         XCTAssertFalse(Character("?").isBase58)
@@ -53,6 +67,14 @@ class TestFormats: XCTestCase {
         XCTAssertNoThrow(try base58Encoded |> base58ToData == testData)
         XCTAssertNoThrow(try "" |> base58ToData |> fromUTF8 == "") // Empty string
         XCTAssertThrowsError(try "1BoatSLRHtKNngkdXEeobR76b53LETtpy!" |> base58ToData == testData) // Invalid character
+    }
+
+    func testBase58Check() {
+        let testData = try! "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31" |> fromHex
+        let base58CheckEncoded = "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
+        XCTAssert(testData |> toBase58Check == base58CheckEncoded)
+        XCTAssertNoThrow(try base58CheckEncoded |> base58CheckToData == testData)
+        XCTAssertThrowsError(try "" |> base58CheckToData |> fromUTF8 == "") // Empty string
     }
 
     func testBase64() {

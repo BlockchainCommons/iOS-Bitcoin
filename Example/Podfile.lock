@@ -1,7 +1,6 @@
 PODS:
   - Bitcoin (0.1.0):
     - CBitcoin
-    - WolfPipe
   - CBitcoin (0.1.0)
   - ExtensibleEnumeratedName (1.0.3)
   - WolfNumerics (1.0.3)
@@ -31,7 +30,7 @@ EXTERNAL SOURCES:
     :path: "../../CBitcoin"
 
 SPEC CHECKSUMS:
-  Bitcoin: 46bf2cb54c1dd48174462b50c348791f44bc5211
+  Bitcoin: 82b537f31105a6f56ff59a8da6869bce53820e89
   CBitcoin: a5ea3cb3c08dd4af1c02d8bab9f53bdb2c22055d
   ExtensibleEnumeratedName: c6caeb662f79105e7229a613f9043e8a7e15e642
   WolfNumerics: aac52cdac131f4d54c9f09479156a5cf016ab62f
