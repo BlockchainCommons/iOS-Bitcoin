@@ -15,8 +15,8 @@
 * hd-public
 * hd-to-ec
 * hd-to-public
-* mnemonic-new
-* mnemonic-to-seed
+* ✅ mnemonic-new (mnemonicNew)
+* ✅ mnemonic-to-seed (mnemonicToSeed)
 * qrcode
 * ✅ seed (seed)
 * uri-decode
