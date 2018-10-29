@@ -10,7 +10,7 @@
 * ec-to-wif
 * electrum-new
 * electrum-to-seed
-* hd-new
+* ✅ hd-new (hdNew)
 * hd-private
 * hd-public
 * hd-to-ec
@@ -18,7 +18,7 @@
 * mnemonic-new
 * mnemonic-to-seed
 * qrcode
-* seed
+* ✅ seed (seed)
 * uri-decode
 * uri-encode
 * wif-to-ec

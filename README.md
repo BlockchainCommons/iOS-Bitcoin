@@ -15,7 +15,7 @@ Swift 4.2
 
 ## Installation
 
-Bitcoin is available through [CocoaPods](https://cocoapods.org). To install
+Bitcoin is available through [Blockchain Commons](https://github.com/blockchaincommons). To install
 it, simply add the following line to your Podfile:
 
 ```ruby

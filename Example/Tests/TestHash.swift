@@ -3,14 +3,13 @@
 //  Bitcoin_Tests
 //
 //  Created by Wolf McNally on 10/25/18.
-//  Copyright © 2018 CocoaPods. All rights reserved.
+//  Copyright © 2018 Blockchain Commons. All rights reserved.
 //
 
 import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
-
 
 class TestHash: XCTestCase {
     func testHash() {
