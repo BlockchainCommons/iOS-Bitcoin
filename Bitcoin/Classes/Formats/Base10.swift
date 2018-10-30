@@ -76,7 +76,7 @@ public func decodeBase10(decimalPlaces: Int, strict: Bool = true) -> (String) th
             }
         }
         guard success else {
-            throw BitcoinError("Invalid base10 format.")
+            throw BitcoinError.invalidFormat
         }
         return out
     }

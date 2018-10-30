@@ -4,7 +4,7 @@
 
 ## Wallet Commands
 
-* ec-new
+* ✅ ec-new (ecNew)
 * ec-to-address
 * ec-to-public
 * ec-to-wif

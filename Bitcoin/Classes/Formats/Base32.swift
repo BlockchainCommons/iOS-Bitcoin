@@ -32,7 +32,7 @@ public func base32Decode(_ string: String) throws -> (prefix: String, payload: D
         var payloadCount: Int = 0
         _base32Decode(stringBytes, &prefixBytes, &prefixCount, &payloadBytes, &payloadCount)
         guard let dataBytes = payloadBytes else {
-            throw BitcoinError("Invalid Base32 format")
+            throw BitcoinError.invalidFormat
         }
         let prefix = receiveString(bytes: prefixBytes, count: prefixCount)
         let payload = receiveData(bytes: dataBytes, count: payloadCount)

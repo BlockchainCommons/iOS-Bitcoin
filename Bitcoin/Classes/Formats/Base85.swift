@@ -26,7 +26,7 @@ public func base85Decode(_ string: String) throws -> Data {
         var count: Int = 0
         _base85Decode(stringBytes, &bytes, &count)
         guard let dataBytes = bytes else {
-            throw BitcoinError("Invalid Base58 format.")
+            throw BitcoinError.invalidFormat
         }
         return receiveData(bytes: dataBytes, count: count)
     }

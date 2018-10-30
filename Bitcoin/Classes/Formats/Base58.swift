@@ -43,7 +43,7 @@ public func base58Decode(_ string: String) throws -> Data {
         var count: Int = 0
         _base58Decode(stringBytes, &bytes, &count)
         guard let dataBytes = bytes else {
-            throw BitcoinError("Invalid Base58 format")
+            throw BitcoinError.invalidFormat
         }
         return receiveData(bytes: dataBytes, count: count)
     }
@@ -72,7 +72,7 @@ public func base58CheckDecode(_ string: String) throws -> (version: UInt8, paylo
         var version: UInt8 = 0
         _base58CheckDecode(stringBytes, &bytes, &count, &version)
         guard let dataBytes = bytes else {
-            throw BitcoinError("Invalid Base58Check format")
+            throw BitcoinError.invalidFormat
         }
         let data = receiveData(bytes: dataBytes, count: count)
         return (version, data)

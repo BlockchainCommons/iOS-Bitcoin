@@ -29,10 +29,10 @@ public enum Language: String, CaseIterable {
 public func mnemonicNew(language: Language) -> (_ seed: Data) throws -> String {
     return { seed in
         guard seed.count % mnemonicSeedMultiple == 0 else {
-            throw BitcoinError("Seed size must be muliple of \(mnemonicSeedMultiple) bytes")
+            throw BitcoinError.invalidSeedSize
         }
         guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
-            throw BitcoinError("Unsupported language")
+            throw BitcoinError.unsupportedLanguage
         }
         var mnemonic: UnsafeMutablePointer<Int8>!
         var mnemonicLength: Int = 0
@@ -40,7 +40,7 @@ public func mnemonicNew(language: Language) -> (_ seed: Data) throws -> String {
             _mnemonicNew(seedBytes, seed.count, dictionary, &mnemonic, &mnemonicLength)
         }
         guard success else {
-            throw BitcoinError("Invalid seed")
+            throw BitcoinError.invalidSeed
         }
         return receiveString(bytes: mnemonic, count: mnemonicLength)
     }
@@ -54,7 +54,7 @@ public func mnemonicToSeed(passphrase: String = "", language: Language) -> (_ mn
     return { mnemonic in
         let normalizedPassphrase = passphrase.precomposedStringWithCanonicalMapping
         guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
-            throw BitcoinError("Unsupported language")
+            throw BitcoinError.unsupportedLanguage
         }
         var seed: UnsafeMutablePointer<UInt8>!
         var seedLength: Int = 0
@@ -64,7 +64,7 @@ public func mnemonicToSeed(passphrase: String = "", language: Language) -> (_ mn
             }
         }
         guard success else {
-            throw BitcoinError("Invalid mnemonic")
+            throw BitcoinError.invalidFormat
         }
         return receiveData(bytes: seed, count: seedLength)
     }
@@ -82,7 +82,7 @@ public func mnemonicToSeed(passphrase: String) -> (_ mnemonic: String) throws ->
             }
         }
         guard seed != nil else {
-            throw BitcoinError("Invalid mnemonic")
+            throw BitcoinError.invalidFormat
         }
         return seed
     }

@@ -1,3 +1,10 @@
+//
+//  HDNew.swift
+//  Bitcoin
+//
+//  Created by Wolf McNally on 10/30/18.
+//
+
 import CBitcoin
 
 public var minimumSeedSize: Int = {
@@ -7,7 +14,7 @@ public var minimumSeedSize: Int = {
 public func hdNew(version: UInt32) -> (_ seed: Data) throws -> String {
     return { seed in
         guard seed.count >= minimumSeedSize else {
-            throw BitcoinError("Seed size too small")
+            throw BitcoinError.seedTooSmall
         }
         var key: UnsafeMutablePointer<Int8>!
         var keyLength: Int = 0
@@ -15,7 +22,7 @@ public func hdNew(version: UInt32) -> (_ seed: Data) throws -> String {
             _hdNew(seedBytes, seed.count, version, &key, &keyLength)
         }
         guard success else {
-            throw BitcoinError("Invalid seed")
+            throw BitcoinError.invalidSeed
         }
         return receiveString(bytes: key, count: keyLength)
     }

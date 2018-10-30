@@ -38,3 +38,7 @@ public func seed<T>(bits: Int, using generator: inout T) -> Data where T: Random
 public func seed(bits: Int) -> Data {
     return seed(bits: bits, using: &randomNumberGenerator)
 }
+
+public func seed() -> Data {
+    return seed(count: minimumSeedSize)
+}

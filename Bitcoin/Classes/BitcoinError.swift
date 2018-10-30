@@ -24,10 +24,10 @@
 
 import Foundation
 
-public struct BitcoinError: Error {
-    public let message: String
-
-    public init(_ message: String) {
-        self.message = message
-    }
+public enum BitcoinError: String, Error {
+    case seedTooSmall = "Seed size too small"
+    case invalidSeedSize = "Invalid seed size"
+    case invalidSeed = "Invalid seed"
+    case unsupportedLanguage = "Unsupported language"
+    case invalidFormat = "Invalid format"
 }

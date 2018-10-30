@@ -11,6 +11,7 @@
 		0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC5218683CD001C12B5 /* TestRandom.swift */; };
 		0361BCC921877354001C12B5 /* TestHD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC72187733B001C12B5 /* TestHD.swift */; };
 		03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D7102D2187979B00E70327 /* TestMnemonic.swift */; };
+		03D710372188ED4700E70327 /* TestEC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D710352188ED1B00E70327 /* TestEC.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -37,6 +38,7 @@
 		0361BCC5218683CD001C12B5 /* TestRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRandom.swift; sourceTree = "<group>"; };
 		0361BCC72187733B001C12B5 /* TestHD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHD.swift; sourceTree = "<group>"; };
 		03D7102D2187979B00E70327 /* TestMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMnemonic.swift; sourceTree = "<group>"; };
+		03D710352188ED1B00E70327 /* TestEC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEC.swift; sourceTree = "<group>"; };
 		0482D64EDEE9715D175CF016 /* Pods_Bitcoin_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Bitcoin_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		05D0FE05BA7A72641201C4E1 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		4EB2C27D3619D1CA0346AA96 /* Pods-Bitcoin_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Bitcoin_Tests.debug.xcconfig"; path = "Target Support Files/Pods-Bitcoin_Tests/Pods-Bitcoin_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -146,6 +148,7 @@
 				607FACEB1AFB9204008FA782 /* TestFormats.swift */,
 				0309A6822182876C007E974E /* TestHash.swift */,
 				0361BCC5218683CD001C12B5 /* TestRandom.swift */,
+				03D710352188ED1B00E70327 /* TestEC.swift */,
 				0361BCC72187733B001C12B5 /* TestHD.swift */,
 				03D7102D2187979B00E70327 /* TestMnemonic.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
@@ -370,6 +373,7 @@
 				607FACEC1AFB9204008FA782 /* TestFormats.swift in Sources */,
 				0309A6842182879F007E974E /* TestHash.swift in Sources */,
 				0361BCC921877354001C12B5 /* TestHD.swift in Sources */,
+				03D710372188ED4700E70327 /* TestEC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

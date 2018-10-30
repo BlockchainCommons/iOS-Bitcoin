@@ -26,7 +26,7 @@ public func base16Decode(_ string: String) throws -> Data {
         var count: Int = 0
         _base16Decode(stringBytes, &bytes, &count)
         guard let dataBytes = bytes else {
-            throw BitcoinError("Invalid Base16 format.")
+            throw BitcoinError.invalidFormat
         }
         return receiveData(bytes: dataBytes, count: count)
     }
@@ -38,7 +38,7 @@ public func base16Decode(_ string: String) throws -> Data {
 /// Throws if the input data is not exactly 32 bytes long.
 public func bitcoinHashEncode(_ data: Data) throws -> String {
     guard data.count == 32 else {
-        throw BitcoinError("Invalid bitcoin hash.")
+        throw BitcoinError.invalidFormat
     }
     return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
         var bytes: UnsafeMutablePointer<Int8>!
@@ -58,7 +58,7 @@ public func bitcoinHashDecode(_ string: String) throws -> Data {
         var count: Int = 0
         _bitcoinHashDecode(stringBytes, &bytes, &count)
         guard let dataBytes = bytes else {
-            throw BitcoinError("Invalid bitcoin hash format.")
+            throw BitcoinError.invalidFormat
         }
         return receiveData(bytes: dataBytes, count: count)
     }
