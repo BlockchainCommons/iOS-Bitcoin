@@ -15,7 +15,7 @@ class TestHD: XCTestCase {
     func testHDNew() {
         func test(seed: String, version: UInt32, expected: String) throws -> Bool {
             let version: UInt32 = 76066276
-            let seedData = try! seed |> fromHex
+            let seedData = try! seed |> base16Decode
             return try seedData |> hdNew(version: version) == expected
         }
 

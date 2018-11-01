@@ -43,7 +43,7 @@ class TestFormats: XCTestCase {
 
     func testBase32() {
         func test(prefix: String, payload: String, expected: String) throws -> Bool {
-            let payloadData = try payload |> fromHex
+            let payloadData = try payload |> base16Decode
             let encoded = payloadData |> base32Encode(prefix: prefix)
             guard encoded == expected else { return false }
             let (decodedPrefix, decodedPayload) = try encoded |> base32Decode
@@ -59,7 +59,7 @@ class TestFormats: XCTestCase {
         XCTAssert(Character("c").isBase58)
         XCTAssertFalse(Character("?").isBase58)
 
-        let testData = try! "007680adec8eabcabac676be9e83854ade0bd22cdb0bb960de" |> fromHex
+        let testData = try! "007680adec8eabcabac676be9e83854ade0bd22cdb0bb960de" |> base16Decode
         let base58Encoded = "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
         XCTAssert(base58Encoded.isBase58)
         XCTAssertFalse("F00bar".isBase58) // Invalid format
@@ -70,7 +70,7 @@ class TestFormats: XCTestCase {
     }
 
     func testBase58Check() {
-        let testData = try! "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31" |> fromHex
+        let testData = try! "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31" |> base16Decode
         let base58CheckEncoded = "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
         XCTAssert(testData |> base58CheckEncode == base58CheckEncoded)
         XCTAssertNoThrow(try base58CheckEncoded |> base58CheckDecode == (0, testData))

@@ -13,7 +13,7 @@ import WolfStrings
 
 class TestMnemonic: XCTestCase {
     func _test(seed: String, passphrase: String = "", language: Language? = nil, mnemonic: String) throws -> Bool {
-        let seedData = try seed |> fromHex
+        let seedData = try seed |> base16Decode
         if let language = language {
             let encodedMnemonic = try seedData |> mnemonicNew(language: language)
             guard encodedMnemonic == mnemonic else {

@@ -30,4 +30,5 @@ public enum BitcoinError: String, Error {
     case invalidSeed = "Invalid seed"
     case unsupportedLanguage = "Unsupported language"
     case invalidFormat = "Invalid format"
+    case invalidDataSize = "Invalid data size"
 }
