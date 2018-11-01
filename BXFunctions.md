@@ -5,8 +5,8 @@
 ## Wallet Commands
 
 * ✅ ec-new (ecNew, toECPrivateKey)
-* ec-to-address
-* ✅ ec-to-public (toECPublicKey, toECUncompressedPublicKey)
+* ✅ ec-to-address (toECPaymentAddress)
+* ✅ ec-to-public (toECPublicKey)
 * ec-to-wif
 * electrum-new
 * electrum-to-seed
