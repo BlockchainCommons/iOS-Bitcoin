@@ -7,7 +7,7 @@
 * ✅ ec-new (newECPrivateKey, toECPrivateKey)
 * ✅ ec-to-address (toECPaymentAddress)
 * ✅ ec-to-public (toECPublicKey)
-* ec-to-wif
+* ✅ ec-to-wif (toWIF)
 * electrum-new
 * electrum-to-seed
 * ✅ hd-new (newHDPrivateKey)

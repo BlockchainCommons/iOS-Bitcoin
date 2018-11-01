@@ -29,4 +29,10 @@ class TestEC: XCTestCase {
         XCTAssertNoThrow(try "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6" |> base16Decode |> toECPublicKey |> toECPaymentAddress(version: .mainnetP2KH) == "197FLrycah42jKDgfmTaok7b8kNHA7R2ih")
         XCTAssertNoThrow(try "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6" |> base16Decode |> toECPublicKey |> toECPaymentAddress(version: .testnetP2KH) == "modCdv4bPiVHWRhJPLRxdfKuzjxz275cah")
     }
+
+    func testToWIF() {
+        XCTAssertNoThrow(try "8ed1d17dabce1fccbbe5e9bf008b318334e5bcc78eb9e7c1ea850b7eb0ddb9c8" |> base16Decode |> toECPrivateKey |> toWIF == "L21LJEeJwK35wby1BeTjwWssrhrgQE2MZrpTm2zbMC677czAHHu3")
+        XCTAssertNoThrow(try "8ed1d17dabce1fccbbe5e9bf008b318334e5bcc78eb9e7c1ea850b7eb0ddb9c8" |> base16Decode |> toECPrivateKey |> toWIF(version: .mainnet, isCompressed: false) == "5JuBiWpsjfXNxsWuc39KntBAiAiAP2bHtrMGaYGKCppq4MuVcQL")
+        XCTAssertNoThrow(try "0C28FCA386C7A227600B2FE50B7CAE11EC86D3BF1FBE471BE89827E19D72AA1D" |> base16Decode |> toECPrivateKey |> toWIF(version: .mainnet, isCompressed: false) == "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ")
+    }
 }
