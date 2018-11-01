@@ -26,7 +26,7 @@ public enum Language: String, CaseIterable {
     case zh_Hant
 }
 
-public func mnemonicNew(language: Language) -> (_ seed: Data) throws -> String {
+public func newMnemonic(language: Language) -> (_ seed: Data) throws -> String {
     return { seed in
         guard seed.count % mnemonicSeedMultiple == 0 else {
             throw BitcoinError.invalidSeedSize
@@ -46,8 +46,8 @@ public func mnemonicNew(language: Language) -> (_ seed: Data) throws -> String {
     }
 }
 
-public func mnemonicNew(_ seed: Data) throws -> String {
-    return try mnemonicNew(language: .en)(seed)
+public func newMnemonic(_ seed: Data) throws -> String {
+    return try newMnemonic(language: .en)(seed)
 }
 
 public func mnemonicToSeed(passphrase: String = "", language: Language) -> (_ mnemonic: String) throws -> Data {

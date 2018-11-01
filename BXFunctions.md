@@ -4,7 +4,7 @@
 
 ## Wallet Commands
 
-* ✅ ec-new (ecNew, toECPrivateKey)
+* ✅ ec-new (newECPrivateKey, toECPrivateKey)
 * ✅ ec-to-address (toECPaymentAddress)
 * ✅ ec-to-public (toECPublicKey)
 * ec-to-wif
@@ -15,7 +15,7 @@
 * hd-public
 * hd-to-ec
 * hd-to-public
-* ✅ mnemonic-new (mnemonicNew)
+* ✅ mnemonic-new (newMnemonic)
 * ✅ mnemonic-to-seed (mnemonicToSeed)
 * qrcode
 * ✅ seed (seed)

@@ -12,7 +12,7 @@ import WolfStrings
 import WolfNumerics
 
 class TestRandom: XCTestCase {
-    func test1() {
+    func testSeed() {
         var rng = SeededRandomNumberGenerator(seed: 1)
         let data = seed(count: 10, using: &rng)
         XCTAssert(try! data == "610d61f11a62b17cd484" |> base16Decode)

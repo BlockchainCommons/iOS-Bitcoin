@@ -1,5 +1,5 @@
 //
-//  HDNew.swift
+//  HDPrivateKey.swift
 //  Bitcoin
 //
 //  Created by Wolf McNally on 10/30/18.
@@ -11,6 +11,7 @@ public var minimumSeedSize: Int = {
     return _minimumSeedSize()
 }()
 
+/// Create a new HD (BIP32) private key from entropy.
 public func hdNew(version: UInt32) -> (_ seed: Data) throws -> String {
     return { seed in
         guard seed.count >= minimumSeedSize else {
