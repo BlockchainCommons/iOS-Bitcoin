@@ -10,7 +10,7 @@
 * ec-to-wif
 * electrum-new
 * electrum-to-seed
-* ✅ hd-new (hdNew)
+* ✅ hd-new (newHDPrivateKey)
 * hd-private
 * hd-public
 * hd-to-ec

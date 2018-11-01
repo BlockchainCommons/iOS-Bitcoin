@@ -16,7 +16,7 @@ class TestHD: XCTestCase {
         func test(seed: String, version: UInt32, expected: String) throws -> Bool {
             let version: UInt32 = 76066276
             let seedData = try! seed |> base16Decode
-            return try seedData |> hdNew(version: version) == expected
+            return try seedData |> newHDPrivateKey(version: version) == expected
         }
 
         let mainnetVersion: UInt32 = 76066276

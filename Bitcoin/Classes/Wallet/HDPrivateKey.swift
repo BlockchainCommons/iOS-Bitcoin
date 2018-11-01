@@ -12,7 +12,7 @@ public var minimumSeedSize: Int = {
 }()
 
 /// Create a new HD (BIP32) private key from entropy.
-public func hdNew(version: UInt32) -> (_ seed: Data) throws -> String {
+public func newHDPrivateKey(version: UInt32) -> (_ seed: Data) throws -> String {
     return { seed in
         guard seed.count >= minimumSeedSize else {
             throw BitcoinError.seedTooSmall
@@ -20,7 +20,7 @@ public func hdNew(version: UInt32) -> (_ seed: Data) throws -> String {
         var key: UnsafeMutablePointer<Int8>!
         var keyLength: Int = 0
         let success = seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            _hdNew(seedBytes, seed.count, version, &key, &keyLength)
+            _newHDPrivateKey(seedBytes, seed.count, version, &key, &keyLength)
         }
         guard success else {
             throw BitcoinError.invalidSeed
