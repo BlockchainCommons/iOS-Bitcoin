@@ -69,3 +69,16 @@ public func toWIF(version: WIFVersion, isCompressed: Bool = true) -> (_ privateK
 public func toWIF(_ privateKey: ECPrivateKey) throws -> String {
     return try privateKey |> toWIF(version: .mainnet)
 }
+
+/// Convert a WIF private key to an EC private key.
+public func wifToECPrivateKey(_ wif: String) throws -> ECPrivateKey {
+    var privateKeyBytes: UnsafeMutablePointer<UInt8>!
+    var privateKeyLength: Int = 0
+    let success = wif.withCString { wifString in
+        _wifToECPrivateKey(wifString, &privateKeyBytes, &privateKeyLength)
+    }
+    guard success else {
+        throw BitcoinError.invalidFormat
+    }
+    return try ECPrivateKey(receiveData(bytes: privateKeyBytes, count: privateKeyLength))
+}

@@ -21,8 +21,8 @@
 * ✅ seed (seed)
 * uri-decode
 * uri-encode
-* wif-to-ec
-* wif-to-public
+* ✅ wif-to-ec (wifToECPrivateKey)
+* ✅ wif-to-public (wifToECPrivateKey |> toECPublicKey)
 
 ## Key Encryption Commands
 
