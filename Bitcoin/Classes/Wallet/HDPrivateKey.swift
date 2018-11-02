@@ -18,7 +18,7 @@ public func newHDPrivateKey(version: UInt32) -> (_ seed: Data) throws -> String 
             throw BitcoinError.seedTooSmall
         }
         var key: UnsafeMutablePointer<Int8>!
-        var keyLength: Int = 0
+        var keyLength = 0
         let success = seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
             _newHDPrivateKey(seedBytes, seed.count, version, &key, &keyLength)
         }
@@ -26,5 +26,20 @@ public func newHDPrivateKey(version: UInt32) -> (_ seed: Data) throws -> String 
             throw BitcoinError.invalidSeed
         }
         return receiveString(bytes: key, count: keyLength)
+    }
+}
+
+/// Derive a child HD (BIP32) private key from another HD private key.
+public func deriveHDPrivateKey(index: Int, isHardened: Bool) -> (_ privateKey: String) throws -> String {
+    return { privateKey in
+        return try privateKey.withCString { privateKeyString in
+            var childKey: UnsafeMutablePointer<Int8>!
+            var childKeyLength = 0
+            let success = _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)
+            guard success else {
+                throw BitcoinError.invalidFormat
+            }
+            return receiveString(bytes: childKey, count: childKeyLength)
+        }
     }
 }

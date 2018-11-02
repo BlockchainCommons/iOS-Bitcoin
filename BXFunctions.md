@@ -11,9 +11,9 @@
 * electrum-new
 * electrum-to-seed
 * ✅ hd-new (newHDPrivateKey)
-* hd-private
-* hd-public
-* hd-to-ec
+* ✅ hd-private (deriveHDPrivateKey)
+* hd-public (deriveHDPublicKey)
+* hd-to-ec (toECKey)
 * hd-to-public
 * ✅ mnemonic-new (newMnemonic)
 * ✅ mnemonic-to-seed (mnemonicToSeed)
