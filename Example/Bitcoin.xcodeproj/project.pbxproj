@@ -544,10 +544,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 4EB2C27D3619D1CA0346AA96 /* Pods-Bitcoin_Tests.debug.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -566,10 +562,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 51400B6C08379C0E6EC2285F /* Pods-Bitcoin_Tests.release.xcconfig */;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = (
-					"$(SDKROOT)/Developer/Library/Frameworks",
-					"$(inherited)",
-				);
 				INFOPLIST_FILE = Tests/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "org.cocoapods.$(PRODUCT_NAME:rfc1034identifier)";
