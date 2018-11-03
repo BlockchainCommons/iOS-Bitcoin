@@ -24,11 +24,37 @@
 
 import Foundation
 
-public enum BitcoinError: String, Error {
-    case seedTooSmall = "Seed size too small"
-    case invalidSeedSize = "Invalid seed size"
-    case invalidSeed = "Invalid seed"
-    case unsupportedLanguage = "Unsupported language"
-    case invalidFormat = "Invalid format"
-    case invalidDataSize = "Invalid data size"
+public enum BitcoinError: Int, Error, CustomStringConvertible {
+    case invalidFormat = 1
+    case invalidDataSize = 2
+    case seedTooSmall = 3
+    case invalidSeedSize = 4
+    case invalidSeed = 5
+    case unsupportedLanguage = 6
+    case invalidVersion = 7
+    case privateKeyRequired = 8
+    case invalidKey = 9
+
+    public var description: String {
+        switch self {
+        case .seedTooSmall:
+            return "Seed size too small"
+        case .invalidSeedSize:
+            return "Invalid seed size"
+        case .invalidSeed:
+            return "Invalid seed"
+        case .unsupportedLanguage:
+            return "Unsupported language"
+        case .invalidFormat:
+            return "Invalid format"
+        case .invalidDataSize:
+            return "Invalid data size"
+        case .invalidVersion:
+            return "Invalid version"
+        case .privateKeyRequired:
+            return "Private key required"
+        case .invalidKey:
+            return "Invalid key"
+        }
+    }
 }

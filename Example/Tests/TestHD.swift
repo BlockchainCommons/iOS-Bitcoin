@@ -30,38 +30,43 @@ class TestHD: XCTestCase {
     let key14 = "tprv8ceMhknangxznNWYWLbRe6ovqv4rPkrnv61XEwfaoaXwHtPQVT8Rg4PUQaGuuHCEyRC4bAthkWKmmKGML38nCcn7sEZ4v1Cw5Ar6TP63QcC"
 
     func testHDNew() {
-        func test(seed: String, version: UInt32, expected: String) throws -> Bool {
-            let version: UInt32 = 76066276
+        func test(seed: String, version: HDPrivateKeyVersion, expected: String) throws -> Bool {
             let seedData = try! seed |> base16Decode
             return try seedData |> newHDPrivateKey(version: version) == expected
         }
 
-        let mainnetVersion: UInt32 = 76066276
-        let testnetVersion: UInt32 = 70615956
-
-        XCTAssertNoThrow(try test(seed: "000102030405060708090a0b0c0d0e0f", version: mainnetVersion, expected: key1))
-        XCTAssertNoThrow(try test(seed: "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542", version: mainnetVersion, expected: "xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U"))
-        XCTAssertNoThrow(try test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", version: mainnetVersion, expected: "xprv9s21ZrQH143K3bJ7oEuyFtvSpSHmdsmfiPcDXX2RpArAvnuBwcUo8KbeNXLvdbBPgjeFdEpQCAuxLaAP3bJRiiTdw1Kx4chf9zSGp95KBBR"))
-        XCTAssertNoThrow(try test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", version: testnetVersion, expected: "tprv8ZgxMBicQKsPeQXeTomURYYS8ZhysPog3wXLPwStJ9LeiPeGvypYe4y6HhWadxZi4BB2dLSAMXVkoRi8AoeNXmjETeYFiyRi56BhFnkm9uh"))
-        XCTAssertThrowsError(try test(seed: "baadf00dbaadf00d", version: mainnetVersion, expected: "throws")) // short seed
+        XCTAssert(try! test(seed: "000102030405060708090a0b0c0d0e0f", version: .mainnet, expected: key1))
+        XCTAssert(try! test(seed: "fffcf9f6f3f0edeae7e4e1dedbd8d5d2cfccc9c6c3c0bdbab7b4b1aeaba8a5a29f9c999693908d8a8784817e7b7875726f6c696663605d5a5754514e4b484542", version: .mainnet, expected: "xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U"))
+        XCTAssert(try! test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", version: .mainnet, expected: "xprv9s21ZrQH143K3bJ7oEuyFtvSpSHmdsmfiPcDXX2RpArAvnuBwcUo8KbeNXLvdbBPgjeFdEpQCAuxLaAP3bJRiiTdw1Kx4chf9zSGp95KBBR"))
+        XCTAssert(try! test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", version: .testnet, expected: "tprv8ZgxMBicQKsPeQXeTomURYYS8ZhysPog3wXLPwStJ9LeiPeGvypYe4y6HhWadxZi4BB2dLSAMXVkoRi8AoeNXmjETeYFiyRi56BhFnkm9uh"))
+        XCTAssertThrowsError(try test(seed: "baadf00dbaadf00d", version: .mainnet, expected: "throws")) // short seed
     }
 
     func testDeriveHDPrivateKey() {
-        XCTAssertNoThrow(try key1 |> deriveHDPrivateKey(index: 0, isHardened: true) == key2)
-        XCTAssertNoThrow(try key2 |> deriveHDPrivateKey(index: 1, isHardened: false) == key3)
-        XCTAssertNoThrow(try key3 |> deriveHDPrivateKey(index: 2, isHardened: true) == key4)
-        XCTAssertNoThrow(try key4 |> deriveHDPrivateKey(index: 2, isHardened: false) == key5)
-        XCTAssertNoThrow(try key5 |> deriveHDPrivateKey(index: 1000000000, isHardened: false) == key6)
+        XCTAssert(try! key1 |> deriveHDPrivateKey(isHardened: true, index: 0) == key2)
+        XCTAssert(try! key2 |> deriveHDPrivateKey(isHardened: false, index: 1) == key3)
+        XCTAssert(try! key3 |> deriveHDPrivateKey(isHardened: true, index: 2) == key4)
+        XCTAssert(try! key4 |> deriveHDPrivateKey(isHardened: false, index: 2) == key5)
+        XCTAssert(try! key5 |> deriveHDPrivateKey(isHardened: false, index: 1000000000) == key6)
 
-        XCTAssertNoThrow(try key7 |> deriveHDPrivateKey(index: 0, isHardened: false) == key8)
-        XCTAssertNoThrow(try key8 |> deriveHDPrivateKey(index: 2147483647, isHardened: true) == key9)
-        XCTAssertNoThrow(try key9 |> deriveHDPrivateKey(index: 1, isHardened: false) == key10)
-        XCTAssertNoThrow(try key10 |> deriveHDPrivateKey(index: 2147483646, isHardened: true) == key11)
-        XCTAssertNoThrow(try key10 |> deriveHDPrivateKey(index: 2147483646, isHardened: true) == key11)
-        XCTAssertNoThrow(try key11 |> deriveHDPrivateKey(index: 2, isHardened: false) == key12)
+        XCTAssert(try! key7 |> deriveHDPrivateKey(isHardened: false, index: 0) == key8)
+        XCTAssert(try! key8 |> deriveHDPrivateKey(isHardened: true, index: 2147483647) == key9)
+        XCTAssert(try! key9 |> deriveHDPrivateKey(isHardened: false, index: 1) == key10)
+        XCTAssert(try! key10 |> deriveHDPrivateKey(isHardened: true, index: 2147483646) == key11)
+        XCTAssert(try! key10 |> deriveHDPrivateKey(isHardened: true, index: 2147483646) == key11)
+        XCTAssert(try! key11 |> deriveHDPrivateKey(isHardened: false, index: 2) == key12)
 
-        XCTAssertNoThrow(try key13 |> deriveHDPrivateKey(index: 1, isHardened: false) == key14)
+        XCTAssert(try! key13 |> deriveHDPrivateKey(isHardened: false, index: 1) == key14)
 
-        XCTAssertThrowsError(try "foobar" |> deriveHDPrivateKey(index: 1, isHardened: false) == key14) // Bad parent key
+        XCTAssertThrowsError(try "foobar" |> deriveHDPrivateKey(isHardened: false, index: 1) == key14) // Bad parent key
+    }
+
+    func testDeriveHDPublicKey() {
+        XCTAssertThrowsError(try "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8" |> deriveHDPublicKey(isHardened: true, index: 0) == key1)
+        print(try! "xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw" |> deriveHDPublicKey(isHardened: false, index: 1))
+        XCTAssert(try! "xpub68Gmy5EdvgibQVfPdqkBBCHxA5htiqg55crXYuXoQRKfDBFA1WEjWgP6LHhwBZeNK1VTsfTFUHCdrfp1bgwQ9xv5ski8PX9rL2dZXvgGDnw" |> deriveHDPublicKey(isHardened: false, index: 2) == "xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ")
+        XCTAssertThrowsError(try "xpub6ASuArnXKPbfEwhqN6e3mwBcDTgzisQN1wXN9BJcM47sSikHjJf3UFHKkNAWbWMiGj7Wf5uMash7SyYq527Hqck2AxYysAA7xmALppuCkwQ" |> deriveHDPublicKey(isHardened: true, index: 2) == key1)
+        XCTAssert(try! "xpub6D4BDPcP2GT577Vvch3R8wDkScZWzQzMMUm3PWbmWvVJrZwQY4VUNgqFJPMM3No2dFDFGTsxxpG5uJh7n7epu4trkrX7x7DogT5Uv6fcLW5" |> deriveHDPublicKey(isHardened: false, index: 2) == "xpub6FHa3pjLCk84BayeJxFW2SP4XRrFd1JYnxeLeU8EqN3vDfZmbqBqaGJAyiLjTAwm6ZLRQUMv1ZACTj37sR62cfN7fe5JnJ7dh8zL4fiyLHV")
+        XCTAssert(try! "xpub6FHa3pjLCk84BayeJxFW2SP4XRrFd1JYnxeLeU8EqN3vDfZmbqBqaGJAyiLjTAwm6ZLRQUMv1ZACTj37sR62cfN7fe5JnJ7dh8zL4fiyLHV" |> deriveHDPublicKey(isHardened: false, index: 1000000000) == "xpub6H1LXWLaKsWFhvm6RVpEL9P4KfRZSW7abD2ttkWP3SSQvnyA8FSVqNTEcYFgJS2UaFcxupHiYkro49S8yGasTvXEYBVPamhGW6cFJodrTHy")
     }
 }

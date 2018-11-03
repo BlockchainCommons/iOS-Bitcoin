@@ -14,8 +14,8 @@ class TestFormats: XCTestCase {
         let btcString = "10.12345678"
         XCTAssert(satoshis |> encodeBase10 == satoshisString)
         XCTAssert(satoshis |> encodeBase10(decimalPlaces: btcDecimalPlaces) == btcString)
-        XCTAssertNoThrow(try satoshisString |> decodeBase10 == satoshis)
-        XCTAssertNoThrow(try btcString |> decodeBase10(decimalPlaces: btcDecimalPlaces) == satoshis)
+        XCTAssert(try! satoshisString |> decodeBase10 == satoshis)
+        XCTAssert(try! btcString |> decodeBase10(decimalPlaces: btcDecimalPlaces) == satoshis)
         XCTAssertThrowsError(try "Foobar" |> decodeBase10 == satoshis) // Invalid format
         XCTAssertThrowsError(try btcString |> decodeBase10(decimalPlaces: 1) == satoshis) // incorrect decimal place
     }
@@ -25,16 +25,16 @@ class TestFormats: XCTestCase {
         let hexString = "00112233445566778899aabbccddeeff"
 
         XCTAssert(data |> base16Encode == hexString)
-        XCTAssertNoThrow(try hexString |> base16Decode == data)
+        XCTAssert(try! hexString |> base16Decode == data)
         XCTAssertThrowsError(try "0123456789abcdefg" |> base16Decode) // Invalid characters
-        XCTAssertNoThrow(try hexString |> base16Decode |> base16Encode == hexString)
+        XCTAssert(try! hexString |> base16Decode |> base16Encode == hexString)
     }
 
     func testBase16Hash() {
         let hashData = Data(bytes: [0x18, 0x5f, 0x8d, 0xb3, 0x22, 0x71, 0xfe, 0x25, 0xf5, 0x61, 0xa6, 0xfc, 0x93, 0x8b, 0x2e, 0x26, 0x43, 0x06, 0xec, 0x30, 0x4e, 0xda, 0x51, 0x80, 0x07, 0xd1, 0x76, 0x48, 0x26, 0x38, 0x19, 0x69])
         let hashString = "691938264876d1078051da4e30ec0643262e8b93fca661f525fe7122b38d5f18"
-        XCTAssertNoThrow(try hashData |> bitcoinHashEncode == hashString)
-        XCTAssertNoThrow(try hashString |> bitcoinHashDecode == hashData)
+        XCTAssert(try! hashData |> bitcoinHashEncode == hashString)
+        XCTAssert(try! hashString |> bitcoinHashDecode == hashData)
         XCTAssertThrowsError(try Data(bytes: [0x01, 0x02]) |> bitcoinHashEncode == hashString) // Wrong length
         XCTAssertThrowsError(try "" |> bitcoinHashDecode == hashData) // Empty string
         XCTAssertThrowsError(try "010203" |> bitcoinHashDecode == hashData) // Wrong length
@@ -50,9 +50,9 @@ class TestFormats: XCTestCase {
             guard decodedPrefix == prefix, decodedPayload == payloadData else { return false }
             return true
         }
-        XCTAssertNoThrow(try test(prefix: "a", payload: "", expected: "a12uel5l"))
-        XCTAssertNoThrow(try test(prefix: "abcdef", payload: "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", expected: "abcdef1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw"))
-        XCTAssertNoThrow(try test(prefix: "split", payload: "18171918161c01100b1d0819171d130d10171d16191c01100b03191d1b1903031d130b190303190d181d01190303190d", expected: "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w"))
+        XCTAssert(try! test(prefix: "a", payload: "", expected: "a12uel5l"))
+        XCTAssert(try! test(prefix: "abcdef", payload: "000102030405060708090a0b0c0d0e0f101112131415161718191a1b1c1d1e1f", expected: "abcdef1qpzry9x8gf2tvdw0s3jn54khce6mua7lmqqqxw"))
+        XCTAssert(try! test(prefix: "split", payload: "18171918161c01100b1d0819171d130d10171d16191c01100b03191d1b1903031d130b190303190d181d01190303190d", expected: "split1checkupstagehandshakeupstreamerranterredcaperred2y9e3w"))
     }
 
     func testBase58() {
@@ -64,8 +64,8 @@ class TestFormats: XCTestCase {
         XCTAssert(base58Encoded.isBase58)
         XCTAssertFalse("F00bar".isBase58) // Invalid format
         XCTAssert(testData |> base58Encode == base58Encoded)
-        XCTAssertNoThrow(try base58Encoded |> base58Decode == testData)
-        XCTAssertNoThrow(try "" |> base58Decode |> fromUTF8 == "") // Empty string
+        XCTAssert(try! base58Encoded |> base58Decode == testData)
+        XCTAssert(try! "" |> base58Decode |> fromUTF8 == "") // Empty string
         XCTAssertThrowsError(try "1BoatSLRHtKNngkdXEeobR76b53LETtpy!" |> base58Decode == testData) // Invalid character
     }
 
@@ -73,7 +73,7 @@ class TestFormats: XCTestCase {
         let testData = try! "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31" |> base16Decode
         let base58CheckEncoded = "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
         XCTAssert(testData |> base58CheckEncode == base58CheckEncoded)
-        XCTAssertNoThrow(try base58CheckEncoded |> base58CheckDecode == (0, testData))
+        XCTAssert(try! base58CheckEncoded |> base58CheckDecode == (0, testData))
         XCTAssertThrowsError(try "" |> base58CheckDecode == (0, testData)) // Empty string
     }
 
@@ -81,8 +81,8 @@ class TestFormats: XCTestCase {
         let testString = "Foobar"
         let base64Encoded = "Rm9vYmFy"
         XCTAssert(testString |> toUTF8 |> Bitcoin.base64Encode == base64Encoded)
-        XCTAssertNoThrow(try base64Encoded |> base64Decode |> fromUTF8 == testString)
-        XCTAssertNoThrow(try "" |> base64Decode |> fromUTF8 == "") // Empty string
+        XCTAssert(try! base64Encoded |> base64Decode |> fromUTF8 == testString)
+        XCTAssert(try! "" |> base64Decode |> fromUTF8 == "") // Empty string
         XCTAssertThrowsError(try "Rm9vYmFy0" |> base64Decode |> fromUTF8 == testString) // Invalid character
     }
 
@@ -90,8 +90,8 @@ class TestFormats: XCTestCase {
         let testString = "Hello World!"
         let base85Encoded = "SGVsbG8gV29ybGQh"
         XCTAssert(testString |> toUTF8 |> Bitcoin.base85Encode == base85Encoded)
-        XCTAssertNoThrow(try base85Encoded |> base85Decode |> fromUTF8 == testString)
-        XCTAssertNoThrow(try "" |> base85Decode |> fromUTF8 == "") // Empty string
+        XCTAssert(try! base85Encoded |> base85Decode |> fromUTF8 == testString)
+        XCTAssert(try! "" |> base85Decode |> fromUTF8 == "") // Empty string
         XCTAssertThrowsError(try "SGVsbG8gV29ybGQ'" |> base85Decode |> fromUTF8 == testString) // Invalid character
     }
 }

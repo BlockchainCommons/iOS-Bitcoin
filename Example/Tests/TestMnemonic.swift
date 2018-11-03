@@ -12,44 +12,42 @@ import WolfPipe
 import WolfStrings
 
 class TestMnemonic: XCTestCase {
-    func _test(seed: String, passphrase: String = "", language: Language? = nil, mnemonic: String) throws -> Bool {
-        let seedData = try seed |> base16Decode
-        if let language = language {
-            let encodedMnemonic = try seedData |> newMnemonic(language: language)
-            guard encodedMnemonic == mnemonic else {
-                return false
-            }
-        } else {
-            guard try seedData |> newMnemonic == mnemonic else {
-                return false
-            }
+    func testNewMnemonic() {
+        func test(_ seed: String, _ language: Language, _ mnemonic: String) -> Bool {
+            return try! seed |> base16Decode |> newMnemonic(language: language) == mnemonic
         }
-        let decodedSeedData = try mnemonic |> mnemonicToSeed(passphrase: passphrase)
-        guard decodedSeedData == seedData else {
-            return false
-        }
-        return true
+
+        XCTAssert(test("baadf00dbaadf00d", .en, "rival hurdle address inspire tenant alone"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .en, "rival hurdle address inspire tenant almost turkey safe asset step lab boy"))
+        XCTAssertThrowsError(try "baadf00dbaadf00dbaadf00dbaadf00dff" |> base16Decode |> newMnemonic(language: .en) == "won't happen") // Invalid seed size
+        XCTAssert(test("7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f", .en, "legal winner thank year wave sausage worth useful legal winner thank yellow"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .es, "previo humilde actuar jarabe tabique ahorro tope pulpo anís señal lavar bahía"))
+
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .fr, "placard garantir acerbe gratuit soluble affaire théorie ponctuel anguleux salon horrible bateau"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .it, "rizoma lastra affabile lucidato sultano algebra tramonto rupe annuncio sonda mega bavosa"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .ja, "ねんかん すずしい あひる せたけ ほとんど あんまり めいあん のべる いなか ふとる ぜんりゃく えいせい"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .cs, "semeno mudrc babka nasekat uvolnit bazuka vydra skanzen broskev trefit nuget datel"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .ru, "ремарка кривой айсберг лауреат тротуар амнезия фонтан рояль бакалея сухой магазин бунт"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .uk, "сержант ледачий актив люкс фах арена цемент слон бесіда тротуар мандри верба"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .zh_Hans, "博 肉 地 危 惜 多 陪 荒 因 患 伊 基"))
+        XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .zh_Hant, "博 肉 地 危 惜 多 陪 荒 因 患 伊 基"))
     }
 
-    func testMnemonic() {
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00d", language: .en, mnemonic: "rival hurdle address inspire tenant alone"))
-        XCTAssertThrowsError(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00dff", language: .en, mnemonic: "rival hurdle address inspire tenant alone")) // Invalid seed size
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .en, mnemonic: "rival hurdle address inspire tenant almost turkey safe asset step lab boy"))
-        XCTAssertNoThrow(try _test(seed: "7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f", language: .en, mnemonic: "legal winner thank year wave sausage worth useful legal winner thank yellow"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .es, mnemonic: "previo humilde actuar jarabe tabique ahorro tope pulpo anís señal lavar bahía"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .fr, mnemonic: "placard garantir acerbe gratuit soluble affaire théorie ponctuel anguleux salon horrible bateau"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .it, mnemonic: "rizoma lastra affabile lucidato sultano algebra tramonto rupe annuncio sonda mega bavosa"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .ja, mnemonic: "ねんかん すずしい あひる せたけ ほとんど あんまり めいあん のべる いなか ふとる ぜんりゃく えいせい"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .cs, mnemonic: "semeno mudrc babka nasekat uvolnit bazuka vydra skanzen broskev trefit nuget datel"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .ru, mnemonic: "ремарка кривой айсберг лауреат тротуар амнезия фонтан рояль бакалея сухой магазин бунт"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .uk, mnemonic: "сержант ледачий актив люкс фах арена цемент слон бесіда тротуар мандри верба"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .zh_Hans, mnemonic: "博 肉 地 危 惜 多 陪 荒 因 患 伊 基"))
-        XCTAssertNoThrow(try _test(seed: "baadf00dbaadf00dbaadf00dbaadf00d", language: .zh_Hant, mnemonic: "博 肉 地 危 惜 多 陪 荒 因 患 伊 基"))
+    func testMnemonicToSeed() {
+        func test(_ mnemonic: String, seed: String) -> Bool {
+            return try! mnemonic |> mnemonicToSeed |> base16Encode == seed
+        }
+
+        XCTAssert(test("rival hurdle address inspire tenant alone", seed: "33498afc5ef71e87afd7cad1e50a9d9adb9e30d3ca4b1da5dc370d266aa7796cbc1854eebce5ab3fd3b02b6625e2a82868dbb693e988e47d74106f04c76a6263"))
     }
 
-    func testMnemonicWithPassphrase() {
-        XCTAssertNoThrow(try _test(seed: "2e8905819b8723fe2c1d161860e5ee1830318dbf49a83bd451cfb8440c28bd6fa457fe1296106559a3c80937a1c1069be3a3a5bd381ee6260e8d9739fce1f607", passphrase: "TREZOR", mnemonic: "legal winner thank year wave sausage worth useful legal winner thank yellow"))
-        XCTAssertNoThrow(try _test(seed: "3e52585ea1275472a82fa0dcd84121e742140f64a302eca7c390832ba428c707a7ebf449267ae592c51f1740259226e31520de39fd8f33e08788fd21221c6f4e", passphrase: "博 肉 地 危 惜 多 陪 荒 因 患 伊 基", mnemonic: "legal winner thank year wave sausage worth useful legal winner thank yellow"))
-        XCTAssertNoThrow(try _test(seed: "e72505021b97e15171fe09e996898888579c4196c445d7629762c5b09586e3fb3d68380120b8d8a6ed6f9a73306dab7bf54127f3a610ede2a2d5b4e59916ac73", passphrase: "博 肉 地 危 惜 多 陪 荒 因 患 伊 基", mnemonic: "previo humilde actuar jarabe tabique ahorro tope pulpo anís señal lavar bahía"))
+    func testMnemonicToSeedWithPassphrase() {
+        func test(_ mnemonic: String, passphrase: String, seed: String) -> Bool {
+            return try! mnemonic |> mnemonicToSeedWithPassphrase(passphrase) |> base16Encode == seed
+        }
+
+        XCTAssert(test("legal winner thank year wave sausage worth useful legal winner thank yellow", passphrase: "TREZOR", seed: "2e8905819b8723fe2c1d161860e5ee1830318dbf49a83bd451cfb8440c28bd6fa457fe1296106559a3c80937a1c1069be3a3a5bd381ee6260e8d9739fce1f607"))
+        XCTAssert(test("legal winner thank year wave sausage worth useful legal winner thank yellow", passphrase: "博 肉 地 危 惜 多 陪 荒 因 患 伊 基", seed: "3e52585ea1275472a82fa0dcd84121e742140f64a302eca7c390832ba428c707a7ebf449267ae592c51f1740259226e31520de39fd8f33e08788fd21221c6f4e"))
+        XCTAssert(test("previo humilde actuar jarabe tabique ahorro tope pulpo anís señal lavar bahía", passphrase: "博 肉 地 危 惜 多 陪 荒 因 患 伊 基", seed: "e72505021b97e15171fe09e996898888579c4196c445d7629762c5b09586e3fb3d68380120b8d8a6ed6f9a73306dab7bf54127f3a610ede2a2d5b4e59916ac73"))
     }
 }
