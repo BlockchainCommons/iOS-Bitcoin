@@ -30,12 +30,11 @@ public func base32Decode(_ string: String) throws -> (prefix: String, payload: D
         var prefixCount: Int = 0
         var payloadBytes: UnsafeMutablePointer<UInt8>!
         var payloadCount: Int = 0
-        _base32Decode(stringBytes, &prefixBytes, &prefixCount, &payloadBytes, &payloadCount)
-        guard let dataBytes = payloadBytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _base32Decode(stringBytes, &prefixBytes, &prefixCount, &payloadBytes, &payloadCount)) {
+            throw error
         }
         let prefix = receiveString(bytes: prefixBytes, count: prefixCount)
-        let payload = receiveData(bytes: dataBytes, count: payloadCount)
+        let payload = receiveData(bytes: payloadBytes, count: payloadCount)
         return (prefix, payload)
     }
 }

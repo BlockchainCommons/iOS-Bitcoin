@@ -22,13 +22,12 @@ public func base16Encode(_ data: Data) -> String {
 /// Throws if the string is not valid base16.
 public func base16Decode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>?
+        var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _base16Decode(stringBytes, &bytes, &count)
-        guard let dataBytes = bytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _base16Decode(stringBytes, &bytes, &count)) {
+            throw error
         }
-        return receiveData(bytes: dataBytes, count: count)
+        return receiveData(bytes: bytes, count: count)
     }
 }
 
@@ -54,12 +53,11 @@ public func bitcoinHashEncode(_ data: Data) throws -> String {
 /// Throws if the string is not valid base16.
 public func bitcoinHashDecode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>?
+        var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _bitcoinHashDecode(stringBytes, &bytes, &count)
-        guard let dataBytes = bytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _bitcoinHashDecode(stringBytes, &bytes, &count)) {
+            throw error
         }
-        return receiveData(bytes: dataBytes, count: count)
+        return receiveData(bytes: bytes, count: count)
     }
 }

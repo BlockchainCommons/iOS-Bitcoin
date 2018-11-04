@@ -39,13 +39,12 @@ public func base58Encode(_ data: Data) -> String {
 /// Throws if the string is not valid base58.
 public func base58Decode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>?
+        var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _base58Decode(stringBytes, &bytes, &count)
-        guard let dataBytes = bytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _base58Decode(stringBytes, &bytes, &count)) {
+            throw error
         }
-        return receiveData(bytes: dataBytes, count: count)
+        return receiveData(bytes: bytes, count: count)
     }
 }
 
@@ -67,14 +66,13 @@ public func base58CheckEncode(_ data: Data) -> String {
 
 public func base58CheckDecode(_ string: String) throws -> (version: UInt8, payload: Data) {
     return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>?
+        var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         var version: UInt8 = 0
-        _base58CheckDecode(stringBytes, &bytes, &count, &version)
-        guard let dataBytes = bytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _base58CheckDecode(stringBytes, &bytes, &count, &version)) {
+            throw error
         }
-        let data = receiveData(bytes: dataBytes, count: count)
+        let data = receiveData(bytes: bytes, count: count)
         return (version, data)
     }
 }

@@ -22,12 +22,11 @@ public func base85Encode(_ data: Data) -> String {
 /// Throws if the string is not valid base85.
 public func base85Decode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>?
+        var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _base85Decode(stringBytes, &bytes, &count)
-        guard let dataBytes = bytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _base85Decode(stringBytes, &bytes, &count)) {
+            throw error
         }
-        return receiveData(bytes: dataBytes, count: count)
+        return receiveData(bytes: bytes, count: count)
     }
 }

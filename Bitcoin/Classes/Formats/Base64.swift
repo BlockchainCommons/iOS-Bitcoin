@@ -22,12 +22,11 @@ public func base64Encode(_ data: Data) -> String {
 /// Throws if the string is not valid base64.
 public func base64Decode(_ string: String) throws -> Data {
     return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>?
+        var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _base64Decode(stringBytes, &bytes, &count)
-        guard let dataBytes = bytes else {
-            throw BitcoinError.invalidFormat
+        if let error = BitcoinError(rawValue: _base64Decode(stringBytes, &bytes, &count)) {
+            throw error
         }
-        return receiveData(bytes: dataBytes, count: count)
+        return receiveData(bytes: bytes, count: count)
     }
 }
