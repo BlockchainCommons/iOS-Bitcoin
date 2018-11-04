@@ -37,11 +37,10 @@ public func newMnemonic(language: Language) -> (_ seed: Data) throws -> String {
         }
         var mnemonic: UnsafeMutablePointer<Int8>!
         var mnemonicLength: Int = 0
-        let success = seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            _mnemonicNew(seedBytes, seed.count, dictionary, &mnemonic, &mnemonicLength)
-        }
-        guard success else {
-            throw BitcoinError.invalidSeed
+        try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
+            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes, seed.count, dictionary, &mnemonic, &mnemonicLength)) {
+                throw error
+            }
         }
         return receiveString(bytes: mnemonic, count: mnemonicLength)
     }
@@ -60,13 +59,12 @@ public func mnemonicToSeed(_ language: Language, passphrase: String? = nil) -> (
         }
         var seed: UnsafeMutablePointer<UInt8>!
         var seedLength: Int = 0
-        let success = normalizedMnemonic.withCString { mnemonicCStr in
-            normalizedPassphrase.withCString { passphraseCStr in
-                _mnemonicToSeed(mnemonicCStr, dictionary, passphraseCStr, &seed, &seedLength)
+        try normalizedMnemonic.withCString { mnemonicCStr in
+            try normalizedPassphrase.withCString { passphraseCStr in
+                if let error = BitcoinError(rawValue: _mnemonicToSeed(mnemonicCStr, dictionary, passphraseCStr, &seed, &seedLength)) {
+                    throw error
+                }
             }
-        }
-        guard success else {
-            throw BitcoinError.invalidFormat
         }
         return receiveData(bytes: seed, count: seedLength)
     }

@@ -60,8 +60,8 @@ public func toECPublicKey(isCompressed: Bool) -> (_ privateKey: ECPrivateKey) th
         return try privateKey.data.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
             var publicKeyBytes: UnsafeMutablePointer<UInt8>!
             var publicKeyLength: Int = 0
-            guard _toECPublicKey(privateKeyBytes, privateKey.data.count, isCompressed, &publicKeyBytes, &publicKeyLength) else {
-                throw BitcoinError.invalidFormat
+            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes, privateKey.data.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
+                throw error
             }
             let data = receiveData(bytes: publicKeyBytes, count: publicKeyLength)
             if isCompressed {
@@ -93,8 +93,8 @@ public func toECPaymentAddress(version: ECPaymentAddressVersion) -> (_ publicKey
         return try publicKey.data.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
             var addressBytes: UnsafeMutablePointer<Int8>!
             var addressLength: Int = 0
-            guard _toECPaymentAddress(publicKeyBytes, publicKey.data.count, version.rawValue, &addressBytes, &addressLength) else {
-                throw BitcoinError.invalidFormat
+            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey.data.count, version.rawValue, &addressBytes, &addressLength)) {
+                throw error
             }
             return receiveString(bytes: addressBytes, count: addressLength)
         }

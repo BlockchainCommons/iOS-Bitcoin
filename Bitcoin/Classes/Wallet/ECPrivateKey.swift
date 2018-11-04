@@ -36,11 +36,10 @@ public func newECPrivateKey(_ seed: Data) throws -> ECPrivateKey {
     }
     var privateKeyBytes: UnsafeMutablePointer<UInt8>!
     var privateKeyLength: Int = 0
-    let success = seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-        _ecNewPrivateKey(seedBytes, seed.count, &privateKeyBytes, &privateKeyLength)
-    }
-    guard success else {
-        throw BitcoinError.invalidSeed
+    try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
+        if let error = BitcoinError(rawValue: _ecNewPrivateKey(seedBytes, seed.count, &privateKeyBytes, &privateKeyLength)) {
+            throw error
+        }
     }
     return try ECPrivateKey(receiveData(bytes: privateKeyBytes, count: privateKeyLength))
 }
@@ -55,11 +54,10 @@ public func toWIF(version: WIFVersion, isCompressed: Bool = true) -> (_ privateK
     return { privateKey in
         var wifBytes: UnsafeMutablePointer<Int8>!
         var wifLength: Int = 0
-        let success = privateKey.data.withUnsafeBytes { privateKeyBytes in
-            _ecPrivateKeyToWIF(privateKeyBytes, privateKey.data.count, version.rawValue, isCompressed, &wifBytes, &wifLength)
-        }
-        guard success else {
-            throw BitcoinError.invalidFormat
+        try privateKey.data.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+            if let error = BitcoinError(rawValue: _ecPrivateKeyToWIF(privateKeyBytes, privateKey.data.count, version.rawValue, isCompressed, &wifBytes, &wifLength)) {
+                throw error
+            }
         }
         return receiveString(bytes: wifBytes, count: wifLength)
     }
@@ -74,11 +72,10 @@ public func toWIF(_ privateKey: ECPrivateKey) throws -> String {
 public func wifToECPrivateKey(_ wif: String) throws -> ECPrivateKey {
     var privateKeyBytes: UnsafeMutablePointer<UInt8>!
     var privateKeyLength: Int = 0
-    let success = wif.withCString { wifString in
-        _wifToECPrivateKey(wifString, &privateKeyBytes, &privateKeyLength)
-    }
-    guard success else {
-        throw BitcoinError.invalidFormat
+    try wif.withCString { wifString in
+        if let error = BitcoinError(rawValue: _wifToECPrivateKey(wifString, &privateKeyBytes, &privateKeyLength)) {
+            throw error
+        }
     }
     return try ECPrivateKey(receiveData(bytes: privateKeyBytes, count: privateKeyLength))
 }

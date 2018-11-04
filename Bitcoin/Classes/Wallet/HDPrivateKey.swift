@@ -48,16 +48,12 @@ public enum HDKeyVersion {
 /// Create a new HD (BIP32) private key from entropy.
 public func newHDPrivateKey(version: HDKeyVersion) -> (_ seed: Data) throws -> String {
     return { seed in
-        guard seed.count >= minimumSeedSize else {
-            throw BitcoinError.seedTooSmall
-        }
         var key: UnsafeMutablePointer<Int8>!
         var keyLength = 0
-        let success = seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            _newHDPrivateKey(seedBytes, seed.count, version.privateVersion, &key, &keyLength)
-        }
-        guard success else {
-            throw BitcoinError.invalidSeed
+        try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
+            if let error = BitcoinError(rawValue: _newHDPrivateKey(seedBytes, seed.count, version.privateVersion, &key, &keyLength)) {
+                throw error
+            }
         }
         return receiveString(bytes: key, count: keyLength)
     }
@@ -69,9 +65,8 @@ public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: S
         return try privateKey.withCString { privateKeyString in
             var childKey: UnsafeMutablePointer<Int8>!
             var childKeyLength = 0
-            let success = _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)
-            guard success else {
-                throw BitcoinError.invalidFormat
+            if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)) {
+                throw error
             }
             return receiveString(bytes: childKey, count: childKeyLength)
         }
