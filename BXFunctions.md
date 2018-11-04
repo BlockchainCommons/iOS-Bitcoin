@@ -14,7 +14,7 @@
 * ✅ hd-private (deriveHDPrivateKey)
 * ✅ hd-public (deriveHDPublicKey)
 * hd-to-ec (toECKey)
-* hd-to-public
+* ✅ hd-to-public (toHDPublicKey)
 * ✅ mnemonic-new (newMnemonic)
 * ✅ mnemonic-to-seed (mnemonicToSeed)
 * qrcode

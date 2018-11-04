@@ -13,7 +13,7 @@ import WolfStrings
 
 class TestHD: XCTestCase {
     func testHDNew() {
-        func test(seed: String, version: HDPrivateKeyVersion, expected: String) throws -> Bool {
+        func test(seed: String, version: HDKeyVersion, expected: String) throws -> Bool {
             let seedData = try! seed |> base16Decode
             return try seedData |> newHDPrivateKey(version: version) == expected
         }
@@ -140,8 +140,16 @@ class TestHD: XCTestCase {
     }
 
     func testDeriveHDPublicKeyTestnet() {
-        XCTAssert(try! "tprv8ZgxMBicQKsPeQXeTomURYYS8ZhysPog3wXLPwStJ9LeiPeGvypYe4y6HhWadxZi4BB2dLSAMXVkoRi8AoeNXmjETeYFiyRi56BhFnkm9uh" |> deriveHDPublicKey(isHardened: false, index: 1, publicVersion: .testnet, privateVersion: .testnet) == "tpubD9LPrAppw4effqYLPzG23WU3QwanZ63hVPcJXThtDrLL8NeB7qx1rZ1Lage8GLtHHjiJMNFhMS1pL6xBiM2MwpmBpZbDLXZxfUFEg9Fvh4t")
+        XCTAssert(try! "tprv8ZgxMBicQKsPeQXeTomURYYS8ZhysPog3wXLPwStJ9LeiPeGvypYe4y6HhWadxZi4BB2dLSAMXVkoRi8AoeNXmjETeYFiyRi56BhFnkm9uh" |> deriveHDPublicKey(isHardened: false, index: 1, version: .testnet) == "tpubD9LPrAppw4effqYLPzG23WU3QwanZ63hVPcJXThtDrLL8NeB7qx1rZ1Lage8GLtHHjiJMNFhMS1pL6xBiM2MwpmBpZbDLXZxfUFEg9Fvh4t")
 
-        XCTAssert(try! "tpubD9LPrAppw4effqYLPzG23WU3QwanZ63hVPcJXThtDrLL8NeB7qx1rZ1Lage8GLtHHjiJMNFhMS1pL6xBiM2MwpmBpZbDLXZxfUFEg9Fvh4t" |> deriveHDPublicKey(isHardened: false, index: 1, publicVersion: .testnet, privateVersion: .testnet) == "tpubDBUXE2QrFFQBfPLxoKD3U1zG294LmLSG3rD9MvREmKcExYBeH4U1gyHcrtZDZe6JFxMFYVzYYhRDWCuJAQE3AbdpD3Qz4FdPVu5UHLT1NKa")
+        XCTAssert(try! "tpubD9LPrAppw4effqYLPzG23WU3QwanZ63hVPcJXThtDrLL8NeB7qx1rZ1Lage8GLtHHjiJMNFhMS1pL6xBiM2MwpmBpZbDLXZxfUFEg9Fvh4t" |> deriveHDPublicKey(isHardened: false, index: 1, version: .testnet) == "tpubDBUXE2QrFFQBfPLxoKD3U1zG294LmLSG3rD9MvREmKcExYBeH4U1gyHcrtZDZe6JFxMFYVzYYhRDWCuJAQE3AbdpD3Qz4FdPVu5UHLT1NKa")
+    }
+
+    func testToHDPublicKey() {
+        XCTAssert(try! "xprv9s21ZrQH143K3QTDL4LXw2F7HEK3wJUD2nW2nRk4stbPy6cq3jPPqjiChkVvvNKmPGJxWUtg6LnF5kejMRNNU3TGtRBeJgk33yuGBxrMPHi" |> toHDPublicKey == "xpub661MyMwAqRbcFtXgS5sYJABqqG9YLmC4Q1Rdap9gSE8NqtwybGhePY2gZ29ESFjqJoCu1Rupje8YtGqsefD265TMg7usUDFdp6W1EGMcet8")
+
+        XCTAssert(try! "xprv9s21ZrQH143K31xYSDQpPDxsXRTUcvj2iNHm5NUtrGiGG5e2DtALGdso3pGz6ssrdK4PFmM8NSpSBHNqPqm55Qn3LqFtT2emdEXVYsCzC2U" |> toHDPublicKey == "xpub661MyMwAqRbcFW31YEwpkMuc5THy2PSt5bDMsktWQcFF8syAmRUapSCGu8ED9W6oDMSgv6Zz8idoc4a6mr8BDzTJY47LJhkJ8UB7WEGuduB")
+
+        XCTAssert(try! "tprv8ZgxMBicQKsPeQXeTomURYYS8ZhysPog3wXLPwStJ9LeiPeGvypYe4y6HhWadxZi4BB2dLSAMXVkoRi8AoeNXmjETeYFiyRi56BhFnkm9uh" |> toHDPublicKey(version: .testnet) == "tpubD6NzVbkrYhZ4XsZSMTS4pxCYhbDv2izadF87gTVBiR93Ysu3ZNe8pZaxTout4ifQXCUfp2wAChtcHNrbVka3KzfXNRM7gv9pwM57SB7AMFx")
     }
 }
