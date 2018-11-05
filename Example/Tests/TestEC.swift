@@ -64,4 +64,13 @@ class TestEC: XCTestCase {
         XCTAssert("Nakomoto" |> toUTF8 |> messageSign(wif: "KwE19y2Ud8EUEBjeUG4Uc4qWUJUUoZJxHR3xUfTpCSsJEDv2o8fu") == "HxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4=")
         XCTAssert("Nakomoto" |> toUTF8 |> messageSign(wif: "5HpMRgt5u8yyU1AfPwcgLGphD5Qu4ka4v7McE4jKrGNpQPyRqXC") == "GxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4=")
     }
+
+    func testMessageValidate() {
+        // Compressed
+        XCTAssert("Nakomoto" |> toUTF8 |> messageValidate(paymentAddress: "1PeChFbhxDD9NLbU21DfD55aQBC4ZTR3tE", signature: "HxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4="))
+        // Uncompressed
+        XCTAssert("Nakomoto" |> toUTF8 |> messageValidate(paymentAddress: "1Em1SX7qQq1pTmByqLRafhL1ypx2V786tP", signature: "GxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4="))
+        // Compressed-invalid
+        XCTAssertFalse("Satoshi" |> toUTF8 |> messageValidate(paymentAddress: "1PeChFbhxDD9NLbU21DfD55aQBC4ZTR3tE", signature: "HxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4="))
+    }
 }

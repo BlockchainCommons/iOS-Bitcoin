@@ -47,7 +47,7 @@
 ## Messaging Commands
 
 * ✅ message-sign (messageSign)
-* message-validate
+* ✅ message-validate (messageValidate)
 
 ## Transaction Commands
 

@@ -20,6 +20,7 @@
 
 import CBitcoin
 
+/// Create a message signature.
 public func messageSign(wif: String) -> (_ message: Data) -> String {
     return { message in
         wif.withCString { (wifString: UnsafePointer<Int8>) in
@@ -28,6 +29,19 @@ public func messageSign(wif: String) -> (_ message: Data) -> String {
                 var signatureLength = 0
                 _messageSign(messageBytes, message.count, wifString, &signatureBytes, &signatureLength)
                 return receiveString(bytes: signatureBytes, count: signatureLength)
+            }
+        }
+    }
+}
+
+/// Validate a message signature.
+public func messageValidate(paymentAddress: String, signature: String) -> (_ message: Data) -> Bool {
+    return { message in
+        paymentAddress.withCString { (paymentAddressString: UnsafePointer<Int8>) in
+            signature.withCString { (signatureString: UnsafePointer<Int8>) in
+                message.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
+                    _messageValidate(paymentAddressString, signatureString, messageBytes, message.count)
+                }
             }
         }
     }
