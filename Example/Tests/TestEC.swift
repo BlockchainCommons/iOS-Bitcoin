@@ -59,4 +59,9 @@ class TestEC: XCTestCase {
         XCTAssert(try! "5JuBiWpsjfXNxsWuc39KntBAiAiAP2bHtrMGaYGKCppq4MuVcQL" |> wifToECPrivateKey |> toECPublicKey(isCompressed: false) |> base16Encode == "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6")
         XCTAssert(try! "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ" |> wifToECPrivateKey |> toECPublicKey(isCompressed: false) |> base16Encode == "04d0de0aaeaefad02b8bdc8a01a1b8b11c696bd3d66a2c5f10780d95b7df42645cd85228a6fb29940e858e7e55842ae2bd115d1ed7cc0e82d934e929c97648cb0a")
     }
+
+    func testMessageSign() {
+        XCTAssert("Nakomoto" |> toUTF8 |> messageSign(wif: "KwE19y2Ud8EUEBjeUG4Uc4qWUJUUoZJxHR3xUfTpCSsJEDv2o8fu") == "HxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4=")
+        XCTAssert("Nakomoto" |> toUTF8 |> messageSign(wif: "5HpMRgt5u8yyU1AfPwcgLGphD5Qu4ka4v7McE4jKrGNpQPyRqXC") == "GxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4=")
+    }
 }
