@@ -86,7 +86,7 @@
 ## Encoding Commands
 
 * ✅ address-encode (addressEncode)
-* address-decode (addressDecode)
+* ✅ address-decode (addressDecode)
 * address-embed
 * ✅ (bitcoinHashEncode)
 * ✅ (bitcoinHashDecode)

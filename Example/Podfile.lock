@@ -33,8 +33,8 @@ EXTERNAL SOURCES:
     :path: "../../WolfNumerics"
 
 SPEC CHECKSUMS:
-  Bitcoin: 46bf2cb54c1dd48174462b50c348791f44bc5211
-  CBitcoin: a5ea3cb3c08dd4af1c02d8bab9f53bdb2c22055d
+  Bitcoin: 5038268d0cf25ed065f67ffed707421bac058333
+  CBitcoin: ccbf4730afa2d742ce61422e44c7c8c37a7a3997
   ExtensibleEnumeratedName: c6caeb662f79105e7229a613f9043e8a7e15e642
   WolfNumerics: bae55621165b9992c59e614959b9eea4f48142fd
   WolfPipe: 7ac686d6e3d4e960323c864c9e57a667cda7126c

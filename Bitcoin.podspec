@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
 
     s.source_files = 'Bitcoin/Classes/**/*'
 
-    s.ios.deployment_target = '9.3'
+    s.ios.deployment_target = '11.0'
     s.macos.deployment_target = '10.13'
     s.tvos.deployment_target = '11.0'
 
