@@ -24,7 +24,7 @@ import WolfPipe
 public let ecCompressedPublicKeySize: Int = { return _ecCompressedPublicKeySize() }()
 public let ecUncompressedPublicKeySize: Int = { return _ecUncompressedPublicKeySize() }()
 
-public class ECPublicKey {
+public class ECPublicKey: ECKey {
     public let data: Data
 
     init(data: Data) {
@@ -59,10 +59,6 @@ public func toECPublicKey(_ data: Data) throws -> ECPublicKey {
     default:
         throw BitcoinError.invalidFormat
     }
-}
-
-public func base16Encode(_ publicKey: ECPublicKey) -> String {
-    return publicKey.data |> base16Encode
 }
 
 /// Derive the EC public key of an EC private key.

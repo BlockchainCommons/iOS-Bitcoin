@@ -13,7 +13,7 @@
 * ✅ hd-new (newHDPrivateKey)
 * ✅ hd-private (deriveHDPrivateKey)
 * ✅ hd-public (deriveHDPublicKey)
-* hd-to-ec (toECKey)
+* ✅ hd-to-ec (toECKey)
 * ✅ hd-to-public (toHDPublicKey)
 * ✅ mnemonic-new (newMnemonic)
 * ✅ mnemonic-to-seed (mnemonicToSeed)

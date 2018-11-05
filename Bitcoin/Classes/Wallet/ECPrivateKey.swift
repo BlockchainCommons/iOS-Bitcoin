@@ -23,7 +23,7 @@ import WolfPipe
 
 public let ecPrivateKeySize: Int = { return _ecPrivateKeySize() }()
 
-public struct ECPrivateKey {
+public struct ECPrivateKey: ECKey {
     public let data: Data
 
     public init(_ data: Data) throws {
@@ -36,10 +36,6 @@ public struct ECPrivateKey {
 
 public func toECPrivateKey(_ data: Data) throws -> ECPrivateKey {
     return try ECPrivateKey(data)
-}
-
-public func base16Encode(_ privateKey: ECPrivateKey) -> String {
-    return privateKey.data |> base16Encode
 }
 
 /// Create a new EC private key from entropy.

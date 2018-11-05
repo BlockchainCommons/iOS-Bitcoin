@@ -118,3 +118,29 @@ public func toHDPublicKey(version: HDKeyVersion) -> (_ privateKey: String) throw
 public func toHDPublicKey(_ privateKey: String) throws -> String {
     return try privateKey |> toHDPublicKey(version: .mainnet)
 }
+
+/// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
+public func toECKey(version: HDKeyVersion) -> (_ hdKey: String) throws -> ECKey {
+    return { hdKey in
+        try hdKey.withCString { hdKeyString in
+            var ecKey: UnsafeMutablePointer<UInt8>!
+            var ecKeyLength = 0
+            var isPrivate = false
+            if let error = BitcoinError(rawValue: _toECKey(hdKeyString, version.publicVersion, version.privateVersion, &isPrivate, &ecKey, &ecKeyLength)) {
+                throw error
+            }
+            let data = receiveData(bytes: ecKey, count: ecKeyLength)
+            switch isPrivate {
+            case true:
+                return try ECPrivateKey(data)
+            case false:
+                return try ECCompressedPublicKey(data)
+            }
+        }
+    }
+}
+
+/// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
+public func toECKey(_ hdKey: String) throws -> ECKey {
+    return try hdKey |> toECKey(version: .mainnet)
+}
