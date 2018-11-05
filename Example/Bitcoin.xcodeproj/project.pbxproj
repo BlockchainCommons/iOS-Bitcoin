@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0309A6842182879F007E974E /* TestHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0309A6822182876C007E974E /* TestHash.swift */; };
+		032FC9282190F6B4003A55D7 /* TestPaymentAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */; };
 		0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC5218683CD001C12B5 /* TestRandom.swift */; };
 		0361BCC921877354001C12B5 /* TestHD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC72187733B001C12B5 /* TestHD.swift */; };
 		03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D7102D2187979B00E70327 /* TestMnemonic.swift */; };
@@ -34,6 +35,7 @@
 
 /* Begin PBXFileReference section */
 		0309A6822182876C007E974E /* TestHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHash.swift; sourceTree = "<group>"; };
+		032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPaymentAddress.swift; sourceTree = "<group>"; };
 		0355E88BCB373C4803A6A18C /* Bitcoin.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Bitcoin.podspec; path = ../Bitcoin.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		0361BCC5218683CD001C12B5 /* TestRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRandom.swift; sourceTree = "<group>"; };
 		0361BCC72187733B001C12B5 /* TestHD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHD.swift; sourceTree = "<group>"; };
@@ -151,6 +153,7 @@
 				03D710352188ED1B00E70327 /* TestEC.swift */,
 				0361BCC72187733B001C12B5 /* TestHD.swift */,
 				03D7102D2187979B00E70327 /* TestMnemonic.swift */,
+				032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -373,6 +376,7 @@
 				607FACEC1AFB9204008FA782 /* TestFormats.swift in Sources */,
 				0309A6842182879F007E974E /* TestHash.swift in Sources */,
 				0361BCC921877354001C12B5 /* TestHD.swift in Sources */,
+				032FC9282190F6B4003A55D7 /* TestPaymentAddress.swift in Sources */,
 				03D710372188ED4700E70327 /* TestEC.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
