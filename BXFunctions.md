@@ -104,8 +104,8 @@
 * ✅ (base85Decode)
 * ✅ base58check-encode (base58CheckEncode)
 * ✅ base58check-decode (base58CheckDecode)
-* wrap-encode
-* wrap-decode
+* ✅ wrap-encode (wrapEncode)
+* ✅ wrap-decode (wrapDecode)
 
 ## Hash Commands
 

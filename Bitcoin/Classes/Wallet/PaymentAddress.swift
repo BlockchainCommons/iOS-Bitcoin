@@ -98,42 +98,17 @@ public func addressEncode(_ ripemd160: Data) -> String {
     return ripemd160 |> addressEncode()
 }
 
-public struct PaymentAddressComponents: Encodable {
-    public let prefix: UInt8
-    public let payload: Data
-    public let checksum: UInt32
-
-    public enum CodingKeys: String, CodingKey {
-        case prefix
-        case payload
-        case checksum
-    }
-
-    public func encode(to encoder: Encoder) throws {
-        var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(prefix, forKey: .prefix)
-        try container.encode(payload |> base16Encode, forKey: .payload)
-        try container.encode(checksum, forKey: .checksum)
-    }
-}
-
-public func toJSON(_ components: PaymentAddressComponents) throws -> Data {
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys]
-    return try encoder.encode(components)
-}
-
 /// Convert a payment address to its component parts.
-public func addressDecode(_ address: String) throws -> PaymentAddressComponents {
+public func addressDecode(_ address: String) throws -> WrappedData {
     return try address.withCString { (addressString: UnsafePointer<Int8>) in
+        var prefix: UInt8 = 0
         var payloadBytes: UnsafeMutablePointer<UInt8>!
         var payloadLength = 0
         var checksum: UInt32 = 0
-        var prefix: UInt8 = 0
-        if let error = BitcoinError(rawValue: _addressDecode(addressString, &payloadBytes, &payloadLength, &checksum, &prefix)) {
+        if let error = BitcoinError(rawValue: _addressDecode(addressString, &prefix, &payloadBytes, &payloadLength, &checksum)) {
             throw error
         }
         let payload = receiveData(bytes: payloadBytes, count: payloadLength)
-        return PaymentAddressComponents(prefix: prefix, payload: payload, checksum: checksum)
+        return WrappedData(prefix: prefix, payload: payload, checksum: checksum)
     }
 }

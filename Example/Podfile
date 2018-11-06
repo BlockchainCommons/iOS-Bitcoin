@@ -4,10 +4,10 @@ platform :ios, '12.0'
 
 pod 'CBitcoin', :path => '../../CBitcoin'
 pod 'WolfNumerics', :path => '../../WolfNumerics'
+pod 'WolfPipe', :path => '../../WolfPipe'
 
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'
-      pod 'WolfPipe'
       pod 'WolfStrings'
 
       target 'Bitcoin_Tests' do

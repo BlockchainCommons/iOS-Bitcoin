@@ -3,7 +3,6 @@
 //  Bitcoin_Tests
 //
 //  Created by Wolf McNally on 11/5/18.
-//  Copyright © 2018 Blockchain Commons. All rights reserved.
 //
 //  Copyright © 2018 Blockchain Commons.
 //

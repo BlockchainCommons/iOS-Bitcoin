@@ -32,12 +32,12 @@ class TestFormats: XCTestCase {
         let satoshis: UInt64 = 1012345678
         let satoshisString = "1012345678"
         let btcString = "10.12345678"
-        XCTAssert(satoshis |> encodeBase10 == satoshisString)
-        XCTAssert(satoshis |> encodeBase10(decimalPlaces: btcDecimalPlaces) == btcString)
-        XCTAssert(try! satoshisString |> decodeBase10 == satoshis)
-        XCTAssert(try! btcString |> decodeBase10(decimalPlaces: btcDecimalPlaces) == satoshis)
-        XCTAssertThrowsError(try "Foobar" |> decodeBase10 == satoshis) // Invalid format
-        XCTAssertThrowsError(try btcString |> decodeBase10(decimalPlaces: 1) == satoshis) // incorrect decimal place
+        XCTAssert(satoshis |> base10Encode == satoshisString)
+        XCTAssert(satoshis |> base10Encode(decimalPlaces: btcDecimalPlaces) == btcString)
+        XCTAssert(try! satoshisString |> base10Decode == satoshis)
+        XCTAssert(try! btcString |> base10Decode(decimalPlaces: btcDecimalPlaces) == satoshis)
+        XCTAssertThrowsError(try "Foobar" |> base10Decode == satoshis) // Invalid format
+        XCTAssertThrowsError(try btcString |> base10Decode(decimalPlaces: 1) == satoshis) // incorrect decimal place
     }
 
     func testBase16() {

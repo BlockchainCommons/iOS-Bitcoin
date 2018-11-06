@@ -43,11 +43,11 @@ public let ubtcDecimalPlaces: Int = {
 ///
 /// - parameter decimalPlaces: The location of the decimal point. The default
 ///   is zero, which treats the input as a normal integer.
-public func encodeBase10(decimalPlaces: Int) -> (_ amount: UInt64) -> String {
+public func base10Encode(decimalPlaces: Int) -> (_ amount: UInt64) -> String {
     return { amount in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeBase10(amount, &bytes, &count, UInt8(decimalPlaces))
+        _base10Encode(amount, &bytes, &count, UInt8(decimalPlaces))
         return receiveString(bytes: bytes, count: count)
     }
 }
@@ -58,8 +58,8 @@ public func encodeBase10(decimalPlaces: Int) -> (_ amount: UInt64) -> String {
 /// This is a single-argument function suitable for use with the pipe operator.
 ///
 /// - parameter amount: The amount to be encoded.
-public func encodeBase10(_ amount: UInt64) -> String {
-    return amount |> encodeBase10(decimalPlaces: 0)
+public func base10Encode(_ amount: UInt64) -> String {
+    return amount |> base10Encode(decimalPlaces: 0)
 }
 
 /// Converts a bitcoin amount (in satoshis) to a string.
@@ -68,7 +68,7 @@ public func encodeBase10(_ amount: UInt64) -> String {
 ///
 /// - parameter satoshi: The amount (in satoshis) to be encoded.
 public func satoshiToBTC(_ satoshi: UInt64) -> String {
-    return satoshi |> encodeBase10(decimalPlaces: btcDecimalPlaces)
+    return satoshi |> base10Encode(decimalPlaces: btcDecimalPlaces)
 }
 
 /// Converts a string to a Bitcoin amount according to the BIP 21 grammar.
@@ -81,12 +81,12 @@ public func satoshiToBTC(_ satoshi: UInt64) -> String {
 ///   is zero, which treats the input as a normal integer.
 /// - parameter strict: true to treat fractional results as an error,
 ///   or false to round them upwards.
-public func decodeBase10(decimalPlaces: Int, strict: Bool = true) -> (String) throws -> UInt64 {
+public func base10Decode(decimalPlaces: Int, strict: Bool = true) -> (String) throws -> UInt64 {
     return { string in
         var out: UInt64 = 0
         try string.withCString { (stringBytes) in
             try withUnsafeMutablePointer(to: &out) { (outPointer: UnsafeMutablePointer<UInt64>) in
-                if let error = BitcoinError(rawValue: _decodeBase10(stringBytes, outPointer, decimalPlaces, strict)) {
+                if let error = BitcoinError(rawValue: _base10Decode(stringBytes, outPointer, decimalPlaces, strict)) {
                     throw error
                 }
             }
@@ -103,8 +103,8 @@ public func decodeBase10(decimalPlaces: Int, strict: Bool = true) -> (String) th
 ///
 /// - parameter string: The amount to be decoded.
 /// - returns: The amount.
-public func decodeBase10(_ string: String) throws -> UInt64 {
-    return try string |> decodeBase10(decimalPlaces: 0)
+public func base10Decode(_ string: String) throws -> UInt64 {
+    return try string |> base10Decode(decimalPlaces: 0)
 }
 
 /// Converts a string in Bitcoin to an amount (in satoshis).
@@ -114,5 +114,5 @@ public func decodeBase10(_ string: String) throws -> UInt64 {
 /// - parameter string: The amount (in BTC) to be decoded.
 /// - returns: The amount (in satoshis).
 public func btcToSatoshi(_ string: String) throws -> UInt64 {
-    return try string |> decodeBase10(decimalPlaces: btcDecimalPlaces)
+    return try string |> base10Decode(decimalPlaces: btcDecimalPlaces)
 }
