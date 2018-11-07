@@ -36,7 +36,7 @@ public struct PaymentAddressVersion {
     let network: PaymentAddressNetwork
     let type: PaymentAddressType
 
-    public var prefix: UInt8 {
+    public var version: UInt8 {
         switch network {
         case .mainnet:
             switch type {
@@ -60,8 +60,8 @@ public struct PaymentAddressVersion {
         self.type = type
     }
 
-    public init?(prefix: UInt8) {
-        switch prefix {
+    public init?(version: UInt8) {
+        switch version {
         case 0:
             network = .mainnet
             type = .p2sh
@@ -81,16 +81,20 @@ public struct PaymentAddressVersion {
 }
 
 /// Convert a RIPEMD160 value to a payment address.
-public func addressEncode(network: PaymentAddressNetwork = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ ripemd160: Data) -> String {
-    let version = PaymentAddressVersion(network: network, type: type)
+public func addressEncode(version: UInt8) -> (_ ripemd160: Data) -> String {
     return { ripemd160 in
         ripemd160.withUnsafeBytes { (ripemd160Bytes: UnsafePointer<UInt8>) in
             var paymentAddress: UnsafeMutablePointer<Int8>!
             var paymentAddressLength = 0
-            _addressEncode(ripemd160Bytes, version.prefix, &paymentAddress, &paymentAddressLength)
+            _addressEncode(ripemd160Bytes, version, &paymentAddress, &paymentAddressLength)
             return receiveString(bytes: paymentAddress, count: paymentAddressLength)
         }
     }
+}
+
+/// Convert a RIPEMD160 value to a payment address.
+public func addressEncode(network: PaymentAddressNetwork = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ ripemd160: Data) -> String {
+    return addressEncode(version: PaymentAddressVersion(network: network, type: type).version)
 }
 
 /// Convert a RIPEMD160 value to a payment address.
@@ -111,4 +115,44 @@ public func addressDecode(_ address: String) throws -> WrappedData {
         let payload = receiveData(bytes: payloadBytes, count: payloadLength)
         return WrappedData(prefix: prefix, payload: payload, checksum: checksum)
     }
+}
+
+/// Create a payment address with an embedded record of binary data.
+///
+/// The data is hashed as RIPEMD160 and then embedded in a script of the form:
+///
+///     dup hash160 [RIPEMD160] equalverify checksig
+///
+/// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
+public func addressEmbed(version: UInt8) -> (_ data: Data) -> String {
+    return { data in
+        data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+            var paymentAddress: UnsafeMutablePointer<Int8>!
+            var paymentAddressLength = 0
+            _addressEmbed(dataBytes, data.count, version, &paymentAddress, &paymentAddressLength)
+            return receiveString(bytes: paymentAddress, count: paymentAddressLength)
+        }
+    }
+}
+
+/// Create a payment address with an embedded record of binary data.
+///
+/// The data is hashed as RIPEMD160 and then embedded in a script of the form:
+///
+///     dup hash160 [RIPEMD160] equalverify checksig
+///
+/// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
+public func addressEmbed(network: PaymentAddressNetwork = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ data: Data) -> String {
+    return addressEmbed(version: PaymentAddressVersion(network: network, type: type).version)
+}
+
+/// Create a payment address with an embedded record of binary data.
+///
+/// The data is hashed as RIPEMD160 and then embedded in a script of the form:
+///
+///     dup hash160 [RIPEMD160] equalverify checksig
+///
+/// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
+public func addressEmbed(_ data: Data) -> String {
+    return data |> addressEmbed(network: .mainnet, type: .p2pkh)
 }

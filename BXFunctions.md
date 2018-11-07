@@ -87,7 +87,7 @@
 
 * ✅ address-encode (addressEncode)
 * ✅ address-decode (addressDecode)
-* address-embed
+* ✅ address-embed (addressEmbed)
 * ✅ (bitcoinHashEncode)
 * ✅ (bitcoinHashDecode)
 * ✅ (encodeBase10)

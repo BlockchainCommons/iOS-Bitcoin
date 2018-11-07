@@ -34,11 +34,17 @@ class TestPaymentAddress: XCTestCase {
         let mainnetAddress = "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
         let testnetAddress = "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58"
 
-        XCTAssert(try! mainnetAddress |> addressDecode |> toJSON |> fromUTF8 == """
+        let f = addressDecode >>> toJSON >>> fromUTF8
+        XCTAssert(try! mainnetAddress |> f == """
             {"checksum":2743498322,"payload":"b472a266d0bd89c13706a4132ccfb16f7c3b9fcb","prefix":0}
             """)
-        XCTAssert(try! testnetAddress |> addressDecode |> toJSON |> fromUTF8 == """
+        XCTAssert(try! testnetAddress |> f == """
             {"checksum":1475514977,"payload":"b472a266d0bd89c13706a4132ccfb16f7c3b9fcb","prefix":111}
             """)
+    }
+
+    func testAddressEmbed() {
+        XCTAssert("Satoshi Nakamoto" |> toUTF8 |> addressEmbed == "168LnUjqoJLie1PW5dTaF2vKUU9Jf6Fe4a")
+        XCTAssert("Satoshi Nakamoto" |> toUTF8 |> addressEmbed(network: .testnet) == "mkeJ5XppcKmyR7s7oCRx4x8eLTk1Xrso8t")
     }
 }
