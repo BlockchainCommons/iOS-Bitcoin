@@ -8,8 +8,6 @@
 * ✅ ec-to-address (toECPaymentAddress)
 * ✅ ec-to-public (toECPublicKey)
 * ✅ ec-to-wif (toWIF)
-* electrum-new
-* electrum-to-seed
 * ✅ hd-new (newHDPrivateKey)
 * ✅ hd-private (deriveHDPrivateKey)
 * ✅ hd-public (deriveHDPublicKey)
@@ -17,12 +15,14 @@
 * ✅ hd-to-public (toHDPublicKey)
 * ✅ mnemonic-new (newMnemonic)
 * ✅ mnemonic-to-seed (mnemonicToSeed)
-* qrcode
 * ✅ seed (seed)
-* uri-decode
-* uri-encode
 * ✅ wif-to-ec (wifToECPrivateKey)
 * ✅ wif-to-public (wifToECPrivateKey |> toECPublicKey)
+* electrum-new
+* electrum-to-seed
+* qrcode
+* uri-decode
+* uri-encode
 
 ## Key Encryption Commands
 
@@ -54,8 +54,8 @@
 * input-set
 * input-sign
 * input-validate
-* script-decode
-* script-encode
+* ✅ script-decode (scriptDecode)
+* ✅ script-encode (scriptEncode)
 * script-to-address
 * tx-decode
 * tx-encode

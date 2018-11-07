@@ -32,6 +32,7 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
     case invalidKey = 9
     case invalidAddress = 10
     case invalidChecksum = 11
+    case invalidScript = 12
 
     public var description: String {
         switch self {
@@ -57,6 +58,8 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
             return "Invalid address"
         case .invalidChecksum:
             return "Invalid checksum"
+        case .invalidScript:
+            return "Invalid script"
         }
     }
 }
