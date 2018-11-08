@@ -56,7 +56,7 @@
 * input-validate
 * ✅ script-decode (scriptDecode)
 * ✅ script-encode (scriptEncode)
-* script-to-address
+* ✅ script-to-address (scriptToAddress)
 * tx-decode
 * tx-encode
 * tx-sign

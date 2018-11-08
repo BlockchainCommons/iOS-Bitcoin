@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfPipe
 
 /// Decode a script to plain text tokens.
 public func scriptDecode(_ data: Data) -> String {
@@ -40,4 +41,28 @@ public func scriptEncode(_ script: String) throws -> Data {
         }
         return receiveData(bytes: encoded, count: encodedLength)
     }
+}
+
+/// Create a BIP16 pay-to-script-hash address from a script.
+public func scriptToAddress(version: UInt8) -> (_ script: String) throws -> String {
+    return { script in
+        return try script.withCString { (scriptBytes: UnsafePointer<Int8>) in
+            var paymentAddress: UnsafeMutablePointer<Int8>!
+            var paymentAddressLength = 0
+            if let error = BitcoinError(rawValue: _scriptToAddress(scriptBytes, version, &paymentAddress, &paymentAddressLength)) {
+                throw error
+            }
+            return receiveString(bytes: paymentAddress, count: paymentAddressLength)
+        }
+    }
+}
+
+/// Create a BIP16 pay-to-script-hash address from a script.
+public func scriptToAddress(network: PaymentAddressNetwork) -> (_ script: String) throws -> String {
+    return scriptToAddress(version: PaymentAddressVersion(network: network, type: .p2sh).version)
+}
+
+/// Create a BIP16 pay-to-script-hash address from a script.
+public func scriptToAddress(_ script: String) throws -> String {
+    return try script |> scriptToAddress(network: .mainnet)
 }
