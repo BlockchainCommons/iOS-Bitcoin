@@ -57,7 +57,7 @@
 * ✅ script-decode (scriptDecode)
 * ✅ script-encode (scriptEncode)
 * ✅ script-to-address (scriptToAddress)
-* tx-decode
+* ✅ tx-decode (transactionDecode)
 * tx-encode
 * tx-sign
 
