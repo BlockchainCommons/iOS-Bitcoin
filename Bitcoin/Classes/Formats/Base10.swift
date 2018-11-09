@@ -81,7 +81,7 @@ public func satoshiToBTC(_ satoshi: UInt64) -> String {
 ///   is zero, which treats the input as a normal integer.
 /// - parameter strict: true to treat fractional results as an error,
 ///   or false to round them upwards.
-public func base10Decode(decimalPlaces: Int, strict: Bool = true) -> (String) throws -> UInt64 {
+public func base10Decode(decimalPlaces: Int, strict: Bool = true) -> (_ string: String) throws -> UInt64 {
     return { string in
         var out: UInt64 = 0
         try string.withCString { (stringBytes) in

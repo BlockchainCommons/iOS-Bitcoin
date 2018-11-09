@@ -10,6 +10,7 @@ PODS:
     - ExtensibleEnumeratedName
     - WolfNumerics
     - WolfPipe
+  - WolfWith (1.0.2)
 
 DEPENDENCIES:
   - Bitcoin (from `../`)
@@ -17,6 +18,7 @@ DEPENDENCIES:
   - WolfNumerics (from `../../WolfNumerics`)
   - WolfPipe (from `../../WolfPipe`)
   - WolfStrings
+  - WolfWith (from `../../WolfWith`)
 
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
@@ -32,6 +34,8 @@ EXTERNAL SOURCES:
     :path: "../../WolfNumerics"
   WolfPipe:
     :path: "../../WolfPipe"
+  WolfWith:
+    :path: "../../WolfWith"
 
 SPEC CHECKSUMS:
   Bitcoin: 5038268d0cf25ed065f67ffed707421bac058333
@@ -40,7 +44,8 @@ SPEC CHECKSUMS:
   WolfNumerics: bae55621165b9992c59e614959b9eea4f48142fd
   WolfPipe: ff174b2221cee7fc86fc98d05601983d887053fe
   WolfStrings: df8b7406fe1c7fcd6efa1cddf5882647477d0677
+  WolfWith: df7f308b44883b5cee2cce6220f468e6d8c16cb0
 
-PODFILE CHECKSUM: 7ce53dea84df26608e679049bd731601f45fdc1c
+PODFILE CHECKSUM: db89bb30fdddeb6d2b0dd5a37483ef78009b777a
 
 COCOAPODS: 1.6.0.beta.1

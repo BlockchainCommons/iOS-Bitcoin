@@ -55,4 +55,17 @@ class TestTransaction: XCTestCase {
             """
         XCTAssert(try! tx4 |> f == tx4Decoded)
     }
+
+    func testTransactionEncode() {
+        let hash = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3" |> base16Decode |> toHashDigest
+        let outputPoint = OutputPoint(hash: hash, index: 3)
+        XCTAssert(outputPoint.description == "OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 3)")
+
+        let input = Input(previousOutput: outputPoint)
+        XCTAssert(input.description == "Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 3), sequence: 0xffffffff)")
+
+        let value = try! "1.0" |> btcToSatoshi
+        let output = try! Output(value: value, paymentAddress: "1966U1pjj15tLxPXZ19U48c99EJDkdXeqb")
+        XCTAssert(output.description == "Output(value: 100000000, script: dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig)")
+    }
 }

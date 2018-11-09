@@ -19,18 +19,24 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfPipe
 
-/// Encodes the data as a base32 string.
+/// Convert the data to Base32 with the provided prefix.
+public func base32Encode(prefix: String, payload: Data) -> String {
+    return payload.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+        prefix.withCString { prefixBytes in
+            var bytes: UnsafeMutablePointer<Int8>!
+            var count: Int = 0
+            _base32Encode(prefixBytes, dataBytes, payload.count, &bytes, &count)
+            return receiveString(bytes: bytes, count: count)
+        }
+    }
+}
+
+/// Convert the data to Base32 with the provided prefix.
 public func base32Encode(prefix: String) -> (_ payload: Data) -> String {
     return { payload in
-        return payload.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
-            prefix.withCString { prefixBytes in
-                var bytes: UnsafeMutablePointer<Int8>!
-                var count: Int = 0
-                _base32Encode(prefixBytes, dataBytes, payload.count, &bytes, &count)
-                return receiveString(bytes: bytes, count: count)
-            }
-        }
+        base32Encode(prefix: prefix, payload: payload)
     }
 }
 

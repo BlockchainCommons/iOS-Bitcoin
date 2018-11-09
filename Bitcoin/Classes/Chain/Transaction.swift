@@ -39,3 +39,70 @@ public func transactionDecode(isPretty: Bool) -> (_ data: Data) throws -> String
 public func transactionDecode(_ data: Data) throws -> String {
     return try data |> transactionDecode(isPretty: false)
 }
+
+//public final class Input {
+//    private let input: OpaquePointer
+//
+//    public init() {
+//        input = _newTransactionInput()
+//    }
+//
+//    deinit {
+//        _deleteTransactionInput(input)
+//    }
+//}
+
+//
+//public func transactionEncode() {
+//    var input = _transactionInput()
+//    input.sequenc
+//}
+
+//public enum Target {
+//    case address(String)
+//    case script(String)
+//}
+//
+//public struct Output {
+//    var target: Target
+//    var satoshi: UInt64
+//    var seed: UInt32?
+//}
+//
+//public struct Transaction {
+//    var version: UInt32
+//    var lockTime: UInt32
+//    var inputs: [Input]
+//    var outputs: [Output]
+//}
+//
+//public func transactionEncode(_ transaction: Transaction) -> Data {
+//    var inputStrings: [String] = []
+//    for input in transaction.inputs {
+//        var s: [String] = []
+//        s.append(input.hash |> base16Encode)
+//        s.append(String(input.index))
+//        if let sequence = input.sequence {
+//            s.append(String(sequence))
+//        }
+//        inputStrings.append(s.joined(separator: ":"))
+//    }
+//    let inputs = inputStrings.joined(separator: " ")
+//
+//    var outputStrings: [String] = []
+//    for output in transaction.outputs {
+//        var s: [String] = []
+//        switch output.target {
+//        case .address(let a):
+//            s.append(a)
+//        case .script(let scr):
+//            s.append(scr)
+//        }
+//        s.append(String(output.satoshi))
+//        if let seed = output.seed {
+//            s.append(String(seed))
+//        }
+//        outputStrings.append(s.joined(separator: ":"))
+//    }
+//    let outputs = outputStrings.joined(separator: " ")
+//}

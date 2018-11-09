@@ -303,6 +303,7 @@
 				"${BUILT_PRODUCTS_DIR}/WolfNumerics/WolfNumerics.framework",
 				"${BUILT_PRODUCTS_DIR}/WolfPipe/WolfPipe.framework",
 				"${BUILT_PRODUCTS_DIR}/WolfStrings/WolfStrings.framework",
+				"${BUILT_PRODUCTS_DIR}/WolfWith/WolfWith.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
 			outputFileListPaths = (
@@ -314,6 +315,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfNumerics.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfPipe.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfStrings.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfWith.framework",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;

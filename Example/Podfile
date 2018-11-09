@@ -5,6 +5,7 @@ platform :ios, '12.0'
 pod 'CBitcoin', :path => '../../CBitcoin'
 pod 'WolfNumerics', :path => '../../WolfNumerics'
 pod 'WolfPipe', :path => '../../WolfPipe'
+pod 'WolfWith', :path => '../../WolfWith'
 
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'
