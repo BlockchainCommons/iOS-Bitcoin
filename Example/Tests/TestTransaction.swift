@@ -95,12 +95,29 @@ class TestTransaction: XCTestCase {
     }
 
     func testTransaction() {
-//
-//        let transaction = Transaction()
-//        transaction.version = 1
-//        transaction.lockTime = 42
-////        transaction.inputs = [input]
-//        transaction.outputs = [output]
-//        print(transaction)
+        func makeInput(hash: String, index: UInt32, sequence: UInt32) -> Input {
+            let outputPoint = try! OutputPoint(hash: hash |> base16Decode |> toHashDigest, index: index)
+            return Input(previousOutput: outputPoint, sequence: sequence)
+        }
+
+        func makeOutput(btc: String, paymentAddress: String) -> Output {
+            let value = try! btc |> btcToSatoshi
+            return try! Output(value: value, paymentAddress: paymentAddress)
+        }
+
+        let input = makeInput(hash: "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3", index: 3, sequence: 42)
+        let output = makeOutput(btc: "1.0", paymentAddress: "1CK6KHY6MHgYvmRQ4PAafKYDrg1ejbH1cE")
+        let transaction = Transaction(version: 1, lockTime: 100, inputs: [input], outputs: [output])
+
+        var transaction2 = transaction
+        transaction2.version = 2
+        transaction2.lockTime = 200
+        let input2 = makeInput(hash: "fb478fd8f4ffd1224c5720180feabe3644273f81693679777bdd76fd5ae3576c", index: 5, sequence: 55)
+        transaction2.inputs.append(input2)
+        let output2 = makeOutput(btc: "0.5", paymentAddress: "1NTC39oN6MimCif7kZbgVb29oQFxukKCPY")
+        transaction2.outputs.append(output2)
+
+        print(transaction)
+        print(transaction2)
     }
 }

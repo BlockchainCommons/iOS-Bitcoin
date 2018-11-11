@@ -20,7 +20,7 @@
 
 import CBitcoin
 
-public struct Output {
+public struct Output: InstanceContainer {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {

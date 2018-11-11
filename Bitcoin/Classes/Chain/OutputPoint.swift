@@ -23,7 +23,7 @@ import WolfPipe
 
 /// An OutputPoint is a component of a transaction input, and specifies
 /// the output of the previous transaction that is being spent.
-public struct OutputPoint {
+public struct OutputPoint: InstanceContainer {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {

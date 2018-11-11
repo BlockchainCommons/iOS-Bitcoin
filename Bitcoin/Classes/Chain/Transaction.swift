@@ -40,69 +40,92 @@ public func transactionDecode(_ data: Data) throws -> String {
     return try data |> transactionDecode(isPretty: false)
 }
 
-//public final class Transaction: WrappedInstance {
-//    let instance: OpaquePointer
-////    private let isOwned: Bool
-//
-//    init(instance: OpaquePointer) {
-//        self.instance = instance
-////        isOwned = false
-//    }
-//
-//    public init() {
-//        instance = _transactionNew()
-////        isOwned = true
-//    }
-//
-//    deinit {
-////        guard isOwned else { return }
-//        _transactionDelete(instance)
-//    }
-//
-//    public var version: UInt32 {
-//        get { return _transactionGetVersion(instance) }
-//        set { _transactionSetVersion(instance, newValue) }
-//    }
-//
-//    public var lockTime: UInt32 {
-//        get { return _transactionGetLockTime(instance) }
-//        set { _transactionSetLockTime(instance, newValue) }
-//    }
-//
-//    public var inputs: [Input] {
-//        get {
-//            var inputs: UnsafeMutablePointer<OpaquePointer>!
-//            var inputsCount = 0
-//            _transactionGetInputs(instance, &inputs, &inputsCount)
-//            return receiveInstances(instances: inputs, count: inputsCount)
-//        }
-//        set {
-//            let instances = newValue.map { $0.instance }
-//            instances.withUnsafeBufferPointer { instancesBuffer in
-//                _transactionSetInputs(instance, instancesBuffer.baseAddress, instances.count)
-//            }
-//        }
-//    }
-//
-//    public var outputs: [Output] {
-//        get {
-//            var outputs: UnsafeMutablePointer<OpaquePointer>!
-//            var outputsCount = 0
-//            _transactionGetOutputs(instance, &outputs, &outputsCount)
-//            return receiveInstances(instances: outputs, count: outputsCount)
-//        }
-//
-//        set {
-//            let instances = newValue.map { $0.instance }
-//            instances.withUnsafeBufferPointer { instancesBuffer in
-//                _transactionSetOutputs(instance, instancesBuffer.baseAddress, instances.count)
-//            }
-//        }
-//    }
-//}
-//
-//extension Transaction: CustomStringConvertible {
-//    public var description: String {
-//        return "Transaction(version: \(version), lockTime: \(lockTime), inputs: \(inputs), outputs: \(outputs))"
-//    }
-//}
+public struct Transaction: InstanceContainer {
+    var wrapped: WrappedInstance
+
+    init(instance: OpaquePointer) {
+        wrapped = WrappedInstance(instance)
+    }
+
+    public init() {
+        self.init(instance: _transactionNew())
+    }
+
+    public init(version: UInt32, lockTime: UInt32, inputs: [Input], outputs: [Output]) {
+        self.init()
+        self.version = version
+        self.lockTime = lockTime
+        self.inputs = inputs
+        self.outputs = outputs
+    }
+
+    public var version: UInt32 {
+        get {
+            return _transactionGetVersion(wrapped.instance)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_transactionCopy(wrapped.instance))
+            }
+            _transactionSetVersion(wrapped.instance, newValue)
+        }
+    }
+
+    public var lockTime: UInt32 {
+        get {
+            return _transactionGetLockTime(wrapped.instance)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_transactionCopy(wrapped.instance))
+            }
+            _transactionSetLockTime(wrapped.instance, newValue)
+        }
+    }
+
+    public var inputs: [Input] {
+        get {
+            var inputs: UnsafeMutablePointer<OpaquePointer>!
+            var inputsCount = 0
+            _transactionGetInputs(wrapped.instance, &inputs, &inputsCount)
+            return receiveInstances(instances: inputs, count: inputsCount)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_transactionCopy(wrapped.instance))
+            }
+            let instances = newValue.map { $0.wrapped.instance }
+            instances.withUnsafeBufferPointer { instancesBuffer in
+                _transactionSetInputs(wrapped.instance, instancesBuffer.baseAddress, instances.count)
+            }
+        }
+    }
+
+    public var outputs: [Output] {
+        get {
+            var outputs: UnsafeMutablePointer<OpaquePointer>!
+            var outputsCount = 0
+            _transactionGetOutputs(wrapped.instance, &outputs, &outputsCount)
+            return receiveInstances(instances: outputs, count: outputsCount)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_transactionCopy(wrapped.instance))
+            }
+            let instances = newValue.map { $0.wrapped.instance }
+            instances.withUnsafeBufferPointer { instancesBuffer in
+                _transactionSetOutputs(wrapped.instance, instancesBuffer.baseAddress, instances.count)
+            }
+        }
+    }
+}
+
+extension Transaction: CustomStringConvertible {
+    public var description: String {
+        return "Transaction(version: \(version), lockTime: \(lockTime), inputs: \(inputs), outputs: \(outputs))"
+    }
+}

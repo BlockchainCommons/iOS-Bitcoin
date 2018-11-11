@@ -43,8 +43,12 @@ func receiveData(bytes: UnsafeMutablePointer<UInt8>, count: Int) -> Data {
     return Data(bytes: bytes, count: count)
 }
 
-//func receiveInstances<T: WrappedInstance>(instances: UnsafeMutablePointer<OpaquePointer>, count: Int) -> [T] {
-//    defer { _freeData(instances) }
-//    let buffer = UnsafeBufferPointer<OpaquePointer>(start: instances, count: count)
-//    return buffer.map { T(instance: $0) }
-//}
+protocol InstanceContainer {
+    init(instance: OpaquePointer)
+}
+
+func receiveInstances<T: InstanceContainer>(instances: UnsafeMutablePointer<OpaquePointer>, count: Int) -> [T] {
+    defer { _freeData(instances) }
+    let buffer = UnsafeBufferPointer<OpaquePointer>(start: instances, count: count)
+    return buffer.map { T(instance: $0) }
+}
