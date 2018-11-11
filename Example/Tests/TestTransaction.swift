@@ -56,16 +56,51 @@ class TestTransaction: XCTestCase {
         XCTAssert(try! tx4 |> f == tx4Decoded)
     }
 
-    func testTransactionEncode() {
+    func testInput() {
+        XCTAssert(OutputPoint().description == "OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 0)")
+
         let hash = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3" |> base16Decode |> toHashDigest
-        let outputPoint = OutputPoint(hash: hash, index: 3)
-        XCTAssert(outputPoint.description == "OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 3)")
+        let hash2 = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5" |> base16Decode |> toHashDigest
+        var outputPoint = OutputPoint(hash: hash, index: 3)
+        var outputPoint2 = outputPoint
+        outputPoint.hash = hash2
+        outputPoint2.index = 5
+        XCTAssert(outputPoint.description == "OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5, index: 3)")
+        XCTAssert(outputPoint2.description == "OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 5)")
 
-        let input = Input(previousOutput: outputPoint)
-        XCTAssert(input.description == "Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 3), sequence: 0xffffffff)")
+        XCTAssert(Input().description == "Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 0), sequence: 0x0)")
 
+        var input = Input(previousOutput: outputPoint)
+        var input2 = input
+        input.sequence = 42
+        input2.previousOutput = outputPoint2
+        XCTAssert(input.description == "Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5, index: 3), sequence: 0x2a)")
+        XCTAssert(input2.description == "Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 5), sequence: 0xffffffff)")
+    }
+
+    func testOutput() {
+        XCTAssert(Output().description == "Output(value: 18446744073709551615, script: '')")
+        
         let value = try! "1.0" |> btcToSatoshi
-        let output = try! Output(value: value, paymentAddress: "1966U1pjj15tLxPXZ19U48c99EJDkdXeqb")
-        XCTAssert(output.description == "Output(value: 100000000, script: dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig)")
+        let value2 = try! "0.5" |> btcToSatoshi
+
+        var output = try! Output(value: value, paymentAddress: "1966U1pjj15tLxPXZ19U48c99EJDkdXeqb")
+        XCTAssert(output.description == "Output(value: 100000000, script: 'dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig')")
+
+        var output2 = output
+        output2.value = value2
+        try! output.setPaymentAddress("1CK6KHY6MHgYvmRQ4PAafKYDrg1ejbH1cE")
+        XCTAssert(output.description == "Output(value: 100000000, script: 'dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig')")
+        XCTAssert(output2.description == "Output(value: 50000000, script: 'dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig')")
+    }
+
+    func testTransaction() {
+//
+//        let transaction = Transaction()
+//        transaction.version = 1
+//        transaction.lockTime = 42
+////        transaction.inputs = [input]
+//        transaction.outputs = [output]
+//        print(transaction)
     }
 }

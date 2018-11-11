@@ -23,47 +23,50 @@ import WolfPipe
 
 /// An OutputPoint is a component of a transaction input, and specifies
 /// the output of the previous transaction that is being spent.
-public final class OutputPoint {
-    let instance: OpaquePointer
-    private let isOwned: Bool
-
-    public init() {
-        instance = _outputPointNew()
-        isOwned = true
-    }
+public struct OutputPoint {
+    var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
-        self.instance = instance
-        isOwned = false
+        wrapped = WrappedInstance(instance)
     }
 
-    deinit {
-        guard isOwned else { return }
-        _outputPointDelete(instance)
+    public init() {
+        self.init(instance: _outputPointNew())
     }
 
-    public convenience init(hash: HashDigest, index: UInt32) {
+    public init(hash: HashDigest, index: UInt32) {
         self.init()
         self.hash = hash
         self.index = index
     }
 
     public var index: UInt32 {
-        get { return _outputPointGetIndex(instance) }
-        set { _outputPointSetIndex(instance, newValue) }
+        get {
+            return _outputPointGetIndex(wrapped.instance)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_outputPointCopy(wrapped.instance))
+            }
+            _outputPointSetIndex(wrapped.instance, newValue)
+        }
     }
 
     public var hash: HashDigest {
         get {
             var hashBytes: UnsafeMutablePointer<UInt8>!
             var hashLength = 0
-            _outputPointGetHash(instance, &hashBytes, &hashLength)
+            _outputPointGetHash(wrapped.instance, &hashBytes, &hashLength)
             return try! receiveData(bytes: hashBytes, count: hashLength) |> toHashDigest
         }
 
         set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_outputPointCopy(wrapped.instance))
+            }
             newValue.data.withUnsafeBytes { hashBytes in
-                _outputPointSetHash(instance, hashBytes)
+                _outputPointSetHash(wrapped.instance, hashBytes)
             }
         }
     }

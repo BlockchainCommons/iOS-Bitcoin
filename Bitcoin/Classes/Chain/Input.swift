@@ -20,39 +20,47 @@
 
 import CBitcoin
 
-public final class Input {
-    let instance: OpaquePointer
-    private let isOwned: Bool
-
-    public init() {
-        instance = _inputNew()
-        isOwned = true
-    }
+public struct Input {
+    var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
-        self.instance = instance
-        isOwned = false
+        wrapped = WrappedInstance(instance)
     }
 
-    deinit {
-        guard isOwned else { return }
-        _inputDelete(instance)
+    public init() {
+        self.init(instance: _inputNew())
     }
 
-    public convenience init(previousOutput: OutputPoint, sequence: UInt32 = 0xffffffff) {
+    public init(previousOutput: OutputPoint, sequence: UInt32 = 0xffffffff) {
         self.init()
         self.previousOutput = previousOutput
         self.sequence = sequence
     }
 
     public var previousOutput: OutputPoint {
-        get { return OutputPoint(instance: _inputGetPreviousOutput(instance)) }
-        set { _inputSetPreviousOutput(instance, newValue.instance) }
+        get {
+            return OutputPoint(instance: _inputGetPreviousOutput(wrapped.instance))
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_inputCopy(wrapped.instance))
+            }
+            _inputSetPreviousOutput(wrapped.instance, newValue.wrapped.instance)
+        }
     }
 
     public var sequence: UInt32 {
-        get { return _inputGetSequence(instance) }
-        set { _inputSetSequence(instance, newValue) }
+        get {
+            return _inputGetSequence(wrapped.instance)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_inputCopy(wrapped.instance))
+            }
+            _inputSetSequence(wrapped.instance, newValue)
+        }
     }
 }
 

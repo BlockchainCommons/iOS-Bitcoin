@@ -40,69 +40,69 @@ public func transactionDecode(_ data: Data) throws -> String {
     return try data |> transactionDecode(isPretty: false)
 }
 
-//public final class Input {
-//    private let input: OpaquePointer
+//public final class Transaction: WrappedInstance {
+//    let instance: OpaquePointer
+////    private let isOwned: Bool
+//
+//    init(instance: OpaquePointer) {
+//        self.instance = instance
+////        isOwned = false
+//    }
 //
 //    public init() {
-//        input = _newTransactionInput()
+//        instance = _transactionNew()
+////        isOwned = true
 //    }
 //
 //    deinit {
-//        _deleteTransactionInput(input)
+////        guard isOwned else { return }
+//        _transactionDelete(instance)
+//    }
+//
+//    public var version: UInt32 {
+//        get { return _transactionGetVersion(instance) }
+//        set { _transactionSetVersion(instance, newValue) }
+//    }
+//
+//    public var lockTime: UInt32 {
+//        get { return _transactionGetLockTime(instance) }
+//        set { _transactionSetLockTime(instance, newValue) }
+//    }
+//
+//    public var inputs: [Input] {
+//        get {
+//            var inputs: UnsafeMutablePointer<OpaquePointer>!
+//            var inputsCount = 0
+//            _transactionGetInputs(instance, &inputs, &inputsCount)
+//            return receiveInstances(instances: inputs, count: inputsCount)
+//        }
+//        set {
+//            let instances = newValue.map { $0.instance }
+//            instances.withUnsafeBufferPointer { instancesBuffer in
+//                _transactionSetInputs(instance, instancesBuffer.baseAddress, instances.count)
+//            }
+//        }
+//    }
+//
+//    public var outputs: [Output] {
+//        get {
+//            var outputs: UnsafeMutablePointer<OpaquePointer>!
+//            var outputsCount = 0
+//            _transactionGetOutputs(instance, &outputs, &outputsCount)
+//            return receiveInstances(instances: outputs, count: outputsCount)
+//        }
+//
+//        set {
+//            let instances = newValue.map { $0.instance }
+//            instances.withUnsafeBufferPointer { instancesBuffer in
+//                _transactionSetOutputs(instance, instancesBuffer.baseAddress, instances.count)
+//            }
+//        }
 //    }
 //}
-
 //
-//public func transactionEncode() {
-//    var input = _transactionInput()
-//    input.sequenc
-//}
-
-//public enum Target {
-//    case address(String)
-//    case script(String)
-//}
-//
-//public struct Output {
-//    var target: Target
-//    var satoshi: UInt64
-//    var seed: UInt32?
-//}
-//
-//public struct Transaction {
-//    var version: UInt32
-//    var lockTime: UInt32
-//    var inputs: [Input]
-//    var outputs: [Output]
-//}
-//
-//public func transactionEncode(_ transaction: Transaction) -> Data {
-//    var inputStrings: [String] = []
-//    for input in transaction.inputs {
-//        var s: [String] = []
-//        s.append(input.hash |> base16Encode)
-//        s.append(String(input.index))
-//        if let sequence = input.sequence {
-//            s.append(String(sequence))
-//        }
-//        inputStrings.append(s.joined(separator: ":"))
+//extension Transaction: CustomStringConvertible {
+//    public var description: String {
+//        return "Transaction(version: \(version), lockTime: \(lockTime), inputs: \(inputs), outputs: \(outputs))"
 //    }
-//    let inputs = inputStrings.joined(separator: " ")
-//
-//    var outputStrings: [String] = []
-//    for output in transaction.outputs {
-//        var s: [String] = []
-//        switch output.target {
-//        case .address(let a):
-//            s.append(a)
-//        case .script(let scr):
-//            s.append(scr)
-//        }
-//        s.append(String(output.satoshi))
-//        if let seed = output.seed {
-//            s.append(String(seed))
-//        }
-//        outputStrings.append(s.joined(separator: ":"))
-//    }
-//    let outputs = outputStrings.joined(separator: " ")
 //}

@@ -20,8 +20,20 @@
 
 import CBitcoin
 
+final class WrappedInstance {
+    let instance: OpaquePointer
+
+    init(_ instance: OpaquePointer) {
+        self.instance = instance
+    }
+
+    deinit {
+        _deleteInstance(instance)
+    }
+}
+
 func receiveString(bytes: UnsafeMutablePointer<Int8>, count: Int) -> String {
-    defer { _freeString(bytes) }
+    defer { _freeData(bytes) }
     let stringData = Data(bytes: bytes, count: count)
     return String(data: stringData, encoding: .utf8)!
 }
@@ -30,3 +42,9 @@ func receiveData(bytes: UnsafeMutablePointer<UInt8>, count: Int) -> Data {
     defer { _freeData(bytes) }
     return Data(bytes: bytes, count: count)
 }
+
+//func receiveInstances<T: WrappedInstance>(instances: UnsafeMutablePointer<OpaquePointer>, count: Int) -> [T] {
+//    defer { _freeData(instances) }
+//    let buffer = UnsafeBufferPointer<OpaquePointer>(start: instances, count: count)
+//    return buffer.map { T(instance: $0) }
+//}

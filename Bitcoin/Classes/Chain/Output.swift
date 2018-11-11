@@ -20,50 +20,57 @@
 
 import CBitcoin
 
-public final class Output {
-    let instance: OpaquePointer
-    private let isOwned: Bool
-
-    public init() {
-        instance = _outputNew()
-        isOwned = true
-    }
+public struct Output {
+    var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
-        self.instance = instance
-        isOwned = false
+        wrapped = WrappedInstance(instance)
     }
 
-    deinit {
-        guard isOwned else { return }
-        _outputDelete(instance)
+    public init() {
+        self.init(instance: _outputNew())
     }
 
-    public convenience init(value: UInt64, paymentAddress: String) throws {
+    public init(value: UInt64, paymentAddress: String) throws {
         self.init()
-        _outputSetValue(instance, value)
+        self.value = value
+        try setPaymentAddress(paymentAddress)
+    }
+
+    public mutating func setPaymentAddress(_ paymentAddress: String) throws {
+        if !isKnownUniquelyReferenced(&wrapped) {
+            wrapped = WrappedInstance(_outputCopy(wrapped.instance))
+        }
         try paymentAddress.withCString { paymentAddressBytes in
-            if let error = BitcoinError(rawValue: _outputSetPaymentAddress(instance, paymentAddressBytes)) {
+            if let error = BitcoinError(rawValue: _outputSetPaymentAddress(wrapped.instance, paymentAddressBytes)) {
                 throw error;
             }
         }
     }
 
     public var value: UInt64 {
-        get { return _outputGetValue(instance) }
-        set { _outputSetValue(instance, newValue) }
+        get {
+            return _outputGetValue(wrapped.instance)
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_outputCopy(wrapped.instance))
+            }
+            _outputSetValue(wrapped.instance, newValue)
+        }
     }
 
     public var script: String {
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _outputGetScript(instance, &decoded, &decodedLength)
+        _outputGetScript(wrapped.instance, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
 }
 
 extension Output: CustomStringConvertible {
     public var description: String {
-        return "Output(value: \(value), script: \(script))"
+        return "Output(value: \(value), script: '\(script)')"
     }
 }
