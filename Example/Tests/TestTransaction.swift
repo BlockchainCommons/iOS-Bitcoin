@@ -186,10 +186,20 @@ class TestTransaction: XCTestCase {
 
     func testIsCoinbaseOneInputReturnsTrue() {
         var tx = Transaction()
-        var input = Input()
-        input.previousOutput.index = OutputPoint.nullIndex
-        tx.inputs = [input]
+        var input1 = Input()
+        input1.previousOutput.index = OutputPoint.nullIndex
+        tx.inputs = [input1]
         XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 4294967295), sequence: 0x0, script: '')], outputs: [])")
         XCTAssert(tx.isCoinbase)
+
+        var input2 = input1
+        input2.previousOutput.index = 42
+        tx.inputs = [input2]
+        XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 42), sequence: 0x0, script: '')], outputs: [])")
+        XCTAssertFalse(tx.isCoinbase)
+
+        tx.inputs = [input1, input2]
+        XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 4294967295), sequence: 0x0, script: ''), Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 42), sequence: 0x0, script: '')], outputs: [])")
+        XCTAssertFalse(tx.isCoinbase)
     }
 }

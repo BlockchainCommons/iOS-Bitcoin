@@ -62,6 +62,13 @@ public struct Transaction: InstanceContainer {
         self.init(instance: instance)
     }
 
+    public var data: Data {
+        var dataBytes: UnsafeMutablePointer<UInt8>!
+        var dataLength = 0
+        _transactionToData(wrapped.instance, &dataBytes, &dataLength)
+        return receiveData(bytes: dataBytes, count: dataLength)
+    }
+
     public init(version: UInt32, lockTime: UInt32 = 0, inputs: [Input], outputs: [Output]) {
         self.init()
         self.version = version
@@ -140,13 +147,6 @@ public struct Transaction: InstanceContainer {
                 _transactionSetOutputs(wrapped.instance, instancesBuffer.baseAddress, instances.count)
             }
         }
-    }
-
-    public var data: Data {
-        var dataBytes: UnsafeMutablePointer<UInt8>!
-        var dataLength = 0
-        _transactionToData(wrapped.instance, &dataBytes, &dataLength)
-        return receiveData(bytes: dataBytes, count: dataLength)
     }
 }
 

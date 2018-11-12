@@ -34,6 +34,24 @@ public struct OutputPoint: InstanceContainer {
         self.init(instance: _outputPointNew())
     }
 
+    public init(data: Data) throws {
+        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+            var instance: OpaquePointer!
+            if let error = BitcoinError(rawValue: _outputPointFromData(dataBytes, data.count, &instance)) {
+                throw error
+            }
+            return instance
+        }
+        self.init(instance: instance)
+    }
+
+    public var data: Data {
+        var dataBytes: UnsafeMutablePointer<UInt8>!
+        var dataLength = 0
+        _outputPointToData(wrapped.instance, &dataBytes, &dataLength)
+        return receiveData(bytes: dataBytes, count: dataLength)
+    }
+
     public init(hash: HashDigest, index: UInt32) {
         self.init()
         self.hash = hash
@@ -73,10 +91,20 @@ public struct OutputPoint: InstanceContainer {
             }
         }
     }
+
+    public var isValid: Bool {
+        return _outputPointIsValid(wrapped.instance)
+    }
 }
 
 extension OutputPoint: CustomStringConvertible {
     public var description: String {
         return "OutputPoint(hash: \(hash), index: \(index))"
+    }
+}
+
+extension OutputPoint: Equatable {
+    public static func == (lhs: OutputPoint, rhs: OutputPoint) -> Bool {
+        return _outputPointEqual(lhs.wrapped.instance, rhs.wrapped.instance);
     }
 }

@@ -16,6 +16,8 @@
 		0361BCC921877354001C12B5 /* TestHD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC72187733B001C12B5 /* TestHD.swift */; };
 		03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D7102D2187979B00E70327 /* TestMnemonic.swift */; };
 		03D710372188ED4700E70327 /* TestEC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D710352188ED1B00E70327 /* TestEC.swift */; };
+		03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DD3E282199F36800E7D982 /* TestOutputPoint.swift */; };
+		03DD3E2B219A0B1300E7D982 /* TestInput.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DD3E2A219A0B1300E7D982 /* TestInput.swift */; };
 		607FACD61AFB9204008FA782 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD51AFB9204008FA782 /* AppDelegate.swift */; };
 		607FACD81AFB9204008FA782 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 607FACD71AFB9204008FA782 /* ViewController.swift */; };
 		607FACDB1AFB9204008FA782 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 607FACD91AFB9204008FA782 /* Main.storyboard */; };
@@ -47,6 +49,8 @@
 		0361BCC72187733B001C12B5 /* TestHD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHD.swift; sourceTree = "<group>"; };
 		03D7102D2187979B00E70327 /* TestMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMnemonic.swift; sourceTree = "<group>"; };
 		03D710352188ED1B00E70327 /* TestEC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEC.swift; sourceTree = "<group>"; };
+		03DD3E282199F36800E7D982 /* TestOutputPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOutputPoint.swift; sourceTree = "<group>"; };
+		03DD3E2A219A0B1300E7D982 /* TestInput.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestInput.swift; sourceTree = "<group>"; };
 		0482D64EDEE9715D175CF016 /* Pods_Bitcoin_Tests.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Bitcoin_Tests.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		05D0FE05BA7A72641201C4E1 /* README.md */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = net.daringfireball.markdown; name = README.md; path = ../README.md; sourceTree = "<group>"; };
 		4EB2C27D3619D1CA0346AA96 /* Pods-Bitcoin_Tests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Bitcoin_Tests.debug.xcconfig"; path = "Target Support Files/Pods-Bitcoin_Tests/Pods-Bitcoin_Tests.debug.xcconfig"; sourceTree = "<group>"; };
@@ -162,6 +166,8 @@
 				032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */,
 				0331067021922387000509BB /* TestWrapped.swift */,
 				0331068221937FDC000509BB /* TestScript.swift */,
+				03DD3E282199F36800E7D982 /* TestOutputPoint.swift */,
+				03DD3E2A219A0B1300E7D982 /* TestInput.swift */,
 				0331068A2193F052000509BB /* TestTransaction.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
@@ -384,8 +390,10 @@
 			files = (
 				0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */,
 				03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */,
+				03DD3E2B219A0B1300E7D982 /* TestInput.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* TestFormats.swift in Sources */,
 				0309A6842182879F007E974E /* TestHash.swift in Sources */,
+				03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */,
 				0361BCC921877354001C12B5 /* TestHD.swift in Sources */,
 				032FC9282190F6B4003A55D7 /* TestPaymentAddress.swift in Sources */,
 				0331068B2193F052000509BB /* TestTransaction.swift in Sources */,
