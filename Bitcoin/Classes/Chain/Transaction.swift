@@ -51,12 +51,31 @@ public struct Transaction: InstanceContainer {
         self.init(instance: _transactionNew())
     }
 
-    public init(version: UInt32, lockTime: UInt32, inputs: [Input], outputs: [Output]) {
+    public init(data: Data) throws {
+        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+            var instance: OpaquePointer!
+            if let error = BitcoinError(rawValue: _transactionFromData(dataBytes, data.count, &instance)) {
+                throw error
+            }
+            return instance
+        }
+        self.init(instance: instance)
+    }
+
+    public init(version: UInt32, lockTime: UInt32 = 0, inputs: [Input], outputs: [Output]) {
         self.init()
         self.version = version
         self.lockTime = lockTime
         self.inputs = inputs
         self.outputs = outputs
+    }
+
+    public var isValid: Bool {
+        return _transactionIsValid(wrapped.instance)
+    }
+
+    public var isCoinbase: Bool {
+        return _transactionIsCoinbase(wrapped.instance)
     }
 
     public var version: UInt32 {
@@ -122,10 +141,23 @@ public struct Transaction: InstanceContainer {
             }
         }
     }
+
+    public var data: Data {
+        var dataBytes: UnsafeMutablePointer<UInt8>!
+        var dataLength = 0
+        _transactionToData(wrapped.instance, &dataBytes, &dataLength)
+        return receiveData(bytes: dataBytes, count: dataLength)
+    }
 }
 
 extension Transaction: CustomStringConvertible {
     public var description: String {
         return "Transaction(version: \(version), lockTime: \(lockTime), inputs: \(inputs), outputs: \(outputs))"
     }
+}
+
+// MARK: - Free functions
+
+public func toData(_ transaction: Transaction) -> Data {
+    return transaction.data
 }

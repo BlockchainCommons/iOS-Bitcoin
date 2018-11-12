@@ -31,6 +31,17 @@ public struct Output: InstanceContainer {
         self.init(instance: _outputNew())
     }
 
+    public init(data: Data) throws {
+        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+            var instance: OpaquePointer!
+            if let error = BitcoinError(rawValue: _outputFromData(dataBytes, data.count, &instance)) {
+                throw error
+            }
+            return instance
+        }
+        self.init(instance: instance)
+    }
+
     public init(value: UInt64, paymentAddress: String) throws {
         self.init()
         self.value = value
@@ -72,5 +83,11 @@ public struct Output: InstanceContainer {
 extension Output: CustomStringConvertible {
     public var description: String {
         return "Output(value: \(value), script: '\(script)')"
+    }
+}
+
+extension Output: Equatable {
+    public static func == (lhs: Output, rhs: Output) -> Bool {
+        return _outputEqual(lhs.wrapped.instance, rhs.wrapped.instance)
     }
 }

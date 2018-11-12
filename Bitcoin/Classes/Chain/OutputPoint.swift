@@ -40,6 +40,9 @@ public struct OutputPoint: InstanceContainer {
         self.index = index
     }
 
+    /// This is a sentinel used in `index` to indicate no output, e.g. coinbase.
+    public static let nullIndex = UInt32.max
+
     public var index: UInt32 {
         get {
             return _outputPointGetIndex(wrapped.instance)

@@ -31,10 +31,21 @@ public struct Input: InstanceContainer {
         self.init(instance: _inputNew())
     }
 
-    public init(previousOutput: OutputPoint, sequence: UInt32 = 0xffffffff) {
+    public init(data: Data) throws {
+        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+            var instance: OpaquePointer!
+            if let error = BitcoinError(rawValue: _inputFromData(dataBytes, data.count, &instance)) {
+                throw error
+            }
+            return instance
+        }
+        self.init(instance: instance)
+    }
+
+    public init(previousOutput: OutputPoint, sequence: UInt32? = nil) {
         self.init()
         self.previousOutput = previousOutput
-        self.sequence = sequence
+        self.sequence = sequence ?? 0xffffffff
     }
 
     public var previousOutput: OutputPoint {
@@ -62,10 +73,23 @@ public struct Input: InstanceContainer {
             _inputSetSequence(wrapped.instance, newValue)
         }
     }
+
+    public var script: String {
+        var decoded: UnsafeMutablePointer<Int8>!
+        var decodedLength = 0
+        _inputGetScript(wrapped.instance, &decoded, &decodedLength)
+        return receiveString(bytes: decoded, count: decodedLength)
+    }
 }
 
 extension Input: CustomStringConvertible {
     public var description: String {
-        return "Input(previousOutput: \(previousOutput), sequence: 0x\(String(sequence, radix: 16)))"
+        return "Input(previousOutput: \(previousOutput), sequence: 0x\(String(sequence, radix: 16)), script: '\(script)')"
+    }
+}
+
+extension Input: Equatable {
+    public static func == (lhs: Input, rhs: Input) -> Bool {
+        return _inputEqual(lhs.wrapped.instance, rhs.wrapped.instance)
     }
 }
