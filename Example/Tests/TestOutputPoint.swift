@@ -67,7 +67,7 @@ class TestOutputPoint: XCTestCase {
         let data = try! "46682488f0a721124a3905a1bb72445bf13493e2cd46c5c0c8db1c15afa0d58e00000000" |> base16Decode
         let point = try! OutputPoint(data: data)
         XCTAssert(point.isValid)
-        XCTAssert(point.hash |> base16Encode == "8ed5a0af151cdbc8c0c546cde29334f15b4472bba105394a1221a7f088246846")
+        XCTAssert(point.hash |> hashEncode == "8ed5a0af151cdbc8c0c546cde29334f15b4472bba105394a1221a7f088246846")
         XCTAssert(point.index == 0)
         XCTAssert(point.data == data)
     }

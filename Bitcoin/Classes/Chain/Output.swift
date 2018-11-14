@@ -75,7 +75,7 @@ public struct Output: InstanceContainer {
     public var script: String {
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _outputGetScript(wrapped.instance, &decoded, &decodedLength)
+        _outputGetScript(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
 }

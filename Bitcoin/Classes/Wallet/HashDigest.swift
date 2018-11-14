@@ -37,6 +37,14 @@ public func toHashDigest(_ data: Data) throws -> HashDigest {
     return try HashDigest(data)
 }
 
-public func base16Encode(_ hash: HashDigest) -> String {
-    return hash.data.reversed() |> Data.init(_:) |> base16Encode
+public func reversed(_ data: Data) -> Data {
+    return Data(data.reversed())
+}
+
+public func hashEncode(_ hash: HashDigest) -> String {
+    return hash.data |> reversed |> base16Encode
+}
+
+public func hashDecode(_ string: String) throws -> HashDigest {
+    return try string |> base16Decode |> reversed |> toHashDigest
 }

@@ -21,6 +21,71 @@
 import CBitcoin
 import WolfPipe
 
+public struct Script: InstanceContainer {
+    var wrapped: WrappedInstance
+
+    init(instance: OpaquePointer) {
+        wrapped = WrappedInstance(instance)
+    }
+
+    public init() {
+        self.init(instance: _scriptNew())
+    }
+
+    public init(string: String) throws {
+        let instance = try string.withCString { (stringBytes: UnsafePointer<Int8>) -> OpaquePointer in
+            var instance: OpaquePointer!
+            if let error = BitcoinError(rawValue: _scriptFromString(stringBytes, &instance)) {
+                throw error
+            }
+            return instance
+        }
+        self.init(instance: instance)
+    }
+
+    public init(data: Data, prefix: Bool = false) throws {
+        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+            var instance: OpaquePointer!
+            if let error = BitcoinError(rawValue: _scriptFromData(dataBytes, data.count, prefix, &instance)) {
+                throw error
+            }
+            return instance
+        }
+        self.init(instance: instance)
+    }
+
+    public func toData(prefix: Bool) -> Data {
+        var dataBytes: UnsafeMutablePointer<UInt8>!
+        var dataLength = 0
+        _scriptToData(wrapped.instance, prefix, &dataBytes, &dataLength)
+        return receiveData(bytes: dataBytes, count: dataLength)
+    }
+
+    public var data: Data {
+        return toData(prefix: false)
+    }
+
+    public var isValid: Bool {
+        return _scriptIsValid(wrapped.instance)
+    }
+}
+
+extension Script: CustomStringConvertible {
+    public var description: String {
+        return "Script('\(self.data |> scriptDecode)')"
+    }
+}
+
+extension Script: Equatable {
+    public static func == (lhs: Script, rhs: Script) -> Bool {
+        return _scriptEqual(lhs.wrapped.instance, rhs.wrapped.instance);
+    }
+}
+
+
+// MARK: - Free functions
+
+
 /// Decode a script to plain text tokens.
 public func scriptDecode(_ data: Data) -> String {
     return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in

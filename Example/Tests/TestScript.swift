@@ -48,4 +48,121 @@ class TestScript: XCTestCase {
         XCTAssert(try! s2 |> scriptToAddress == "3CS58tZGJtjz4qBFyNgQRtneKaWUjeEZVM")
         XCTAssert(try! s2 |> scriptToAddress(network: .testnet) == "2N3zHCdVHvMFLGcooeWJH3qmuXvieWfEFKG")
     }
+
+    let scriptReturn = "return"
+    let scriptReturnEmpty = "return []"
+    let scriptReturn80 = "return [0001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809]"
+    let scriptReturn81 = "return [0001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809000102030405060708090001020304050607080900010203040506070809FF]"
+
+    let script0Of3Multisig = "0 [03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] [02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] [03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] 3 checkmultisig"
+    let script1Of3Multisig = "1 [03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] [02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] [03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] 3 checkmultisig"
+    let script2Of3Multisig = "2 [03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] [02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] [03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] 3 checkmultisig"
+    let script3Of3Multisig = "3 [03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] [02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] [03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] 3 checkmultisig"
+    let script4Of3Multisig = "4 [03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] [02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] [03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] 3 checkmultisig"
+
+    let script16Of16Multisig =
+    "16 " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "16 checkmultisig"
+
+    let script17Of17Multisig =
+    "[17] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934] " +
+    "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864] " +
+    "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c] " +
+    "16 checkmultisig"
+
+    func test_script__one_hash__literal__same() {
+        let hashOne = try! "0000000000000000000000000000000000000000000000000000000000000001" |> hashDecode
+        let oneHash = try! HashDigest(Data([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]))
+        XCTAssert(hashOne == oneHash)
+    }
+
+    func test_script__from_data__testnet_119058_invalid_op_codes__success() {
+        let rawScript = try! "0130323066643366303435313438356531306633383837363437356630643265396130393739343332353534313766653139316438623963623230653430643863333030326431373463336539306366323433393231383761313037623634373337633937333135633932393264653431373731636565613062323563633534353732653302ae" |> base16Decode
+        XCTAssertNoThrow(try Script(data: rawScript))
+    }
+
+    func test_script__from_data__parse__success() {
+        let rawScript = try! "3045022100ff1fc58dbd608e5e05846a8e6b45a46ad49878aef6879ad1a7cf4c5a7f853683022074a6a10f6053ab3cddc5620d169c7374cd42c1416c51b9744db2c8d9febfb84d01" |> base16Decode
+        XCTAssertNoThrow(try Script(data: rawScript, prefix: true))
+    }
+
+    func test_script__from_data__to_data__roundtrips() {
+        let normal_output_script = try! "3045022100ff1fc58dbd608e5e05846a8e6b45a46ad49878aef6879ad1a7cf4c5a7f853683022074a6a10f6053ab3cddc5620d169c7374cd42c1416c51b9744db2c8d9febfb84d01" |> base16Decode
+        var out_script: Script!
+        XCTAssertNoThrow(out_script = try Script(data: normal_output_script))
+        let roundtrip = out_script.data
+        XCTAssert(roundtrip == normal_output_script)
+    }
+
+    func test_script__from_data__to_data_weird__roundtrips() {
+        let weird_raw_script = try! ("0c49206c69656b20636174732e483045022100c7387f64e1f4" +
+                    "cf654cae3b28a15f7572106d6c1319ddcdc878e636ccb83845" +
+                    "e30220050ebf440160a4c0db5623e0cb1562f46401a7ff5b87" +
+                    "7aa03415ae134e8c71c901534d4f0176519c6375522103b124" +
+                    "c48bbff7ebe16e7bd2b2f2b561aa53791da678a73d2777cc1c" +
+                    "a4619ab6f72103ad6bb76e00d124f07a22680e39debd4dc4bd" +
+                    "b1aa4b893720dd05af3c50560fdd52af67529c63552103b124" +
+                    "c48bbff7ebe16e7bd2b2f2b561aa53791da678a73d2777cc1c" +
+                    "a4619ab6f721025098a1d5a338592bf1e015468ec5a8fafc1f" +
+                    "c9217feb5cb33597f3613a2165e9210360cfabc01d52eaaeb3" +
+                    "976a5de05ff0cfa76d0af42d3d7e1b4c233ee8a00655ed2103" +
+                    "f571540c81fd9dbf9622ca00cfe95762143f2eab6b65150365" +
+                    "bb34ac533160432102bc2b4be1bca32b9d97e2d6fb255504f4" +
+                    "bc96e01aaca6e29bfa3f8bea65d8865855af672103ad6bb76e" +
+                    "00d124f07a22680e39debd4dc4bdb1aa4b893720dd05af3c50" +
+                    "560fddada820a4d933888318a23c28fb5fc67aca8530524e20" +
+                    "74b1d185dbf5b4db4ddb0642848868685174519c6351670068") |> base16Decode
+        var weird: Script!
+        XCTAssertNoThrow(weird = try Script(data: weird_raw_script))
+        print(weird)
+        let roundtrip_result = weird.data
+        XCTAssert(roundtrip_result == weird_raw_script)
+    }
+
+    func test_script__factory_chunk_test() {
+        let raw = try! "76a914fc7b44566256621affb1541cc9d59f08336d276b88ac" |> base16Decode
+        let script = try! Script(data: raw)
+        XCTAssert(script.isValid)
+    }
+
+    func script__from_string__empty__success() {
+        
+    }
 }
+//BOOST_AUTO_TEST_CASE(script__from_string__empty__success)
+//{
+//    script instance;
+//    BOOST_REQUIRE(instance.from_string(""));
+//    BOOST_REQUIRE(instance.operations().empty());
+//}
