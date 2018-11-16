@@ -6,10 +6,11 @@ pod 'CBitcoin', :path => '../../CBitcoin'
 pod 'WolfNumerics', :path => '../../WolfNumerics'
 pod 'WolfPipe', :path => '../../WolfPipe'
 pod 'WolfWith', :path => '../../WolfWith'
+pod 'WolfStrings', :path => '../../WolfStrings'
 
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'
-      pod 'WolfStrings'
+      #pod 'WolfStrings'
 
       target 'Bitcoin_Tests' do
           inherit! :search_paths

@@ -203,10 +203,10 @@ public enum Opcode: UInt8 {
     case checkmultisig = 174
     case checkmultisigverify = 175
     case nop1 = 176
-    //case nop2 = 177
-    case checklocktimeverify = 177 //nop2
-    //case nop3 = 178
-    case checksequenceverify = 178 //nop3
+    case checklocktimeverify = 177
+    public static let nop2 = Opcode(rawValue: 177)!
+    case checksequenceverify = 178
+    public static let nop3 = Opcode(rawValue: 178)!
     case nop4 = 179
     case nop5 = 180
     case nop6 = 181
