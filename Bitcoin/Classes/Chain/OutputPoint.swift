@@ -45,6 +45,11 @@ public struct OutputPoint: InstanceContainer {
         self.init(instance: instance)
     }
 
+//    public init(script: Script) {
+//        let instance = _outputPointFromScript(script.wrapped.instance)
+//        self.init(instance: instance)
+//    }
+
     public var data: Data {
         var dataBytes: UnsafeMutablePointer<UInt8>!
         var dataLength = 0

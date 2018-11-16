@@ -42,9 +42,12 @@ public struct Input: InstanceContainer {
         self.init(instance: instance)
     }
 
-    public init(previousOutput: OutputPoint, sequence: UInt32? = nil) {
+    public init(previousOutput: OutputPoint, script: Script? = nil, sequence: UInt32? = nil) {
         self.init()
         self.previousOutput = previousOutput
+        if let script = script {
+            self.script = script
+        }
         self.sequence = sequence ?? 0xffffffff
     }
 
@@ -74,10 +77,23 @@ public struct Input: InstanceContainer {
         }
     }
 
-    public var script: String {
+    public var script: Script {
+        get {
+            return Script(instance: _inputGetScript(wrapped.instance))
+        }
+        
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_inputCopy(wrapped.instance))
+            }
+            _inputSetScript(wrapped.instance, newValue.wrapped.instance)
+        }
+    }
+
+    public var scriptString: String {
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _inputGetScript(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
+        _inputGetScriptString(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
 
@@ -88,7 +104,7 @@ public struct Input: InstanceContainer {
 
 extension Input: CustomStringConvertible {
     public var description: String {
-        return "Input(previousOutput: \(previousOutput), sequence: 0x\(String(sequence, radix: 16)), script: '\(script)')"
+        return "Input(previousOutput: \(previousOutput), sequence: 0x\(String(sequence, radix: 16)), script: '\(scriptString)')"
     }
 }
 

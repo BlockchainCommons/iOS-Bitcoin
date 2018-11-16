@@ -54,6 +54,14 @@ public struct Script: InstanceContainer {
         self.init(instance: instance)
     }
 
+    public init(operations: [Operation]) {
+        let operationInstances = operations.map { $0.wrapped.instance }
+        let newInstance = operationInstances.withUnsafeBufferPointer { instancesBuffer in
+            _scriptFromOperations(instancesBuffer.baseAddress, operationInstances.count)
+        }
+        self.init(instance: newInstance)
+    }
+
     public func toData(prefix: Bool) -> Data {
         var dataBytes: UnsafeMutablePointer<UInt8>!
         var dataLength = 0
@@ -67,6 +75,73 @@ public struct Script: InstanceContainer {
 
     public var isValid: Bool {
         return _scriptIsValid(wrapped.instance)
+    }
+
+    public var operations: [Operation] {
+        var operations: UnsafeMutablePointer<OpaquePointer>!
+        var operationsCount = 0
+        _scriptGetOperations(wrapped.instance, &operations, &operationsCount)
+        return receiveInstances(instances: operations, count: operationsCount)
+    }
+
+    public var isEmpty: Bool {
+        return _scriptIsEmpty(wrapped.instance)
+    }
+
+    public mutating func clear() {
+        if !isKnownUniquelyReferenced(&wrapped) {
+            wrapped = WrappedInstance(_scriptCopy(wrapped.instance))
+        }
+        _scriptClear(wrapped.instance)
+    }
+
+    public var witnessProgram: Data {
+        var program: UnsafeMutablePointer<UInt8>!
+        var programLength = 0
+        _scriptGetWitnessProgram(wrapped.instance, &program, &programLength);
+        return receiveData(bytes: program, count: programLength)
+    }
+
+    public var version: ScriptVersion {
+        return ScriptVersion(rawValue: _scriptGetVersion(wrapped.instance))!
+    }
+
+    public var pattern: ScriptPattern {
+        return ScriptPattern(rawValue: _scriptGetPattern(wrapped.instance))!
+    }
+
+    public var inputPattern: ScriptPattern {
+        return ScriptPattern(rawValue: _scriptGetInputPattern(wrapped.instance))!
+    }
+
+    public var outputPattern: ScriptPattern {
+        return ScriptPattern(rawValue: _scriptGetOutputPattern(wrapped.instance))!
+    }
+
+    public static func makePayNullDataPattern(data: Data) -> [Operation] {
+        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> [Operation] in
+            var operations: UnsafeMutablePointer<OpaquePointer>!
+            var operationsCount = 0
+            _scriptMakePayNullDataPattern(dataBytes, data.count, &operations, &operationsCount)
+            return receiveInstances(instances: operations, count: operationsCount)
+        }
+    }
+
+//    public static func makePayKeyHashPattern(hash: ShortHash) -> [Operation] {
+//    }
+//
+//    public static func makePayScriptHashPattern(hash: ShortHash) -> [Operation] {
+//    }
+
+//    static operation::list to_pay_public_key_pattern(data_slice point);
+//    static operation::list to_pay_key_hash_pattern(const short_hash& hash);
+//    static operation::list to_pay_script_hash_pattern(const short_hash& hash);
+//    static operation::list to_pay_multisig_pattern(uint8_t signatures, const point_list& points);
+//    static operation::list to_pay_multisig_pattern(uint8_t signatures, const data_stack& points);
+
+    public static func verify(transaction: Transaction, inputIndex: UInt32, rules: RuleFork, prevoutScript: Script, value: UInt64) -> LibBitcoinResult {
+        let result = _scriptVerify(transaction.wrapped.instance, inputIndex, rules.rawValue, prevoutScript.wrapped.instance, value)
+        return LibBitcoinResult(code: result)
     }
 }
 

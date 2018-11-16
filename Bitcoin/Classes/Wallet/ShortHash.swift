@@ -1,8 +1,8 @@
 //
-//  HashDigest.swift
+//  ShortHash.swift
 //  Bitcoin
 //
-//  Created by Wolf McNally on 11/8/18.
+//  Created by Wolf McNally on 11/15/18.
 //
 //  Copyright © 2018 Blockchain Commons.
 //
@@ -21,39 +21,31 @@
 import Foundation
 import WolfPipe
 
-public struct HashDigest {
+public struct ShortHash {
     public let data: Data
 
     public init(_ data: Data) throws {
-        guard data.count == 32 else {
+        guard data.count == 20 else {
             throw BitcoinError.invalidDataSize
         }
         self.data = data
     }
 }
 
-extension HashDigest: CustomStringConvertible {
+extension ShortHash: CustomStringConvertible {
     public var description: String {
         return data |> base16Encode
     }
 }
 
-extension HashDigest: Equatable {
-    public static func == (lhs: HashDigest, rhs: HashDigest) -> Bool {
+extension ShortHash: Equatable {
+    public static func == (lhs: ShortHash, rhs: ShortHash) -> Bool {
         return lhs.data == rhs.data
     }
 }
 
 // MARK: - Free functions
 
-public func toHashDigest(_ data: Data) throws -> HashDigest {
-    return try HashDigest(data)
-}
-
-public func hashEncode(_ hash: HashDigest) -> String {
-    return hash.data |> reversed |> base16Encode
-}
-
-public func hashDecode(_ string: String) throws -> HashDigest {
-    return try string |> base16Decode |> reversed |> toHashDigest
+public func toShortHash(_ data: Data) throws -> ShortHash {
+    return try ShortHash(data)
 }

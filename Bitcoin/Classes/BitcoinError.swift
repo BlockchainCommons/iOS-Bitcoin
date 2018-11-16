@@ -20,25 +20,48 @@
 
 import Foundation
 
+public struct LibBitcoinResult: Error, CustomStringConvertible {
+    public let code: UInt32
+
+    public init(code: UInt32) {
+        self.code = code
+    }
+
+    public var isSuccess: Bool {
+        return code == 0
+    }
+
+    public var description: String {
+        return "libbitcoin error \(code)"
+    }
+}
+
 public enum BitcoinError: Int, Error, CustomStringConvertible {
-    case invalidFormat = 1
-    case invalidDataSize = 2
-    case seedTooSmall = 3
-    case invalidSeedSize = 4
-    case invalidSeed = 5
-    case unsupportedLanguage = 6
-    case invalidVersion = 7
-    case privateKeyRequired = 8
-    case invalidKey = 9
-    case invalidAddress = 10
-    case invalidChecksum = 11
-    case invalidScript = 12
-    case invalidTransaction = 13
-    case invalidData = 14
-    case invalidOpcode = 15
+    case errorCode = 1
+    case invalidFormat = 2
+    case invalidDataSize = 3
+    case seedTooSmall = 4
+    case invalidSeedSize = 5
+    case invalidSeed = 6
+    case unsupportedLanguage = 7
+    case invalidVersion = 8
+    case privateKeyRequired = 9
+    case invalidKey = 10
+    case invalidAddress = 11
+    case invalidChecksum = 12
+    case invalidScript = 13
+    case invalidTransaction = 14
+    case invalidData = 15
+    case invalidOpcode = 16
 
     public var description: String {
         switch self {
+        case .errorCode:
+            return "Error code"
+        case .invalidFormat:
+            return "Invalid format"
+        case .invalidDataSize:
+            return "Invalid data size"
         case .seedTooSmall:
             return "Seed size too small"
         case .invalidSeedSize:
@@ -47,10 +70,6 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
             return "Invalid seed"
         case .unsupportedLanguage:
             return "Unsupported language"
-        case .invalidFormat:
-            return "Invalid format"
-        case .invalidDataSize:
-            return "Invalid data size"
         case .invalidVersion:
             return "Invalid version"
         case .privateKeyRequired:

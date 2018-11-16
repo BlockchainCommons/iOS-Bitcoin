@@ -156,13 +156,124 @@ class TestScript: XCTestCase {
         XCTAssert(script.isValid)
     }
 
-    func script__from_string__empty__success() {
-        
+    func test_script__from_string__empty__success() {
+        let script = try! Script(string: "")
+        XCTAssert(script.operations.isEmpty)
+    }
+
+    func test_script__from_string__two_of_three_multisig__success() {
+        let script = try! Script(string: script2Of3Multisig)
+        let ops = script.operations
+        XCTAssert(ops.count == 6)
+        XCTAssert(ops[0].opcode == Opcode.pushPositive2)
+        XCTAssert(ops[1] |> toString(rules: .noRules) == "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864]")
+        XCTAssert(ops[2] |> toString(rules: .noRules) == "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c]")
+        XCTAssert(ops[3] |> toString(rules: .noRules) == "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934]")
+        XCTAssert(ops[4].opcode == Opcode.pushPositive3)
+        XCTAssert(ops[5].opcode == Opcode.checkmultisig)
+    }
+
+    func test_script__empty__default__true() {
+        let script = Script()
+        XCTAssert(script.isEmpty)
+    }
+
+    func test_script__empty__no_operations__true() {
+        let script = Script(operations: [])
+        XCTAssert(script.isEmpty)
+    }
+
+    func test_script__empty__non_empty__false() {
+        let data = try! "2a" |> base16Decode
+        let script = Script(operations: Script.makePayNullDataPattern(data: data))
+        XCTAssertFalse(script.isEmpty)
+    }
+
+    func test_script__clear__non_empty__empty() {
+        let data = try! "2a" |> base16Decode
+        var script = Script(operations: Script.makePayNullDataPattern(data: data))
+        XCTAssertFalse(script.isEmpty)
+        script.clear()
+        XCTAssert(script.isEmpty)
+    }
+
+    func test_script__pattern() {
+        func f(_ scriptString: String, outputPattern: ScriptPattern, inputPattern: ScriptPattern, pattern: ScriptPattern) -> Bool {
+            let script = try! Script(string: scriptString)
+            guard script.isValid else { return false }
+            guard script.outputPattern == outputPattern else { return false }
+            guard script.inputPattern == inputPattern else { return false }
+            guard script.pattern == pattern else { return false }
+            return true
+        }
+
+        XCTAssert(f(scriptReturn, outputPattern: .nonStandard, inputPattern: .nonStandard, pattern: .nonStandard))
+        XCTAssert(f(scriptReturnEmpty, outputPattern: .payNullData, inputPattern: .nonStandard, pattern: .payNullData))
+        XCTAssert(f(scriptReturn80, outputPattern: .payNullData, inputPattern: .nonStandard, pattern: .payNullData))
+        XCTAssert(f(scriptReturn81, outputPattern: .nonStandard, inputPattern: .nonStandard, pattern: .nonStandard))
+        XCTAssert(f(script0Of3Multisig, outputPattern: .nonStandard, inputPattern: .nonStandard, pattern: .nonStandard))
+        XCTAssert(f(script1Of3Multisig, outputPattern: .payMultisig, inputPattern: .nonStandard, pattern: .payMultisig))
+        XCTAssert(f(script2Of3Multisig, outputPattern: .payMultisig, inputPattern: .nonStandard, pattern: .payMultisig))
+        XCTAssert(f(script3Of3Multisig, outputPattern: .payMultisig, inputPattern: .nonStandard, pattern: .payMultisig))
+        XCTAssert(f(script4Of3Multisig, outputPattern: .nonStandard, inputPattern: .nonStandard, pattern: .nonStandard))
+        XCTAssert(f(script16Of16Multisig, outputPattern: .payMultisig, inputPattern: .nonStandard, pattern: .payMultisig))
+        XCTAssert(f(script17Of17Multisig, outputPattern: .nonStandard, inputPattern: .nonStandard, pattern: .nonStandard))
+    }
+
+    struct ScriptTest {
+        let input: String
+        let output: String
+        let description: String
+        let inputSequence: UInt32
+        let lockTime: UInt32
+        let version: UInt32
+
+        init(_ input: String, _ output: String, _ description: String, _ inputSequence: UInt32 = 0, _ lockTime: UInt32 = 0, _ version: UInt32 = 0) {
+            self.input = input
+            self.output = output
+            self.description = description
+            self.inputSequence = inputSequence
+            self.lockTime = lockTime
+            self.version = version
+        }
+    }
+
+    func test_script__bip16__valid() {
+        let valid_bip16_scripts = [
+            ScriptTest("0 [51]", "hash160 [da1745e9b549bd0bfa1a569971c77eba30cd5a4b] equal", "trivial p2sh"),
+            ScriptTest("[1.] [0.51]", "hash160 [da1745e9b549bd0bfa1a569971c77eba30cd5a4b] equal", "basic p2sh")
+        ]
+
+        for test in valid_bip16_scripts {
+            let inputScript = try! Script(string: test.input)
+            let outputScript = try! Script(string: test.output)
+            let outputPoint = OutputPoint()
+            let input = Input(previousOutput: outputPoint, script: inputScript, sequence: test.inputSequence)
+            let tx = Transaction(version: test.version, lockTime: test.lockTime, inputs: [input], outputs: [])
+            XCTAssert(tx.isValid)
+            XCTAssert(Script.verify(transaction: tx, inputIndex: 0, rules: .noRules, prevoutScript: outputScript, value: 0).isSuccess)
+            XCTAssert(Script.verify(transaction: tx, inputIndex: 0, rules: .bip16Rule, prevoutScript: outputScript, value: 0).isSuccess)
+            XCTAssert(Script.verify(transaction: tx, inputIndex: 0, rules: .allRules, prevoutScript: outputScript, value: 0).isSuccess)
+        }
+    }
+
+    func test_script__bip16__invalidated() {
+        let invalidated_bip16_scripts = [
+            ScriptTest("nop [51]", "hash160 [da1745e9b549bd0bfa1a569971c77eba30cd5a4b] equal", "is_push_only fails under bip16"),
+            ScriptTest("nop1 [51]", "hash160 [da1745e9b549bd0bfa1a569971c77eba30cd5a4b] equal", "is_push_only fails under bip16"),
+            ScriptTest("0 [50]", "hash160 [ece424a6bb6ddf4db592c0faed60685047a361b1] equal", "op_reserved as p2sh serialized script fails"),
+            ScriptTest("0 [62]", "hash160 [0f4d7845db968f2a81b530b6f3c1d6246d4c7e01] equal", "op_ver as p2sh serialized script fails")
+        ]
+        for test in invalidated_bip16_scripts {
+            let inputScript = try! Script(string: test.input)
+            let outputScript = try! Script(string: test.output)
+            let outputPoint = OutputPoint()
+            let input = Input(previousOutput: outputPoint, script: inputScript, sequence: test.inputSequence)
+            let tx = Transaction(version: test.version, lockTime: test.lockTime, inputs: [input], outputs: [])
+            XCTAssert(tx.isValid)
+            XCTAssert(Script.verify(transaction: tx, inputIndex: 0, rules: .noRules, prevoutScript: outputScript, value: 0).isSuccess)
+            XCTAssertFalse(Script.verify(transaction: tx, inputIndex: 0, rules: .bip16Rule, prevoutScript: outputScript, value: 0).isSuccess)
+            XCTAssertFalse(Script.verify(transaction: tx, inputIndex: 0, rules: .allRules, prevoutScript: outputScript, value: 0).isSuccess)
+        }
     }
 }
-//BOOST_AUTO_TEST_CASE(script__from_string__empty__success)
-//{
-//    script instance;
-//    BOOST_REQUIRE(instance.from_string(""));
-//    BOOST_REQUIRE(instance.operations().empty());
-//}
