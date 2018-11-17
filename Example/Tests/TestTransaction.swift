@@ -150,10 +150,10 @@ class TestTransaction: XCTestCase {
         "82a203c8b2742985da0ac72cc078f2ffffffff") |> base16Decode
         let tx0LastOutput = try! "f0c9c467000000001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac" |> base16Decode
 
-        let input = try! Input(data: tx0Inputs)
+        let input = try! tx0Inputs |> deserializeInput
         XCTAssert(input.description == "Input(previousOutput: OutputPoint(hash: f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc, index: 1), sequence: 0xffffffff, script: '[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]')")
 
-        let output = try! Output(data: tx0LastOutput)
+        let output = try! tx0LastOutput |> deserializeOutput
         XCTAssert(output.description == "Output(value: 1740950000, script: 'dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig')")
 
         let transaction = Transaction(version: version, lockTime: lockTime, inputs: [input], outputs: [output])
@@ -175,7 +175,7 @@ class TestTransaction: XCTestCase {
         "001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac80c4600f00" +
         "0000001976a9141ee32412020a324b93b1a1acfdfff6ab9ca8fac288ac000000" +
         "00") |> base16Decode
-        let tx = try! Transaction(data: tx1)
+        let tx = try! tx1 |> deserializeTransaction
         XCTAssert(tx.description == "Transaction(version: 1, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc, index: 1), sequence: 0xffffffff, script: '[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]')], outputs: [Output(value: 1740950000, script: 'dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig'), Output(value: 258000000, script: 'dup hash160 [1ee32412020a324b93b1a1acfdfff6ab9ca8fac2] equalverify checksig')])")
     }
 

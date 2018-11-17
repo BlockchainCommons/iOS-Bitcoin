@@ -43,15 +43,26 @@ public struct Script: InstanceContainer {
         self.init(instance: instance)
     }
 
-    public init(data: Data, prefix: Bool = false) throws {
+    public static func deserialize(data: Data, prefix: Bool = false) throws -> Script {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _scriptFromData(dataBytes, data.count, prefix, &instance)) {
+            if let error = BitcoinError(rawValue: _scriptDeserialize(dataBytes, data.count, prefix, &instance)) {
                 throw error
             }
             return instance
         }
-        self.init(instance: instance)
+        return Script(instance: instance)
+    }
+
+    public func serialized(prefix: Bool) -> Data {
+        var dataBytes: UnsafeMutablePointer<UInt8>!
+        var dataLength = 0
+        _scriptSerialize(wrapped.instance, prefix, &dataBytes, &dataLength)
+        return receiveData(bytes: dataBytes, count: dataLength)
+    }
+
+    public var serialized: Data {
+        return serialized(prefix: false)
     }
 
     public init(operations: [Operation]) {
@@ -60,17 +71,6 @@ public struct Script: InstanceContainer {
             _scriptFromOperations(instancesBuffer.baseAddress, operationInstances.count)
         }
         self.init(instance: newInstance)
-    }
-
-    public func toData(prefix: Bool) -> Data {
-        var dataBytes: UnsafeMutablePointer<UInt8>!
-        var dataLength = 0
-        _scriptToData(wrapped.instance, prefix, &dataBytes, &dataLength)
-        return receiveData(bytes: dataBytes, count: dataLength)
-    }
-
-    public var data: Data {
-        return toData(prefix: false)
     }
 
     public var isValid: Bool {
@@ -147,7 +147,7 @@ public struct Script: InstanceContainer {
 
 extension Script: CustomStringConvertible {
     public var description: String {
-        return "Script('\(self.data |> scriptDecode)')"
+        return "Script('\(self |> serialize |> scriptDecode)')"
     }
 }
 
@@ -205,4 +205,12 @@ public func scriptToAddress(network: PaymentAddressNetwork) -> (_ script: String
 /// Create a BIP16 pay-to-script-hash address from a script.
 public func scriptToAddress(_ script: String) throws -> String {
     return try script |> scriptToAddress(network: .mainnet)
+}
+
+public func serialize(_ script: Script) -> Data {
+    return script.serialized
+}
+
+public func deserializeScript(_ data: Data) throws -> Script {
+    return try Script.deserialize(data: data)
 }

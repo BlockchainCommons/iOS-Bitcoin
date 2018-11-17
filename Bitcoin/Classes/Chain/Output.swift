@@ -31,15 +31,22 @@ public struct Output: InstanceContainer {
         self.init(instance: _outputNew())
     }
 
-    public init(data: Data) throws {
+    public static func deserialize(data: Data) throws -> Output {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _outputFromData(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _outputDeserialize(dataBytes, data.count, &instance)) {
                 throw error
             }
             return instance
         }
-        self.init(instance: instance)
+        return Output(instance: instance)
+    }
+
+    public var serialized: Data {
+        var dataBytes: UnsafeMutablePointer<UInt8>!
+        var dataLength = 0
+        _outputSerialize(wrapped.instance, &dataBytes, &dataLength)
+        return receiveData(bytes: dataBytes, count: dataLength)
     }
 
     public init(value: UInt64, paymentAddress: String) throws {
@@ -90,4 +97,14 @@ extension Output: Equatable {
     public static func == (lhs: Output, rhs: Output) -> Bool {
         return _outputEqual(lhs.wrapped.instance, rhs.wrapped.instance)
     }
+}
+
+// MARK: - Free functions
+
+public func serialize(_ output: Output) -> Data {
+    return output.serialized
+}
+
+public func deserializeOutput(_ data: Data) throws -> Output {
+    return try Output.deserialize(data: data)
 }

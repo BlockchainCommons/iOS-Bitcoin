@@ -34,15 +34,15 @@ public struct OutputPoint: InstanceContainer {
         self.init(instance: _outputPointNew())
     }
 
-    public init(data: Data) throws {
+    public static func deserialize(data: Data) throws -> OutputPoint {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _outputPointFromData(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _outputPointDeserialize(dataBytes, data.count, &instance)) {
                 throw error
             }
             return instance
         }
-        self.init(instance: instance)
+        return OutputPoint(instance: instance)
     }
 
 //    public init(script: Script) {
@@ -50,10 +50,10 @@ public struct OutputPoint: InstanceContainer {
 //        self.init(instance: instance)
 //    }
 
-    public var data: Data {
+    public var serialized: Data {
         var dataBytes: UnsafeMutablePointer<UInt8>!
         var dataLength = 0
-        _outputPointToData(wrapped.instance, &dataBytes, &dataLength)
+        _outputPointSerialize(wrapped.instance, &dataBytes, &dataLength)
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
@@ -112,4 +112,14 @@ extension OutputPoint: Equatable {
     public static func == (lhs: OutputPoint, rhs: OutputPoint) -> Bool {
         return _outputPointEqual(lhs.wrapped.instance, rhs.wrapped.instance);
     }
+}
+
+// MARK: - Free functions
+
+public func serialize(_ outputPoint: OutputPoint) -> Data {
+    return outputPoint.serialized
+}
+
+public func deserializeOutputPoint(_ data: Data) throws -> OutputPoint {
+    return try OutputPoint.deserialize(data: data)
 }

@@ -43,7 +43,7 @@ class TestOutputPoint: XCTestCase {
 
     func test3() {
         let data = try! "10" |> base16Decode
-        XCTAssertThrowsError(try OutputPoint(data: data))
+        XCTAssertThrowsError(try data |> deserializeOutputPoint)
     }
 
     func test4() {
@@ -58,18 +58,18 @@ class TestOutputPoint: XCTestCase {
         var point = OutputPoint()
         XCTAssertFalse(initial == point)
 
-        point = try! OutputPoint(data: initial.data)
+        point = try! initial |> serialize |> deserializeOutputPoint
         XCTAssert(point.isValid)
         XCTAssert(initial == point)
     }
 
     func test5() {
         let data = try! "46682488f0a721124a3905a1bb72445bf13493e2cd46c5c0c8db1c15afa0d58e00000000" |> base16Decode
-        let point = try! OutputPoint(data: data)
+        let point = try! data |> deserializeOutputPoint
         XCTAssert(point.isValid)
         XCTAssert(point.hash |> hashEncode == "8ed5a0af151cdbc8c0c546cde29334f15b4472bba105394a1221a7f088246846")
         XCTAssert(point.index == 0)
-        XCTAssert(point.data == data)
+        XCTAssert(point |> serialize == data)
     }
 }
 

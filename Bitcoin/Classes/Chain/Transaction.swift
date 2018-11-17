@@ -51,21 +51,21 @@ public struct Transaction: InstanceContainer {
         self.init(instance: _transactionNew())
     }
 
-    public init(data: Data) throws {
+    public static func deserialize(data: Data) throws -> Transaction {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _transactionFromData(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _transactionDeserialize(dataBytes, data.count, &instance)) {
                 throw error
             }
             return instance
         }
-        self.init(instance: instance)
+        return Transaction(instance: instance)
     }
 
-    public var data: Data {
+    public var serialized: Data {
         var dataBytes: UnsafeMutablePointer<UInt8>!
         var dataLength = 0
-        _transactionToData(wrapped.instance, &dataBytes, &dataLength)
+        _transactionSerialize(wrapped.instance, &dataBytes, &dataLength)
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
@@ -158,6 +158,10 @@ extension Transaction: CustomStringConvertible {
 
 // MARK: - Free functions
 
-public func toData(_ transaction: Transaction) -> Data {
-    return transaction.data
+public func serialize(_ transaction: Transaction) -> Data {
+    return transaction.serialized
+}
+
+public func deserializeTransaction(_ data: Data) throws -> Transaction {
+    return try Transaction.deserialize(data: data)
 }

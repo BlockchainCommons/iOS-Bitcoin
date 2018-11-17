@@ -109,19 +109,19 @@ class TestScript: XCTestCase {
 
     func test_script__from_data__testnet_119058_invalid_op_codes__success() {
         let rawScript = try! "0130323066643366303435313438356531306633383837363437356630643265396130393739343332353534313766653139316438623963623230653430643863333030326431373463336539306366323433393231383761313037623634373337633937333135633932393264653431373731636565613062323563633534353732653302ae" |> base16Decode
-        XCTAssertNoThrow(try Script(data: rawScript))
+        XCTAssertNoThrow(try rawScript |> deserializeScript)
     }
 
     func test_script__from_data__parse__success() {
         let rawScript = try! "3045022100ff1fc58dbd608e5e05846a8e6b45a46ad49878aef6879ad1a7cf4c5a7f853683022074a6a10f6053ab3cddc5620d169c7374cd42c1416c51b9744db2c8d9febfb84d01" |> base16Decode
-        XCTAssertNoThrow(try Script(data: rawScript, prefix: true))
+        XCTAssertNoThrow(try Script.deserialize(data: rawScript, prefix: true))
     }
 
     func test_script__from_data__to_data__roundtrips() {
         let normal_output_script = try! "3045022100ff1fc58dbd608e5e05846a8e6b45a46ad49878aef6879ad1a7cf4c5a7f853683022074a6a10f6053ab3cddc5620d169c7374cd42c1416c51b9744db2c8d9febfb84d01" |> base16Decode
         var out_script: Script!
-        XCTAssertNoThrow(out_script = try Script(data: normal_output_script))
-        let roundtrip = out_script.data
+        XCTAssertNoThrow(out_script = try normal_output_script |> deserializeScript)
+        let roundtrip = out_script |> serialize
         XCTAssert(roundtrip == normal_output_script)
     }
 
@@ -144,15 +144,15 @@ class TestScript: XCTestCase {
                     "560fddada820a4d933888318a23c28fb5fc67aca8530524e20" +
                     "74b1d185dbf5b4db4ddb0642848868685174519c6351670068") |> base16Decode
         var weird: Script!
-        XCTAssertNoThrow(weird = try Script(data: weird_raw_script))
+        XCTAssertNoThrow(weird = try weird_raw_script |> deserializeScript)
         print(weird)
-        let roundtrip_result = weird.data
+        let roundtrip_result = weird |> serialize
         XCTAssert(roundtrip_result == weird_raw_script)
     }
 
     func test_script__factory_chunk_test() {
         let raw = try! "76a914fc7b44566256621affb1541cc9d59f08336d276b88ac" |> base16Decode
-        let script = try! Script(data: raw)
+        let script = try! raw |> deserializeScript
         XCTAssert(script.isValid)
     }
 
