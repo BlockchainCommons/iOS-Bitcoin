@@ -20,7 +20,6 @@
 
 import CBitcoin
 import WolfPipe
-import Foundation
 
 public enum PaymentAddressNetwork {
     case mainnet

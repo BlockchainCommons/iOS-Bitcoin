@@ -157,6 +157,32 @@ extension Script: Equatable {
     }
 }
 
+public func generateSignatureHash(transaction: Transaction, inputIndex: UInt32, script: Script, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> HashDigest {
+    var hash: UnsafeMutablePointer<UInt8>!
+    var hashLength = 0
+    _generateSignatureHash(transaction.wrapped.instance, inputIndex, script.wrapped.instance, sigHashType.rawValue, scriptVersion.rawValue, value, &hash, &hashLength)
+    return try! receiveData(bytes: hash, count: hashLength) |> toHashDigest
+}
+
+public func checkSignature(_ signature: ECSignature, sigHashType: SigHashAlgorithm, publicKey: ECPublicKey, script: Script, transaction: Transaction, inputIndex: UInt32, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> Bool {
+    return signature.data.withUnsafeBytes { (signatureBytes: UnsafePointer<UInt8>) in
+        publicKey.data.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
+        _checkSignature(signatureBytes, sigHashType.rawValue, publicKeyBytes, publicKey.data.count, script.wrapped.instance, transaction.wrapped.instance, inputIndex, scriptVersion.rawValue, value)
+        }
+    }
+}
+
+public func createEndorsement(privateKey: ECPrivateKey, script: Script, transaction: Transaction, inputIndex: UInt32, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) throws -> Endorsement {
+    return try privateKey.data.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+        var endorsement: UnsafeMutablePointer<UInt8>!
+        var endorsementLength = 0
+        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, inputIndex, sigHashType.rawValue, scriptVersion.rawValue, value, &endorsement, &endorsementLength)) {
+            throw error
+        }
+        return try receiveData(bytes: endorsement, count: endorsementLength) |> toEndorsement
+    }
+}
+
 
 // MARK: - Free functions
 
@@ -213,4 +239,8 @@ public func serialize(_ script: Script) -> Data {
 
 public func deserializeScript(_ data: Data) throws -> Script {
     return try Script.deserialize(data: data)
+}
+
+public func toScript(_ script: String) throws -> Script {
+    return try Script(string: script)
 }

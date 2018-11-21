@@ -5,8 +5,6 @@
 //  Created by Wolf McNally on 11/12/18.
 //
 
-import Foundation
-
 public struct RuleFork: OptionSet {
     public let rawValue: UInt32
 

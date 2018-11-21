@@ -18,8 +18,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-import Foundation
-
 public struct LibBitcoinResult: Error, CustomStringConvertible {
     public let code: UInt32
 
@@ -53,6 +51,7 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
     case invalidTransaction = 14
     case invalidData = 15
     case invalidOpcode = 16
+    case invalidSignature = 17
 
     public var description: String {
         switch self {
@@ -88,6 +87,8 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
             return "Invalid data"
         case .invalidOpcode:
             return "Invalid opcode"
+        case .invalidSignature:
+            return "Invalid signature"
         }
     }
 }

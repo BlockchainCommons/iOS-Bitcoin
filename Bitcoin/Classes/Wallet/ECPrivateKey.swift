@@ -34,6 +34,8 @@ public struct ECPrivateKey: ECKey {
     }
 }
 
+// MARK: - Free functions
+
 public func toECPrivateKey(_ data: Data) throws -> ECPrivateKey {
     return try ECPrivateKey(data)
 }
