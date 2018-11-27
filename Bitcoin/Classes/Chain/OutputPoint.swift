@@ -100,6 +100,10 @@ public struct OutputPoint: InstanceContainer {
     public var isValid: Bool {
         return _outputPointIsValid(wrapped.instance)
     }
+
+    public var isNull: Bool {
+        return _outputPointIsNull(wrapped.instance)
+    }
 }
 
 extension OutputPoint: CustomStringConvertible {

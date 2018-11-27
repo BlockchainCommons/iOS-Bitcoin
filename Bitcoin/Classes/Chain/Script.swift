@@ -143,6 +143,10 @@ public struct Script: InstanceContainer {
         let result = _scriptVerify(transaction.wrapped.instance, inputIndex, rules.rawValue, prevoutScript.wrapped.instance, value)
         return LibBitcoinResult(code: result)
     }
+
+    public func serializedSize(prefix: Bool) -> Int {
+        return _scriptSerializedSize(wrapped.instance, prefix)
+    }
 }
 
 extension Script: CustomStringConvertible {

@@ -55,6 +55,11 @@ public struct Output: InstanceContainer {
         try setPaymentAddress(paymentAddress)
     }
 
+    public init(value: UInt64) {
+        self.init()
+        self.value = value
+    }
+
     public mutating func setPaymentAddress(_ paymentAddress: String) throws {
         if !isKnownUniquelyReferenced(&wrapped) {
             wrapped = WrappedInstance(_outputCopy(wrapped.instance))

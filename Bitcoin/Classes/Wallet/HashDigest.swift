@@ -29,6 +29,12 @@ public struct HashDigest {
         }
         self.data = data
     }
+
+    public init() {
+        self.data = Data(count: 32)
+    }
+
+    public static let null = HashDigest()
 }
 
 extension HashDigest: CustomStringConvertible {

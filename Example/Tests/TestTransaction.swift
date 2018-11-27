@@ -139,7 +139,7 @@ class TestTransaction: XCTestCase {
 //        let input = Input();
 //    }
 
-    func testConstructor2ValidInputReturnsInputInitialized() {
+    func test_constructor_2__valid_input__returns_input_initialized() {
         let version: UInt32 = 2345;
         let lockTime: UInt32 = 4568656;
 
@@ -166,7 +166,7 @@ class TestTransaction: XCTestCase {
         XCTAssert(transaction.outputs == [output])
     }
 
-    func testConstructor4ValidInputReturnsInputInitialized() {
+    func test_constructor_4__valid_input__returns_input_initialized() {
         let tx1 = try! ("0100000001f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc" +
         "4de65310fc010000006a473044022050d8368cacf9bf1b8fb1f7cfd9aff63294" +
         "789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e" +
@@ -179,12 +179,12 @@ class TestTransaction: XCTestCase {
         XCTAssert(tx.description == "Transaction(version: 1, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc, index: 1), sequence: 0xffffffff, script: '[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]')], outputs: [Output(value: 1740950000, script: 'dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig'), Output(value: 258000000, script: 'dup hash160 [1ee32412020a324b93b1a1acfdfff6ab9ca8fac2] equalverify checksig')])")
     }
 
-    func testIsCoinbaseEmptyInputsReturnsFalse() {
+    func test_is_coinbase__empty_inputs__returns_false() {
         let tx = Transaction()
         XCTAssertFalse(tx.isCoinbase)
     }
 
-    func testIsCoinbaseOneInputReturnsTrue() {
+    func test_is_coinbase__one_null_input__returns_true() {
         var tx = Transaction()
         var input1 = Input()
         input1.previousOutput.index = OutputPoint.nullIndex
@@ -192,14 +192,358 @@ class TestTransaction: XCTestCase {
         XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 4294967295), sequence: 0x0, script: '')], outputs: [])")
         XCTAssert(tx.isCoinbase)
 
+        // is_coinbase__one_non_null_input__returns_false
         var input2 = input1
         input2.previousOutput.index = 42
         tx.inputs = [input2]
         XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 42), sequence: 0x0, script: '')], outputs: [])")
         XCTAssertFalse(tx.isCoinbase)
 
+        // is_coinbase__two_inputs_first_null__returns_false
         tx.inputs = [input1, input2]
         XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 4294967295), sequence: 0x0, script: ''), Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 42), sequence: 0x0, script: '')], outputs: [])")
         XCTAssertFalse(tx.isCoinbase)
+    }
+
+    func test_is_null_non_coinbase__empty_inputs__returns_false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isNullNonCoinbase)
+    }
+
+    func test_is_null_non_coinbase__one_null_input__returns_false() {
+        var tx = Transaction()
+        var input1 = Input()
+        input1.previousOutput.index = OutputPoint.nullIndex
+        tx.inputs = [input1]
+        XCTAssertFalse(tx.isNullNonCoinbase)
+    }
+
+    func test_is_null_non_coinbase__one_non_null_input__returns_false() {
+        var tx = Transaction()
+        var input1 = Input()
+        input1.previousOutput.index = 42
+        tx.inputs = [input1]
+        XCTAssertFalse(tx.isNullNonCoinbase)
+    }
+
+    func test_is_null_non_coinbase__two_inputs_first_null__returns_true() {
+        var tx = Transaction()
+        var input1 = Input()
+        input1.previousOutput.index = OutputPoint.nullIndex
+        var input2 = Input()
+        input2.previousOutput.index = 42
+        tx.inputs = [input1, input2]
+        XCTAssert(tx.isNullNonCoinbase)
+    }
+
+    func test_is_final__locktime_zero__returns_true() {
+        var tx = Transaction()
+        tx.lockTime = 0
+        XCTAssert(tx.isFinal(blockHeight: 100, blockTime: 100))
+    }
+
+    func test_is_final__locktime_less_block_time_greater_threshold__returns_true() {
+        var tx = Transaction()
+        tx.lockTime = UInt32(locktimeThreshold + 50)
+        XCTAssert(tx.isFinal(blockHeight: locktimeThreshold + 100, blockTime: 100))
+    }
+
+    func test_is_final__locktime_less_block_height_less_threshold_returns_true() {
+        var tx = Transaction()
+        tx.lockTime = 50
+        XCTAssert(tx.isFinal(blockHeight: 100, blockTime: 100))
+    }
+
+    func test_is_final__locktime_input_not_final__returns_false() {
+        var input = Input()
+        input.sequence = 1
+        let tx = Transaction(version: 0, lockTime: 101, inputs: [input], outputs: [])
+        XCTAssertFalse(tx.isFinal(blockHeight: 100, blockTime: 100))
+    }
+
+    func test_is_final__locktime_inputs_final__returns_true() {
+        var input = Input()
+        input.sequence = maxInputSequence
+        let tx = Transaction(version: 0, lockTime: 101, inputs: [input], outputs: [])
+        XCTAssert(tx.isFinal(blockHeight: 100, blockTime: 100))
+    }
+
+    func test_is_locked__version_1_empty__returns_false() {
+        var tx = Transaction()
+        tx.version = 1
+        XCTAssertFalse(tx.isLocked(blockHeight: 0, medianTimePast: 0))
+    }
+
+    func test_is_locked__version_2_empty__returns_false() {
+        var tx = Transaction()
+        tx.version = 2
+        XCTAssertFalse(tx.isLocked(blockHeight: 0, medianTimePast: 0))
+    }
+
+    func test_is_locked__version_1_one_of_two_locked_locked__returns_false() {
+        var tx = Transaction()
+        tx.inputs = [Input(sequence: 1), Input(sequence: 0)]
+        tx.version = 1
+        XCTAssertFalse(tx.isLocked(blockHeight: 0, medianTimePast: 0))
+    }
+
+    func test_is_locked__version_4_one_of_two_locked__returns_true() {
+        let tx = Transaction(version: 4, inputs: [Input(sequence: 1), Input(sequence: 0)])
+        XCTAssertTrue(tx.isLocked(blockHeight: 0, medianTimePast: 0))
+    }
+
+    func test_is_locktime_conflict__locktime_zero__returns_false() {
+        let tx = Transaction(lockTime: 0)
+        XCTAssertFalse(tx.isLockTimeConflict)
+    }
+
+    func test_is_locktime_conflict__input_sequence_not_maximum__returns_false() {
+        let tx = Transaction(lockTime: 2143, inputs: [Input(sequence: 1)])
+        XCTAssertFalse(tx.isLockTimeConflict)
+    }
+
+    func test_is_locktime_conflict__no_inputs__returns_true() {
+        let tx = Transaction(lockTime: 2143)
+        XCTAssert(tx.isLockTimeConflict)
+    }
+
+    func test_is_locktime_conflict__input_max_sequence__returns_true() {
+        let tx = Transaction(lockTime: 2143, inputs: [Input(sequence: maxInputSequence)])
+        XCTAssert(tx.isLockTimeConflict)
+    }
+
+    func test_from_data__insufficient_version_bytes__failure() {
+        let data = Data(bytes: [2])
+        XCTAssertThrowsError(try data |> deserializeTransaction)
+    }
+
+    func test_from_data__insufficient_input_bytes__failure() {
+        let data = try! "0000000103" |> base16Decode
+        XCTAssertThrowsError(try data |> deserializeTransaction)
+    }
+
+    func test_from_data__insufficient_output_bytes__failure() {
+        let data = try! "000000010003" |> base16Decode
+        XCTAssertThrowsError(try data |> deserializeTransaction)
+    }
+
+    lazy var TX1_RAW = try!
+    ("0100000001f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc" +
+    "4de65310fc010000006a473044022050d8368cacf9bf1b8fb1f7cfd9aff63294" +
+    "789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e" +
+    "2830b115472fb31de67d16972867f13945012103e589480b2f746381fca01a9b" +
+    "12c517b7a482a203c8b2742985da0ac72cc078f2ffffffff02f0c9c467000000" +
+    "001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac80c4600f00" +
+    "0000001976a9141ee32412020a324b93b1a1acfdfff6ab9ca8fac288ac000000" +
+    "00") |> base16Decode
+
+    lazy var TX1 = try! TX1_RAW |> deserializeTransaction
+
+    lazy var TX1_HASH = try!
+    "bf7c3f5a69a78edd81f3eff7e93a37fb2d7da394d48db4d85e7e5353b9b8e270" |> hashDecode
+
+    func test_factory_data_1__case_1__success() {
+        XCTAssertTrue(TX1.isValid)
+        XCTAssertEqual(TX1.serializedSize, 225)
+        XCTAssertEqual(TX1.hash, TX1_HASH)
+        XCTAssertEqual(TX1.serializedSize, TX1_RAW.count)
+        XCTAssertEqual(TX1 |> serialize, TX1_RAW)
+    }
+
+    lazy var TX4_RAW = try!
+    ("010000000364e62ad837f29617bafeae951776e7a6b3019b2da37827921548d1" +
+    "a5efcf9e5c010000006b48304502204df0dc9b7f61fbb2e4c8b0e09f3426d625" +
+    "a0191e56c48c338df3214555180eaf022100f21ac1f632201154f3c69e1eadb5" +
+    "9901a34c40f1127e96adc31fac6ae6b11fb4012103893d5a06201d5cf61400e9" +
+    "6fa4a7514fc12ab45166ace618d68b8066c9c585f9ffffffff54b755c39207d4" +
+    "43fd96a8d12c94446a1c6f66e39c95e894c23418d7501f681b010000006b4830" +
+    "4502203267910f55f2297360198fff57a3631be850965344370f732950b47795" +
+    "737875022100f7da90b82d24e6e957264b17d3e5042bab8946ee5fc676d15d91" +
+    "5da450151d36012103893d5a06201d5cf61400e96fa4a7514fc12ab45166ace6" +
+    "18d68b8066c9c585f9ffffffff0aa14d394a1f0eaf0c4496537f8ab9246d9663" +
+    "e26acb5f308fccc734b748cc9c010000006c493046022100d64ace8ec2d5feeb" +
+    "3e868e82b894202db8cb683c414d806b343d02b7ac679de7022100a2dcd39940" +
+    "dd28d4e22cce417a0829c1b516c471a3d64d11f2c5d754108bdc0b012103893d" +
+    "5a06201d5cf61400e96fa4a7514fc12ab45166ace618d68b8066c9c585f9ffff" +
+    "ffff02c0e1e400000000001976a914884c09d7e1f6420976c40e040c30b2b622" +
+    "10c3d488ac20300500000000001976a914905f933de850988603aafeeb2fd7fc" +
+    "e61e66fe5d88ac00000000") |> base16Decode
+
+    lazy var TX4 = try! TX4_RAW |> deserializeTransaction
+
+    lazy var TX4_HASH = try! "8a6d9302fbe24f0ec756a94ecfc837eaffe16c43d1e68c62dfe980d99eea556f" |> hashDecode
+
+    func test_factory_data_1__case_2__success() {
+        XCTAssertEqual(TX4_RAW.count, 523)
+        XCTAssertTrue(TX4.isValid)
+        XCTAssertEqual(TX4.hash, TX4_HASH)
+        XCTAssertEqual(TX4.serializedSize, TX4_RAW.count)
+        XCTAssertEqual(TX4 |> serialize, TX4_RAW)
+    }
+
+    lazy var TX5_RAW = try!
+    ("01000000023562c207a2a505820324aa03b769ee9c04a221eff59fdab6d52c312544a" +
+    "c4b21020000006a473044022075d3dd4cd26137f50d1b8c18b5ecbd13b7309b801f62" +
+    "83ebb951b137972d6e5b02206776f5e3acb2d996a9553f2438a4d2566c1fd786d9075" +
+    "5a5bca023bd9ae3945b0121029caef1b63490b7deabc9547e3e5d8b13c004b4bfd04d" +
+    "fae270874d569e5b89a8ffffffff8593568e460593c3dd30a470977a14928be6a29c6" +
+    "14a644c531471a773a63601020000006a47304402201fd9ea7dc62628ea82ff7b38cc" +
+    "90b3f2aa8c9ae25aa575600de38c79eafc925602202ca57bcd29d38a3e6aebd6809f7" +
+    "be4379d86f173b2ad2d42892dcb1dccca14b60121029caef1b63490b7deabc9547e3e" +
+    "5d8b13c004b4bfd04dfae270874d569e5b89a8ffffffff01763d0300000000001976a" +
+    "914e0d40d609d0282cc97314e454d194f65c16c257888ac00000000") |> base16Decode
+
+    lazy var TX5 = try! TX5_RAW |> deserializeTransaction
+
+    func test_is_oversized_coinbase__non_coinbase_tx__returns_false() {
+        XCTAssertFalse(TX5.isCoinbase)
+        XCTAssertFalse(TX5.isOversizedCoinbase)
+    }
+
+    func test_is_oversized_coinbase__script_size_below_min__returns_true() {
+        var tx = Transaction()
+        var input = Input()
+        input.previousOutput.hash = .null
+        input.previousOutput.index = OutputPoint.nullIndex
+        tx.inputs.append(input)
+        XCTAssertTrue(tx.isCoinbase)
+        XCTAssertTrue(tx.inputs.last!.script.serializedSize(prefix: false) < minCoinbaseSize)
+        XCTAssertTrue(tx.isOversizedCoinbase)
+    }
+
+    lazy var TX6_RAW = try!
+    ("010000000100000000000000000000000000000000000000000000000000000000000" +
+    "00000ffffffff23039992060481e1e157082800def50009dfdc102f42697446757279" +
+    "2f5345475749542f00000000015b382d4b000000001976a9148cf4f6175b2651dcdff" +
+    "0051970a917ea10189c2d88ac00000000") |> base16Decode
+
+    lazy var TX6 = try! TX6_RAW |> deserializeTransaction
+
+    func test_is_null_non_coinbase__coinbase_tx__returns_false() {
+        XCTAssertFalse(TX6.isNullNonCoinbase)
+    }
+
+    func test_is_null_non_coinbase__no_null_input_prevout__returns_false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isCoinbase)
+        XCTAssertFalse(tx.isNullNonCoinbase)
+    }
+
+    func test_is_null_non_coinbase__null_input_prevout__returns_true() {
+        var tx = Transaction()
+        tx.inputs.append(Input())
+        tx.inputs.append(Input(previousOutput: OutputPoint(hash: HashDigest.null, index: OutputPoint.nullIndex)))
+        XCTAssertFalse(tx.isCoinbase)
+        XCTAssertTrue(tx.inputs.last!.previousOutput.isNull)
+        XCTAssertTrue(tx.isNullNonCoinbase)
+    }
+
+    func test_total_input_value__no_cache__returns_zero() {
+        var tx = Transaction()
+        tx.inputs.append(Input())
+        tx.inputs.append(Input())
+        XCTAssertEqual(tx.totalInputValue, 0)
+    }
+
+    func test_total_output_value__empty_outputs__returns_zero() {
+        let tx = Transaction()
+        XCTAssertEqual(tx.totalOutputValue, 0)
+    }
+
+    func test_total_output_value__non_empty_outputs__returns_sum() {
+        let tx = Transaction(outputs: [Output(value: 1200), Output(value: 34)])
+        XCTAssertEqual(tx.totalOutputValue, 1234)
+    }
+
+    func test_is_overspent__output_does_not_exceed_input__returns_false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isOverspent)
+    }
+
+    func test_is_overspent__output_exceeds_input__returns_true() {
+        let tx = Transaction(outputs: [Output(value: 1200), Output(value: 34)])
+        XCTAssertTrue(tx.isOverspent)
+    }
+
+    func test_signature_operations_single_input_output_uninitialized__returns_zero() {
+        let tx = Transaction(inputs: [Input()], outputs: [Output()])
+        XCTAssertEqual(tx.signatureOperationsCount(bip16: false, bip141: false), 0)
+    }
+
+    func test_is_missing_previous_outputs__empty_inputs__returns_false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isMissingPreviousOutputs)
+    }
+
+    func test_is_missing_previous_outputs__inputs_without_cache_value__returns_true() {
+        let tx = Transaction(inputs: [Input()])
+        XCTAssertTrue(tx.isMissingPreviousOutputs)
+    }
+
+    func test_is_confirmed_double_spend__empty_inputs__returns_false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isConfirmedDoubleSpend)
+    }
+
+    func test_is_confirmed_double_spend__default_input__returns_false() {
+        let tx = Transaction(inputs: [Input()])
+        XCTAssertFalse(tx.isConfirmedDoubleSpend)
+    }
+
+    func test_is_dusty__no_outputs_zero__returns_false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isDusty(minimumOutputValue: 0))
+    }
+
+    func test_is_dusty__two_outputs_limit_above_both__returns_true() {
+        XCTAssertTrue(TX1.isDusty(minimumOutputValue: 1740950001))
+    }
+
+    func test_is_dusty__two_outputs_limit_below_both__returns_false() {
+        XCTAssertFalse(TX1.isDusty(minimumOutputValue: 257999999))
+    }
+
+    func test_is_dusty__two_outputs_limit_at_upper__returns_true() {
+        XCTAssertTrue(TX1.isDusty(minimumOutputValue: 1740950000))
+    }
+
+    func test_is_dusty__two_outputs_limit_at_lower__returns_false() {
+        XCTAssertFalse(TX1.isDusty(minimumOutputValue: 258000000))
+    }
+
+    func test_is_dusty__two_outputs_limit_between_both__returns_true() {
+        XCTAssertTrue(TX1.isDusty(minimumOutputValue: 258000001))
+    }
+
+    func test_is_mature__no_inputs__returns_true() {
+        let tx = Transaction()
+        XCTAssertTrue(tx.isMature(height: 453))
+    }
+
+    func test_is_internal_double_spend__empty_prevouts__false() {
+        let tx = Transaction()
+        XCTAssertFalse(tx.isInternalDoubleSpend)
+
+    }
+
+    lazy var TX7_HASH = try! "cb1e303db604f066225eb14d59d3f8d2231200817bc9d4610d2802586bd93f8a" |> hashDecode
+
+    func test_is_internal_double_spend__unique_prevouts__false() {
+        let tx = Transaction(inputs: [
+            Input(previousOutput: OutputPoint(hash: TX1_HASH, index: 42)),
+            Input(previousOutput: OutputPoint(hash: TX4_HASH, index: 27)),
+            Input(previousOutput: OutputPoint(hash: TX7_HASH, index: 36))
+            ])
+        XCTAssertFalse(tx.isInternalDoubleSpend)
+    }
+
+    func test_is_internal_double_spend__nonunique_prevouts__true() {
+        let tx = Transaction(inputs: [
+            Input(previousOutput: OutputPoint(hash: TX1_HASH, index: 42)),
+            Input(previousOutput: OutputPoint(hash: TX4_HASH, index: 27)),
+            Input(previousOutput: OutputPoint(hash: TX7_HASH, index: 36)),
+            Input(previousOutput: OutputPoint(hash: TX7_HASH, index: 36))
+            ])
+        XCTAssertTrue(tx.isInternalDoubleSpend)
     }
 }

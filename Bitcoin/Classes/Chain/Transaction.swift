@@ -69,7 +69,7 @@ public struct Transaction: InstanceContainer {
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
-    public init(version: UInt32, lockTime: UInt32 = 0, inputs: [Input], outputs: [Output]) {
+    public init(version: UInt32 = 0, lockTime: UInt32 = 0, inputs: [Input] = [], outputs: [Output] = []) {
         self.init()
         self.version = version
         self.lockTime = lockTime
@@ -83,6 +83,14 @@ public struct Transaction: InstanceContainer {
 
     public var isCoinbase: Bool {
         return _transactionIsCoinbase(wrapped.instance)
+    }
+
+    public var isOversizedCoinbase: Bool {
+        return _transactionIsOversizedCoinbase(wrapped.instance)
+    }
+
+    public var isNullNonCoinbase: Bool {
+        return _transactionIsNullNonCoinbase(wrapped.instance)
     }
 
     public var version: UInt32 {
@@ -147,6 +155,69 @@ public struct Transaction: InstanceContainer {
                 _transactionSetOutputs(wrapped.instance, instancesBuffer.baseAddress, instances.count)
             }
         }
+    }
+
+    public func isFinal(blockHeight: Int, blockTime: UInt32) -> Bool {
+        return _transactionIsFinal(wrapped.instance, blockHeight, blockTime)
+    }
+
+    public func isLocked(blockHeight: Int, medianTimePast: UInt32) -> Bool {
+        return _transactionIsLocked(wrapped.instance, blockHeight, medianTimePast)
+    }
+
+    public var isLockTimeConflict: Bool {
+        return _transactionIsLockTimeConflict(wrapped.instance)
+    }
+
+    public var serializedSize: Int {
+        return _transactionSerializedSize(wrapped.instance)
+    }
+
+    public var hash: HashDigest {
+        var hash: UnsafeMutablePointer<UInt8>!
+        var hashLength = 0
+        _transactionHash(wrapped.instance, &hash, &hashLength)
+        return try! receiveData(bytes: hash, count: hashLength) |> toHashDigest
+    }
+
+    public var totalInputValue: UInt64 {
+        return _transactionTotalInputValue(wrapped.instance)
+    }
+
+    public var totalOutputValue: UInt64 {
+        return _transactionTotalOutputValue(wrapped.instance)
+    }
+
+    public var isOverspent: Bool {
+        return _transactionIsOverspent(wrapped.instance)
+    }
+
+    public func signatureOperationsCount(bip16: Bool, bip141: Bool) -> Int {
+        return _transactionSignatureOperationsCount(wrapped.instance, bip16, bip141)
+    }
+
+    public var signatureOperationsCount: Int {
+        return signatureOperationsCount(bip16: false, bip141: false)
+    }
+
+    public var isMissingPreviousOutputs: Bool {
+        return _transactionIsMissingPreviousOutputs(wrapped.instance)
+    }
+
+    public var isConfirmedDoubleSpend: Bool {
+        return _transactionIsConfirmedDoubleSpend(wrapped.instance)
+    }
+
+    public func isDusty(minimumOutputValue: UInt64) -> Bool {
+        return _transactionIsDusty(wrapped.instance, minimumOutputValue)
+    }
+
+    public func isMature(height: Int) -> Bool {
+        return _transactionIsMature(wrapped.instance, height)
+    }
+
+    public var isInternalDoubleSpend: Bool {
+        return _transactionIsInternalDoubleSpend(wrapped.instance)
     }
 }
 

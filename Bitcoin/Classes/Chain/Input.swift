@@ -49,9 +49,11 @@ public struct Input: InstanceContainer {
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
-    public init(previousOutput: OutputPoint, script: Script? = nil, sequence: UInt32? = nil) {
+    public init(previousOutput: OutputPoint? = nil, script: Script? = nil, sequence: UInt32? = nil) {
         self.init()
-        self.previousOutput = previousOutput
+        if let previousOutput = previousOutput {
+            self.previousOutput = previousOutput
+        }
         if let script = script {
             self.script = script
         }
