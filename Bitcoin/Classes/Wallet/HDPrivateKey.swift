@@ -20,20 +20,16 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
+
+public enum HDKeyTag { }
+public typealias HDKey = Tagged<HDKeyTag, String>
+
+public func hdKey(_ string: String) -> HDKey { return HDKey(rawValue: string) }
 
 public var minimumSeedSize: Int = {
     return _minimumSeedSize()
 }()
-
-//public enum HDPublicKeyVersion: UInt32 {
-//    case mainnet = 0x0488B21E
-//    case testnet = 0x043587CF
-//}
-//
-//public enum HDPrivateKeyVersion: UInt32 {
-//    case mainnet = 0x0488ADE4
-//    case testnet = 0x04358394
-//}
 
 public enum HDKeyVersion {
     case mainnet
@@ -59,7 +55,7 @@ public enum HDKeyVersion {
 }
 
 /// Create a new HD (BIP32) private key from entropy.
-public func newHDPrivateKey(version: HDKeyVersion) -> (_ seed: Data) throws -> String {
+public func newHDPrivateKey(version: HDKeyVersion) -> (_ seed: Data) throws -> HDKey {
     return { seed in
         var key: UnsafeMutablePointer<Int8>!
         var keyLength = 0
@@ -68,61 +64,61 @@ public func newHDPrivateKey(version: HDKeyVersion) -> (_ seed: Data) throws -> S
                 throw error
             }
         }
-        return receiveString(bytes: key, count: keyLength)
+        return receiveString(bytes: key, count: keyLength) |> hdKey
     }
 }
 
 /// Derive a child HD (BIP32) private key from another HD private key.
-public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: String) throws -> String {
+public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: HDKey) throws -> HDKey {
     return { privateKey in
-        return try privateKey.withCString { privateKeyString in
+        return try privateKey.rawValue.withCString { privateKeyString in
             var childKey: UnsafeMutablePointer<Int8>!
             var childKeyLength = 0
             if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)) {
                 throw error
             }
-            return receiveString(bytes: childKey, count: childKeyLength)
+            return receiveString(bytes: childKey, count: childKeyLength) |> hdKey
         }
     }
 }
 
 /// Derive a child HD (BIP32) public key from another HD public or private key.
-public func deriveHDPublicKey(isHardened: Bool, index: Int, version: HDKeyVersion = .mainnet) -> (_ key: String) throws -> String {
+public func deriveHDPublicKey(isHardened: Bool, index: Int, version: HDKeyVersion = .mainnet) -> (_ key: HDKey) throws -> HDKey {
     return { parentKey in
-        return try parentKey.withCString { parentKeyString in
+        return try parentKey.rawValue.withCString { parentKeyString in
             var childPublicKey: UnsafeMutablePointer<Int8>!
             var childPublicKeyLength = 0
             if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, index, isHardened, version.publicVersion, version.privateVersion, &childPublicKey, &childPublicKeyLength)) {
                 throw error
             }
-            return receiveString(bytes: childPublicKey, count: childPublicKeyLength)
+            return receiveString(bytes: childPublicKey, count: childPublicKeyLength) |> hdKey
         }
     }
 }
 
 /// Derive the HD (BIP32) public key of a HD private key.
-public func toHDPublicKey(version: HDKeyVersion) -> (_ privateKey: String) throws -> String {
+public func toHDPublicKey(version: HDKeyVersion) -> (_ privateKey: HDKey) throws -> HDKey {
     return { privateKey in
-        return try privateKey.withCString { privateKeyString in
+        return try privateKey.rawValue.withCString { privateKeyString in
             var publicKey: UnsafeMutablePointer<Int8>!
             var publicKeyLength = 0
             if let error = BitcoinError(rawValue: _toHDPublicKey(privateKeyString, version.publicVersion, &publicKey, &publicKeyLength)) {
                 throw error
             }
-            return receiveString(bytes: publicKey, count: publicKeyLength)
+            return receiveString(bytes: publicKey, count: publicKeyLength) |> hdKey
         }
     }
 }
 
 /// Derive the HD (BIP32) public key of a HD private key.
-public func toHDPublicKey(_ privateKey: String) throws -> String {
+public func toHDPublicKey(_ privateKey: HDKey) throws -> HDKey {
     return try privateKey |> toHDPublicKey(version: .mainnet)
 }
 
 /// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
-public func toECKey(version: HDKeyVersion) -> (_ hdKey: String) throws -> ECKey {
+public func toECKey(version: HDKeyVersion) -> (_ hdKey: HDKey) throws -> ECKey {
     return { hdKey in
-        try hdKey.withCString { hdKeyString in
+        try hdKey.rawValue.withCString { hdKeyString in
             var ecKey: UnsafeMutablePointer<UInt8>!
             var ecKeyLength = 0
             var isPrivate = false
@@ -141,6 +137,6 @@ public func toECKey(version: HDKeyVersion) -> (_ hdKey: String) throws -> ECKey 
 }
 
 /// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
-public func toECKey(_ hdKey: String) throws -> ECKey {
-    return try hdKey |> toECKey(version: .mainnet)
+public func toECKey(_ key: HDKey) throws -> ECKey {
+    return try key |> toECKey(version: .mainnet)
 }

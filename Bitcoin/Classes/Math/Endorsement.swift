@@ -18,20 +18,15 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+import WolfFoundation
+
+public enum EndorsementTag { }
 /// DER encoded signature with sighash byte for contract endorsement:
-public struct Endorsement {
-    public let data: Data
+public typealias Endorsement = Tagged<EndorsementTag, Data>
 
-    public init(_ data: Data) throws {
-        guard (9 ... 72).contains(data.count) else {
-            throw BitcoinError.invalidDataSize
-        }
-        self.data = data
+public func endorsement(_ data: Data) throws -> Endorsement {
+    guard (9 ... 73).contains(data.count) else {
+        throw BitcoinError.invalidDataSize
     }
-}
-
-// MARK: - Free functions
-
-public func toEndorsement(_ data: Data) throws -> Endorsement {
-    return try Endorsement(data)
+    return Endorsement(rawValue: data)
 }

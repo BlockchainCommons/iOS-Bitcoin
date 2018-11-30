@@ -19,32 +19,14 @@
 //  limitations under the License.
 
 import WolfPipe
+import WolfFoundation
 
-public struct ShortHash {
-    public let data: Data
+public enum ShortHashTag { }
+public typealias ShortHash = Tagged<ShortHashTag, Data>
 
-    public init(_ data: Data) throws {
-        guard data.count == 20 else {
-            throw BitcoinError.invalidDataSize
-        }
-        self.data = data
+public func shortHash(_ data: Data) throws -> ShortHash {
+    guard data.count == 20 else {
+        throw BitcoinError.invalidDataSize
     }
-}
-
-extension ShortHash: CustomStringConvertible {
-    public var description: String {
-        return data |> base16Encode
-    }
-}
-
-extension ShortHash: Equatable {
-    public static func == (lhs: ShortHash, rhs: ShortHash) -> Bool {
-        return lhs.data == rhs.data
-    }
-}
-
-// MARK: - Free functions
-
-public func toShortHash(_ data: Data) throws -> ShortHash {
-    return try ShortHash(data)
+    return ShortHash(rawValue: data)
 }

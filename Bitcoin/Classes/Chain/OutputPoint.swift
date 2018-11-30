@@ -20,10 +20,11 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
 /// An OutputPoint is a component of a transaction input, and specifies
 /// the output of the previous transaction that is being spent.
-public struct OutputPoint: InstanceContainer {
+public struct OutputPoint: InstanceContainer, Encodable {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
@@ -84,14 +85,14 @@ public struct OutputPoint: InstanceContainer {
             var hashBytes: UnsafeMutablePointer<UInt8>!
             var hashLength = 0
             _outputPointGetHash(wrapped.instance, &hashBytes, &hashLength)
-            return try! receiveData(bytes: hashBytes, count: hashLength) |> toHashDigest
+            return try! receiveData(bytes: hashBytes, count: hashLength) |> hashDigest
         }
 
         set {
             if !isKnownUniquelyReferenced(&wrapped) {
                 wrapped = WrappedInstance(_outputPointCopy(wrapped.instance))
             }
-            newValue.data.withUnsafeBytes { hashBytes in
+            newValue.rawValue.withUnsafeBytes { hashBytes in
                 _outputPointSetHash(wrapped.instance, hashBytes)
             }
         }
@@ -104,11 +105,22 @@ public struct OutputPoint: InstanceContainer {
     public var isNull: Bool {
         return _outputPointIsNull(wrapped.instance)
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case hash
+        case index
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(hash.rawValue |> toBase16, forKey: .hash)
+        try container.encode(index, forKey: .index)
+    }
 }
 
 extension OutputPoint: CustomStringConvertible {
     public var description: String {
-        return "OutputPoint(hash: \(hash), index: \(index))"
+        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
     }
 }
 

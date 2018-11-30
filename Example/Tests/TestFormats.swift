@@ -21,7 +21,7 @@
 import XCTest
 import Bitcoin
 import WolfPipe
-import WolfStrings
+import WolfFoundation
 
 class TestFormats: XCTestCase {
     func testBase10() {
@@ -30,10 +30,10 @@ class TestFormats: XCTestCase {
         XCTAssert(ubtcDecimalPlaces == 2)
 
         let satoshis: UInt64 = 1012345678
-        let satoshisString = "1012345678"
-        let btcString = "10.12345678"
-        XCTAssert(satoshis |> base10Encode == satoshisString)
-        XCTAssert(satoshis |> base10Encode(decimalPlaces: btcDecimalPlaces) == btcString)
+        let satoshisString: Base10 = "1012345678"
+        let btcString: Base10 = "10.12345678"
+        XCTAssert(satoshis |> toBase10 == satoshisString)
+        XCTAssert(satoshis |> toBase10(decimalPlaces: btcDecimalPlaces) == btcString)
         XCTAssert(try! satoshisString |> base10Decode == satoshis)
         XCTAssert(try! btcString |> base10Decode(decimalPlaces: btcDecimalPlaces) == satoshis)
         XCTAssertThrowsError(try "Foobar" |> base10Decode == satoshis) // Invalid format
@@ -42,31 +42,31 @@ class TestFormats: XCTestCase {
 
     func testBase16() {
         let data = Data(bytes: [0x00, 0x11, 0x22, 0x33, 0x44, 0x55, 0x66, 0x77, 0x88, 0x99, 0xaa, 0xbb, 0xcc, 0xdd, 0xee, 0xff])
-        let hexString = "00112233445566778899aabbccddeeff"
+        let hexString: Base16 = "00112233445566778899aabbccddeeff"
 
-        XCTAssert(data |> base16Encode == hexString)
-        XCTAssert(try! hexString |> base16Decode == data)
-        XCTAssertThrowsError(try "0123456789abcdefg" |> base16Decode) // Invalid characters
-        XCTAssert(try! hexString |> base16Decode |> base16Encode == hexString)
+        XCTAssert(data |> toBase16 == hexString)
+        XCTAssert(try! hexString |> toData == data)
+        XCTAssertThrowsError(try "0123456789abcdefg" |> base16 |> toData) // Invalid characters
+        XCTAssert(try! hexString |> toData |> toBase16 == hexString)
     }
 
     func testBase16Hash() {
         let hashData = Data(bytes: [0x18, 0x5f, 0x8d, 0xb3, 0x22, 0x71, 0xfe, 0x25, 0xf5, 0x61, 0xa6, 0xfc, 0x93, 0x8b, 0x2e, 0x26, 0x43, 0x06, 0xec, 0x30, 0x4e, 0xda, 0x51, 0x80, 0x07, 0xd1, 0x76, 0x48, 0x26, 0x38, 0x19, 0x69])
-        let hashString = "691938264876d1078051da4e30ec0643262e8b93fca661f525fe7122b38d5f18"
-        XCTAssert(try! hashData |> bitcoinHashEncode == hashString)
-        XCTAssert(try! hashString |> bitcoinHashDecode == hashData)
-        XCTAssertThrowsError(try Data(bytes: [0x01, 0x02]) |> bitcoinHashEncode == hashString) // Wrong length
-        XCTAssertThrowsError(try "" |> bitcoinHashDecode == hashData) // Empty string
-        XCTAssertThrowsError(try "010203" |> bitcoinHashDecode == hashData) // Wrong length
-        XCTAssertThrowsError(try (hashString + "x") |> bitcoinHashDecode == hashData) // Invalid character
+        let hash: BitcoinHash = "691938264876d1078051da4e30ec0643262e8b93fca661f525fe7122b38d5f18"
+        XCTAssert(try! hashData |> toBitcoinHash == hash)
+        XCTAssert(try! hash |> toData == hashData)
+        XCTAssertThrowsError(try Data(bytes: [0x01, 0x02]) |> toBitcoinHash == hash) // Wrong length
+        XCTAssertThrowsError(try "" |> bitcoinHash |> toData == hashData) // Empty string
+        XCTAssertThrowsError(try "010203" |> bitcoinHash |> toData == hashData) // Wrong length
+        XCTAssertThrowsError(try (hash.rawValue + "x") |> BitcoinHash.init(rawValue:) |> toData == hashData) // Invalid character
     }
 
     func testBase32() {
         func test(prefix: String, payload: String, expected: String) throws -> Bool {
-            let payloadData = try payload |> base16Decode
-            let encoded = payloadData |> base32Encode(prefix: prefix)
-            guard encoded == expected else { return false }
-            let (decodedPrefix, decodedPayload) = try encoded |> base32Decode
+            let payloadData = payload |> dataLiteral
+            let encoded = payloadData |> toBase32(prefix: prefix)
+            guard encoded == expected |> base32 else { return false }
+            let (decodedPrefix, decodedPayload) = try encoded |> toData
             guard decodedPrefix == prefix, decodedPayload == payloadData else { return false }
             return true
         }
@@ -79,39 +79,39 @@ class TestFormats: XCTestCase {
         XCTAssert(Character("c").isBase58)
         XCTAssertFalse(Character("?").isBase58)
 
-        let testData = try! "007680adec8eabcabac676be9e83854ade0bd22cdb0bb960de" |> base16Decode
-        let base58Encoded = "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
-        XCTAssert(base58Encoded.isBase58)
+        let testData = "007680adec8eabcabac676be9e83854ade0bd22cdb0bb960de" |> dataLiteral
+        let base58Encoded: Base58 = "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
+        XCTAssert(base58Encoded.rawValue.isBase58)
         XCTAssertFalse("F00bar".isBase58) // Invalid format
-        XCTAssert(testData |> base58Encode == base58Encoded)
-        XCTAssert(try! base58Encoded |> base58Decode == testData)
-        XCTAssert(try! "" |> base58Decode |> fromUTF8 == "") // Empty string
-        XCTAssertThrowsError(try "1BoatSLRHtKNngkdXEeobR76b53LETtpy!" |> base58Decode == testData) // Invalid character
+        XCTAssert(testData |> toBase58 == base58Encoded)
+        XCTAssert(try! base58Encoded |> toData == testData)
+        XCTAssert(try! "" |> base58 |> toData |> fromUTF8 == "") // Empty string
+        XCTAssertThrowsError(try "1BoatSLRHtKNngkdXEeobR76b53LETtpy!" |> base58 |> toData == testData) // Invalid character
     }
 
     func testBase58Check() {
-        let testData = try! "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31" |> base16Decode
-        let base58CheckEncoded = "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs"
-        XCTAssert(testData |> base58CheckEncode == base58CheckEncoded)
-        XCTAssert(try! base58CheckEncoded |> base58CheckDecode == (0, testData))
-        XCTAssertThrowsError(try "" |> base58CheckDecode == (0, testData)) // Empty string
+        let testData = "f54a5851e9372b87810a8e60cdd2e7cfd80b6e31" |> dataLiteral
+        let base58CheckEncoded = "1PMycacnJaSqwwJqjawXBErnLsZ7RkXUAs" |> base58Check
+        XCTAssert(testData |> toBase58Check == base58CheckEncoded)
+        XCTAssert(try! base58CheckEncoded |> toData == (0, testData))
+        XCTAssertThrowsError(try "" |> base58Check |> toData == (0, testData)) // Empty string
     }
 
     func testBase64() {
         let testString = "Foobar"
-        let base64Encoded = "Rm9vYmFy"
-        XCTAssert(testString |> toUTF8 |> Bitcoin.base64Encode == base64Encoded)
-        XCTAssert(try! base64Encoded |> base64Decode |> fromUTF8 == testString)
-        XCTAssert(try! "" |> base64Decode |> fromUTF8 == "") // Empty string
-        XCTAssertThrowsError(try "Rm9vYmFy0" |> base64Decode |> fromUTF8 == testString) // Invalid character
+        let base64Encoded: Base64 = "Rm9vYmFy"
+        XCTAssert(testString |> toUTF8 |> Bitcoin.toBase64 == base64Encoded)
+        XCTAssert(try! base64Encoded |> toData |> fromUTF8 == testString)
+        XCTAssert(try! "" |> base64 |> toData |> fromUTF8 == "") // Empty string
+        XCTAssertThrowsError(try "Rm9vYmFy0" |> base64 |> toData |> fromUTF8 == testString) // Invalid character
     }
 
     func testBase85() {
         let testString = "Hello World!"
-        let base85Encoded = "SGVsbG8gV29ybGQh"
-        XCTAssert(testString |> toUTF8 |> Bitcoin.base85Encode == base85Encoded)
-        XCTAssert(try! base85Encoded |> base85Decode |> fromUTF8 == testString)
-        XCTAssert(try! "" |> base85Decode |> fromUTF8 == "") // Empty string
-        XCTAssertThrowsError(try "SGVsbG8gV29ybGQ'" |> base85Decode |> fromUTF8 == testString) // Invalid character
+        let base85Encoded: Base85 = "SGVsbG8gV29ybGQh"
+        XCTAssert(testString |> toUTF8 |> Bitcoin.toBase85 == base85Encoded)
+        XCTAssert(try! base85Encoded |> toData |> fromUTF8 == testString)
+        XCTAssert(try! "" |> base85 |> toData |> fromUTF8 == "") // Empty string
+        XCTAssertThrowsError(try "SGVsbG8gV29ybGQ'" |> base85 |> toData |> fromUTF8 == testString) // Invalid character
     }
 }

@@ -26,12 +26,13 @@ import WolfStrings
 class TestMnemonic: XCTestCase {
     func testNewMnemonic() {
         func test(_ seed: String, _ language: Language, _ mnemonic: String) -> Bool {
-            return try! seed |> base16Decode |> newMnemonic(language: language) == mnemonic
+            let a = seed
+            return try! a |> dataLiteral |> newMnemonic(language: language) |> rawValue == mnemonic
         }
 
         XCTAssert(test("baadf00dbaadf00d", .en, "rival hurdle address inspire tenant alone"))
         XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .en, "rival hurdle address inspire tenant almost turkey safe asset step lab boy"))
-        XCTAssertThrowsError(try "baadf00dbaadf00dbaadf00dbaadf00dff" |> base16Decode |> newMnemonic(language: .en) == "won't happen") // Invalid seed size
+        XCTAssertThrowsError(try "baadf00dbaadf00dbaadf00dbaadf00dff" |> dataLiteral |> newMnemonic(language: .en) == "won't happen") // Invalid seed size
         XCTAssert(test("7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f7f", .en, "legal winner thank year wave sausage worth useful legal winner thank yellow"))
         XCTAssert(test("baadf00dbaadf00dbaadf00dbaadf00d", .es, "previo humilde actuar jarabe tabique ahorro tope pulpo anís señal lavar bahía"))
 
@@ -46,16 +47,16 @@ class TestMnemonic: XCTestCase {
     }
 
     func testMnemonicToSeed() {
-        func test(_ mnemonic: String, seed: String) -> Bool {
-            return try! mnemonic |> mnemonicToSeed |> base16Encode == seed
+        func test(_ m: String, seed: String) -> Bool {
+            return try! m |> mnemonic |> mnemonicToSeed |> toBase16 |> rawValue == seed
         }
 
         XCTAssert(test("rival hurdle address inspire tenant alone", seed: "33498afc5ef71e87afd7cad1e50a9d9adb9e30d3ca4b1da5dc370d266aa7796cbc1854eebce5ab3fd3b02b6625e2a82868dbb693e988e47d74106f04c76a6263"))
     }
 
     func testMnemonicToSeedWithPassphrase() {
-        func test(_ mnemonic: String, passphrase: String, seed: String) -> Bool {
-            return try! mnemonic |> mnemonicToSeedWithPassphrase(passphrase) |> base16Encode == seed
+        func test(_ m: String, passphrase: String, seed: String) -> Bool {
+            return try! m |> mnemonic |> mnemonicToSeedWithPassphrase(passphrase) |> toBase16 |> rawValue == seed
         }
 
         XCTAssert(test("legal winner thank year wave sausage worth useful legal winner thank yellow", passphrase: "TREZOR", seed: "2e8905819b8723fe2c1d161860e5ee1830318dbf49a83bd451cfb8440c28bd6fa457fe1296106559a3c80937a1c1069be3a3a5bd381ee6260e8d9739fce1f607"))

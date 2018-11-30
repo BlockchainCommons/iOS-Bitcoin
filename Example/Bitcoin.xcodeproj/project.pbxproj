@@ -14,6 +14,7 @@
 		0331068B2193F052000509BB /* TestTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331068A2193F052000509BB /* TestTransaction.swift */; };
 		0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC5218683CD001C12B5 /* TestRandom.swift */; };
 		0361BCC921877354001C12B5 /* TestHD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC72187733B001C12B5 /* TestHD.swift */; };
+		0369A1CC21AF3E0B0045AFC4 /* TestEllipticCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */; };
 		03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D7102D2187979B00E70327 /* TestMnemonic.swift */; };
 		03D710372188ED4700E70327 /* TestEC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D710352188ED1B00E70327 /* TestEC.swift */; };
 		03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DD3E282199F36800E7D982 /* TestOutputPoint.swift */; };
@@ -49,6 +50,7 @@
 		0355E88BCB373C4803A6A18C /* Bitcoin.podspec */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; name = Bitcoin.podspec; path = ../Bitcoin.podspec; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.ruby; };
 		0361BCC5218683CD001C12B5 /* TestRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRandom.swift; sourceTree = "<group>"; };
 		0361BCC72187733B001C12B5 /* TestHD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHD.swift; sourceTree = "<group>"; };
+		0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEllipticCurve.swift; sourceTree = "<group>"; };
 		03D7102D2187979B00E70327 /* TestMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMnemonic.swift; sourceTree = "<group>"; };
 		03D710352188ED1B00E70327 /* TestEC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEC.swift; sourceTree = "<group>"; };
 		03DD3E282199F36800E7D982 /* TestOutputPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOutputPoint.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				03DD3E282199F36800E7D982 /* TestOutputPoint.swift */,
 				03DD3E2A219A0B1300E7D982 /* TestInput.swift */,
 				0331068A2193F052000509BB /* TestTransaction.swift */,
+				0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -312,6 +315,7 @@
 				"${BUILT_PRODUCTS_DIR}/Bitcoin/Bitcoin.framework",
 				"${BUILT_PRODUCTS_DIR}/CBitcoin/CBitcoin.framework",
 				"${BUILT_PRODUCTS_DIR}/ExtensibleEnumeratedName/ExtensibleEnumeratedName.framework",
+				"${BUILT_PRODUCTS_DIR}/WolfFoundation/WolfFoundation.framework",
 				"${BUILT_PRODUCTS_DIR}/WolfNumerics/WolfNumerics.framework",
 				"${BUILT_PRODUCTS_DIR}/WolfPipe/WolfPipe.framework",
 				"${BUILT_PRODUCTS_DIR}/WolfStrings/WolfStrings.framework",
@@ -324,6 +328,7 @@
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bitcoin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CBitcoin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ExtensibleEnumeratedName.framework",
+				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfFoundation.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfNumerics.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfPipe.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/WolfStrings.framework",
@@ -400,6 +405,7 @@
 				03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */,
 				03DD3E2B219A0B1300E7D982 /* TestInput.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* TestFormats.swift in Sources */,
+				0369A1CC21AF3E0B0045AFC4 /* TestEllipticCurve.swift in Sources */,
 				0309A6842182879F007E974E /* TestHash.swift in Sources */,
 				03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */,
 				0361BCC921877354001C12B5 /* TestHD.swift in Sources */,

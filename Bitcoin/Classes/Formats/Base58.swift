@@ -19,6 +19,16 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
+import WolfPipe
+
+public enum Base58Tag { }
+public typealias Base58 = Tagged<Base58Tag, String>
+public func base58(_ string: String) -> Base58 { return Base58(rawValue: string) }
+
+public enum Base58CheckTag { }
+public typealias Base58Check = Tagged<Base58CheckTag, String>
+public func base58Check(_ string: String) -> Base58Check { return Base58Check(rawValue: string) }
 
 extension Character {
     /// Returns true if the character is a valid base58 character, false otherwise.
@@ -38,23 +48,23 @@ extension String {
 }
 
 /// Encodes the data as a base58 string.
-public func base58Encode(_ data: Data) -> String {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+public func toBase58(_ data: Data) -> Base58 {
+    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base58 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _base58Encode(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count)
+        _encodeBase58(dataBytes, data.count, &bytes, &count)
+        return receiveString(bytes: bytes, count: count) |> base58
     }
 }
 
 /// Decodes the base58 format string.
 ///
 /// Throws if the string is not valid base58.
-public func base58Decode(_ string: String) throws -> Data {
-    return try string.withCString { (stringBytes) in
+public func toData(_ base58: Base58) throws -> Data {
+    return try base58.rawValue.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        if let error = BitcoinError(rawValue: _base58Decode(stringBytes, &bytes, &count)) {
+        if let error = BitcoinError(rawValue: _decodeBase58(stringBytes, &bytes, &count)) {
             throw error
         }
         return receiveData(bytes: bytes, count: count)
@@ -62,27 +72,27 @@ public func base58Decode(_ string: String) throws -> Data {
 }
 
 /// Encodes the data as a base58check string.
-public func base58CheckEncode(version: UInt8) -> (_ data: Data) -> String {
+public func toBase58Check(version: UInt8) -> (_ data: Data) -> Base58Check {
     return { data in
-        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base58Check in
             var bytes: UnsafeMutablePointer<Int8>!
             var count: Int = 0
-            _base58CheckEncode(dataBytes, data.count, version, &bytes, &count)
-            return receiveString(bytes: bytes, count: count)
+            _encodeBase58Check(dataBytes, data.count, version, &bytes, &count)
+            return receiveString(bytes: bytes, count: count) |> base58Check
         }
     }
 }
 
-public func base58CheckEncode(_ data: Data) -> String {
-    return base58CheckEncode(version: 0)(data)
+public func toBase58Check(_ data: Data) -> Base58Check {
+    return toBase58Check(version: 0)(data)
 }
 
-public func base58CheckDecode(_ string: String) throws -> (version: UInt8, payload: Data) {
-    return try string.withCString { (stringBytes) in
+public func toData(_ base58Check: Base58Check) throws -> (version: UInt8, payload: Data) {
+    return try base58Check.rawValue.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         var version: UInt8 = 0
-        if let error = BitcoinError(rawValue: _base58CheckDecode(stringBytes, &bytes, &count, &version)) {
+        if let error = BitcoinError(rawValue: _decodeBase58Check(stringBytes, &bytes, &count, &version)) {
             throw error
         }
         let data = receiveData(bytes: bytes, count: count)

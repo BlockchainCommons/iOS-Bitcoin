@@ -22,15 +22,9 @@ public struct WrappedData: Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(prefix, forKey: .prefix)
-        try container.encode(payload |> base16Encode, forKey: .payload)
+        try container.encode(payload |> toBase16, forKey: .payload)
         try container.encode(checksum, forKey: .checksum)
     }
-}
-
-public func toJSON(_ components: WrappedData) throws -> Data {
-    let encoder = JSONEncoder()
-    encoder.outputFormatting = [.sortedKeys]
-    return try encoder.encode(components)
 }
 
 /// Add a version byte and checksum to the data.

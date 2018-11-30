@@ -19,46 +19,26 @@
 //  limitations under the License.
 
 import WolfPipe
+import WolfFoundation
 
-public struct HashDigest {
-    public let data: Data
+public enum HashDigestTag { }
+public typealias HashDigest = Tagged<HashDigestTag, Data>
 
-    public init(_ data: Data) throws {
-        guard data.count == 32 else {
-            throw BitcoinError.invalidDataSize
-        }
-        self.data = data
+public let nullHashDigest = try! Data(repeatElement(0, count: 32)) |> hashDigest
+
+//// MARK: - Free functions
+
+public func hashDigest(_ data: Data) throws -> HashDigest {
+    guard data.count == 32 else {
+        throw BitcoinError.invalidDataSize
     }
-
-    public init() {
-        self.data = Data(count: 32)
-    }
-
-    public static let null = HashDigest()
-}
-
-extension HashDigest: CustomStringConvertible {
-    public var description: String {
-        return data |> base16Encode
-    }
-}
-
-extension HashDigest: Equatable {
-    public static func == (lhs: HashDigest, rhs: HashDigest) -> Bool {
-        return lhs.data == rhs.data
-    }
-}
-
-// MARK: - Free functions
-
-public func toHashDigest(_ data: Data) throws -> HashDigest {
-    return try HashDigest(data)
+    return HashDigest(rawValue: data)
 }
 
 public func hashEncode(_ hash: HashDigest) -> String {
-    return hash.data |> reversed |> base16Encode
+    return hash.rawValue |> reversed |> toBase16 |> rawValue
 }
 
 public func hashDecode(_ string: String) throws -> HashDigest {
-    return try string |> base16Decode |> reversed |> toHashDigest
+    return try string |> dataLiteral |> reversed |> hashDigest
 }

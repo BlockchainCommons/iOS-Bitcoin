@@ -19,58 +19,37 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
+import WolfPipe
+
+public enum Base16Tag { }
+public typealias Base16 = Tagged<Base16Tag, String>
+public func base16(_ string: String) -> Base16 { return Base16(rawValue: string) }
 
 /// Encodes the data as a base16 (hex) string.
-public func base16Encode(_ data: Data) -> String {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+public func toBase16(_ data: Data) -> Base16 {
+    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base16 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _base16Encode(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count)
+        _encodeBase16(dataBytes, data.count, &bytes, &count)
+        return receiveString(bytes: bytes, count: count) |> base16
     }
 }
 
 /// Decodes the base16 (hex) format string.
 ///
 /// Throws if the string is not valid base16.
-public func base16Decode(_ string: String) throws -> Data {
-    return try string.withCString { (stringBytes) in
+public func toData(_ base16: Base16) throws -> Data {
+    return try base16.rawValue.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        if let error = BitcoinError(rawValue: _base16Decode(stringBytes, &bytes, &count)) {
+        if let error = BitcoinError(rawValue: _decodeBase16(stringBytes, &bytes, &count)) {
             throw error
         }
         return receiveData(bytes: bytes, count: count)
     }
 }
 
-/// Encodes the bitcoin hash as a string.
-///
-/// The bitcoin hash format is like base16, but with the bytes reversed.
-/// Throws if the input data is not exactly 32 bytes long.
-public func bitcoinHashEncode(_ data: Data) throws -> String {
-    guard data.count == 32 else {
-        throw BitcoinError.invalidFormat
-    }
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
-        var bytes: UnsafeMutablePointer<Int8>!
-        var count: Int = 0
-        _bitcoinHashEncode(dataBytes, &bytes, &count)
-        return receiveString(bytes: bytes, count: count)
-    }
-}
-
-/// Decodes the base16 (hex) format string.
-///
-/// The bitcoin hash format is like base16, but with the bytes reversed.
-/// Throws if the string is not valid base16.
-public func bitcoinHashDecode(_ string: String) throws -> Data {
-    return try string.withCString { (stringBytes) in
-        var bytes: UnsafeMutablePointer<UInt8>!
-        var count: Int = 0
-        if let error = BitcoinError(rawValue: _bitcoinHashDecode(stringBytes, &bytes, &count)) {
-            throw error
-        }
-        return receiveData(bytes: bytes, count: count)
-    }
+public func dataLiteral(_ string: String) -> Data {
+    return try! string |> base16 |> toData
 }

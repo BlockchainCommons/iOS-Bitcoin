@@ -20,6 +20,11 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
+
+public enum MnemonicTag { }
+public typealias Mnemonic = Tagged<MnemonicTag, String>
+public func mnemonic(_ string: String) -> Mnemonic { return Mnemonic(rawValue: string) }
 
 /// A valid mnemonic word count is evenly divisible by this number.
 public let mnemonicWordMultiple: Int = { return _mnemonicWordMultiple() }()
@@ -40,7 +45,7 @@ public enum Language: String, CaseIterable {
     case zh_Hant
 }
 
-public func newMnemonic(language: Language) -> (_ seed: Data) throws -> String {
+public func newMnemonic(language: Language) -> (_ seed: Data) throws -> Mnemonic {
     return { seed in
         guard seed.count % mnemonicSeedMultiple == 0 else {
             throw BitcoinError.invalidSeedSize
@@ -48,24 +53,24 @@ public func newMnemonic(language: Language) -> (_ seed: Data) throws -> String {
         guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
             throw BitcoinError.unsupportedLanguage
         }
-        var mnemonic: UnsafeMutablePointer<Int8>!
-        var mnemonicLength: Int = 0
+        var mnemo: UnsafeMutablePointer<Int8>!
+        var mnemoLength: Int = 0
         try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes, seed.count, dictionary, &mnemonic, &mnemonicLength)) {
+            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes, seed.count, dictionary, &mnemo, &mnemoLength)) {
                 throw error
             }
         }
-        return receiveString(bytes: mnemonic, count: mnemonicLength)
+        return receiveString(bytes: mnemo, count: mnemoLength) |> mnemonic
     }
 }
 
-public func newMnemonic(_ seed: Data) throws -> String {
+public func newMnemonic(_ seed: Data) throws -> Mnemonic {
     return try newMnemonic(language: .en)(seed)
 }
 
-public func mnemonicToSeed(_ language: Language, passphrase: String? = nil) -> (_ mnemonic: String) throws -> Data {
+public func mnemonicToSeed(_ language: Language, passphrase: String? = nil) -> (_ mnemonic: Mnemonic) throws -> Data {
     return { mnemonic in
-        let normalizedMnemonic = mnemonic.precomposedStringWithCanonicalMapping
+        let normalizedMnemonic = mnemonic.rawValue.precomposedStringWithCanonicalMapping
         let normalizedPassphrase = (passphrase ?? "").precomposedStringWithCanonicalMapping
         guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
             throw BitcoinError.unsupportedLanguage
@@ -83,7 +88,7 @@ public func mnemonicToSeed(_ language: Language, passphrase: String? = nil) -> (
     }
 }
 
-public func mnemonicToSeedWithPassphrase(_ passphrase: String?) -> (_ mnemonic: String) throws -> Data {
+public func mnemonicToSeedWithPassphrase(_ passphrase: String?) -> (_ mnemonic: Mnemonic) throws -> Data {
     return { mnemonic in
         var seed: Data!
         _ = Language.allCases.first { language in
@@ -101,6 +106,6 @@ public func mnemonicToSeedWithPassphrase(_ passphrase: String?) -> (_ mnemonic: 
     }
 }
 
-public func mnemonicToSeed(_ mnemonic: String) throws -> Data {
+public func mnemonicToSeed(_ mnemonic: Mnemonic) throws -> Data {
     return try mnemonic |> mnemonicToSeedWithPassphrase(nil)
 }

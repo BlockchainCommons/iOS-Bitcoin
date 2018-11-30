@@ -22,6 +22,7 @@ import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
+import WolfFoundation
 
 class TestTransaction: XCTestCase {
     func testTransactionDecode() {
@@ -57,58 +58,80 @@ class TestTransaction: XCTestCase {
     }
 
     func testInput() {
-        XCTAssert(OutputPoint().description == "OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 0)")
+        XCTAssertEqual(OutputPoint().description, """
+        {"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":0}
+        """)
 
-        let hash = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3" |> base16Decode |> toHashDigest
-        let hash2 = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5" |> base16Decode |> toHashDigest
+        let hash = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3" |> dataLiteral |> hashDigest
+        let hash2 = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5" |> dataLiteral |> hashDigest
         var outputPoint = OutputPoint(hash: hash, index: 3)
         var outputPoint2 = outputPoint
         outputPoint.hash = hash2
         outputPoint2.index = 5
-        XCTAssert(outputPoint.description == "OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5, index: 3)")
-        XCTAssert(outputPoint2.description == "OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 5)")
+        XCTAssertEqual(outputPoint.description, """
+        {"hash":"97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5","index":3}
+        """)
+        XCTAssertEqual(outputPoint2.description,"""
+        {"hash":"97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3","index":5}
+        """)
 
-        XCTAssert(Input().description == "Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 0), sequence: 0x0, script: '')")
+        XCTAssertEqual(Input().description, """
+        {"previousOutput":{"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":0},"script":"","sequence":0}
+        """)
 
         var input = Input(previousOutput: outputPoint)
         var input2 = input
         input.sequence = 42
         input2.previousOutput = outputPoint2
-        XCTAssert(input.description == "Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5, index: 3), sequence: 0x2a, script: '')")
-        XCTAssert(input2.description == "Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 5), sequence: 0xffffffff, script: '')")
+        XCTAssertEqual(input.description, """
+        {"previousOutput":{"hash":"97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5","index":3},"script":"","sequence":42}
+        """)
+        XCTAssertEqual(input2.description, """
+        {"previousOutput":{"hash":"97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3","index":5},"script":"","sequence":4294967295}
+        """)
     }
 
     func testOutput() {
-        XCTAssert(Output().description == "Output(value: 18446744073709551615, script: '')")
+        XCTAssertEqual(Output().description, """
+        {"script":"","value":18446744073709551615}
+        """)
         
         let value = try! "1.0" |> btcToSatoshi
         let value2 = try! "0.5" |> btcToSatoshi
 
         var output = try! Output(value: value, paymentAddress: "1966U1pjj15tLxPXZ19U48c99EJDkdXeqb")
-        XCTAssert(output.description == "Output(value: 100000000, script: 'dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig')")
+        XCTAssertEqual(output.description, """
+        {"script":"dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig","value":100000000}
+        """)
 
         var output2 = output
         output2.value = value2
         try! output.setPaymentAddress("1CK6KHY6MHgYvmRQ4PAafKYDrg1ejbH1cE")
-        XCTAssert(output.description == "Output(value: 100000000, script: 'dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig')")
-        XCTAssert(output2.description == "Output(value: 50000000, script: 'dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig')")
+        XCTAssertEqual(output.description, """
+        {"script":"dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig","value":100000000}
+        """)
+        XCTAssertEqual(output2.description, """
+        {"script":"dup hash160 [58b7a60f11a904feef35a639b6048de8dd4d9f1c] equalverify checksig","value":50000000}
+        """)
     }
 
     private func makeInput(hash: String, index: UInt32, sequence: UInt32? = nil) -> Input {
-        let outputPoint = try! OutputPoint(hash: hash |> base16Decode |> toHashDigest, index: index)
+        let outputPoint = try! OutputPoint(hash: hash |> dataLiteral |> hashDigest, index: index)
         return Input(previousOutput: outputPoint, sequence: sequence)
     }
 
-    private func makeOutput(satoshi value: UInt64, paymentAddress: String) -> Output {
-        return try! Output(value: value, paymentAddress: paymentAddress)
+    private func makeOutput(satoshis: Satoshis, paymentAddress: String) -> Output {
+        return try! Output(value: satoshis, paymentAddress: paymentAddress)
     }
 
     private func makeOutput(btc: String, paymentAddress: String) -> Output {
-        return try! makeOutput(satoshi: btc |> btcToSatoshi, paymentAddress: paymentAddress)
+        return try! makeOutput(satoshis: btc |> Base10.init(rawValue:) |> btcToSatoshi, paymentAddress: paymentAddress)
     }
 
     func testTransaction() {
-        XCTAssert(Transaction().description == "Transaction(version: 0, lockTime: 0, inputs: [], outputs: [])")
+        XCTAssertEqual(Transaction().description, """
+        {"inputs":[],"lockTime":0,"outputs":[],"version":0}
+        """)
 
         let input = makeInput(hash: "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3", index: 3, sequence: 42)
         let output = makeOutput(btc: "1.0", paymentAddress: "1CK6KHY6MHgYvmRQ4PAafKYDrg1ejbH1cE")
@@ -122,15 +145,19 @@ class TestTransaction: XCTestCase {
         let output2 = makeOutput(btc: "0.5", paymentAddress: "1NTC39oN6MimCif7kZbgVb29oQFxukKCPY")
         transaction2.outputs.append(output2)
 
-        XCTAssert(transaction.description == "Transaction(version: 1, lockTime: 100, inputs: [Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 3), sequence: 0x2a, script: '')], outputs: [Output(value: 100000000, script: 'dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig')])")
-        XCTAssert(transaction2.description == "Transaction(version: 2, lockTime: 200, inputs: [Input(previousOutput: OutputPoint(hash: 97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3, index: 3), sequence: 0x2a, script: ''), Input(previousOutput: OutputPoint(hash: fb478fd8f4ffd1224c5720180feabe3644273f81693679777bdd76fd5ae3576c, index: 5), sequence: 0x37, script: '')], outputs: [Output(value: 100000000, script: 'dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig'), Output(value: 50000000, script: 'dup hash160 [eb4eab76288feb6fd4a63df6814e151c03a883d7] equalverify checksig')])")
+        XCTAssertEqual(transaction.description, """
+        {"inputs":[{"previousOutput":{"hash":"97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3","index":3},"script":"","sequence":42}],"lockTime":100,"outputs":[{"script":"dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig","value":100000000}],"version":1}
+        """)
+        XCTAssertEqual(transaction2.description, """
+        {"inputs":[{"previousOutput":{"hash":"97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3","index":3},"script":"","sequence":42},{"previousOutput":{"hash":"fb478fd8f4ffd1224c5720180feabe3644273f81693679777bdd76fd5ae3576c","index":5},"script":"","sequence":55}],"lockTime":200,"outputs":[{"script":"dup hash160 [7c154ed1dc59609e3d26abb2df2ea3d587cd8c41] equalverify checksig","value":100000000},{"script":"dup hash160 [eb4eab76288feb6fd4a63df6814e151c03a883d7] equalverify checksig","value":50000000}],"version":2}
+        """)
     }
 
 //    func testTransactionEncode() {
 //        let input = makeInput(hash: "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3", index: 0)
-//        let output = makeOutput(satoshi: 45000, paymentAddress: "1966U1pjj15tLxPXZ19U48c99EJDkdXeqb")
+//        let output = makeOutput(satoshis: 45000, paymentAddress: "1966U1pjj15tLxPXZ19U48c99EJDkdXeqb")
 //        let transaction = Transaction(version: 1, inputs: [input], outputs: [output])
-//        print(transaction |> toData |> base16Encode)
+//        print(transaction |> toData |> toBase16)
 //    }
 
 //    func testTransaction1() {
@@ -143,40 +170,48 @@ class TestTransaction: XCTestCase {
         let version: UInt32 = 2345;
         let lockTime: UInt32 = 4568656;
 
-        let tx0Inputs = try! ("f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc" +
+        let tx0Inputs = ("f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc" +
         "010000006a473044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb17601" +
         "39e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b11547" +
         "2fb31de67d16972867f13945012103e589480b2f746381fca01a9b12c517b7a4" +
-        "82a203c8b2742985da0ac72cc078f2ffffffff") |> base16Decode
-        let tx0LastOutput = try! "f0c9c467000000001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac" |> base16Decode
+            "82a203c8b2742985da0ac72cc078f2ffffffff") |> dataLiteral
+        let tx0LastOutput = "f0c9c467000000001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac" |> dataLiteral
 
         let input = try! tx0Inputs |> deserializeInput
-        XCTAssert(input.description == "Input(previousOutput: OutputPoint(hash: f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc, index: 1), sequence: 0xffffffff, script: '[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]')")
+        XCTAssertEqual(input.description, """
+        {"previousOutput":{"hash":"f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc","index":1},"script":"[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]","sequence":4294967295}
+        """)
 
         let output = try! tx0LastOutput |> deserializeOutput
-        XCTAssert(output.description == "Output(value: 1740950000, script: 'dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig')")
+        XCTAssertEqual(output.description, """
+        {"script":"dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig","value":1740950000}
+        """)
 
         let transaction = Transaction(version: version, lockTime: lockTime, inputs: [input], outputs: [output])
-        XCTAssert(transaction.description == "Transaction(version: 2345, lockTime: 4568656, inputs: [Input(previousOutput: OutputPoint(hash: f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc, index: 1), sequence: 0xffffffff, script: '[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]')], outputs: [Output(value: 1740950000, script: 'dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig')])")
+        XCTAssertEqual(transaction.description, """
+        {"inputs":[{"previousOutput":{"hash":"f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc","index":1},"script":"[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]","sequence":4294967295}],"lockTime":4568656,"outputs":[{"script":"dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig","value":1740950000}],"version":2345}
+        """)
 
         XCTAssert(transaction.isValid)
-        XCTAssert(transaction.version == version)
-        XCTAssert(transaction.lockTime == lockTime)
-        XCTAssert(transaction.inputs == [input])
-        XCTAssert(transaction.outputs == [output])
+        XCTAssertEqual(transaction.version, version)
+        XCTAssertEqual(transaction.lockTime, lockTime)
+        XCTAssertEqual(transaction.inputs, [input])
+        XCTAssertEqual(transaction.outputs, [output])
     }
 
     func test_constructor_4__valid_input__returns_input_initialized() {
-        let tx1 = try! ("0100000001f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc" +
+        let tx1 = ("0100000001f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc" +
         "4de65310fc010000006a473044022050d8368cacf9bf1b8fb1f7cfd9aff63294" +
         "789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e" +
         "2830b115472fb31de67d16972867f13945012103e589480b2f746381fca01a9b" +
         "12c517b7a482a203c8b2742985da0ac72cc078f2ffffffff02f0c9c467000000" +
         "001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac80c4600f00" +
         "0000001976a9141ee32412020a324b93b1a1acfdfff6ab9ca8fac288ac000000" +
-        "00") |> base16Decode
+            "00") |> dataLiteral
         let tx = try! tx1 |> deserializeTransaction
-        XCTAssert(tx.description == "Transaction(version: 1, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc, index: 1), sequence: 0xffffffff, script: '[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]')], outputs: [Output(value: 1740950000, script: 'dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig'), Output(value: 258000000, script: 'dup hash160 [1ee32412020a324b93b1a1acfdfff6ab9ca8fac2] equalverify checksig')])")
+        XCTAssertEqual(tx.description, """
+        {"inputs":[{"previousOutput":{"hash":"f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc4de65310fc","index":1},"script":"[3044022050d8368cacf9bf1b8fb1f7cfd9aff63294789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e2830b115472fb31de67d16972867f1394501] [03e589480b2f746381fca01a9b12c517b7a482a203c8b2742985da0ac72cc078f2]","sequence":4294967295}],"lockTime":0,"outputs":[{"script":"dup hash160 [d9d78e26df4e4601cf9b26d09c7b280ee764469f] equalverify checksig","value":1740950000},{"script":"dup hash160 [1ee32412020a324b93b1a1acfdfff6ab9ca8fac2] equalverify checksig","value":258000000}],"version":1}
+        """)
     }
 
     func test_is_coinbase__empty_inputs__returns_false() {
@@ -189,19 +224,25 @@ class TestTransaction: XCTestCase {
         var input1 = Input()
         input1.previousOutput.index = OutputPoint.nullIndex
         tx.inputs = [input1]
-        XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 4294967295), sequence: 0x0, script: '')], outputs: [])")
+        XCTAssertEqual(tx.description, """
+        {"inputs":[{"previousOutput":{"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":4294967295},"script":"","sequence":0}],"lockTime":0,"outputs":[],"version":0}
+        """)
         XCTAssert(tx.isCoinbase)
 
         // is_coinbase__one_non_null_input__returns_false
         var input2 = input1
         input2.previousOutput.index = 42
         tx.inputs = [input2]
-        XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 42), sequence: 0x0, script: '')], outputs: [])")
+        XCTAssertEqual(tx.description, """
+        {"inputs":[{"previousOutput":{"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":42},"script":"","sequence":0}],"lockTime":0,"outputs":[],"version":0}
+        """)
         XCTAssertFalse(tx.isCoinbase)
 
         // is_coinbase__two_inputs_first_null__returns_false
         tx.inputs = [input1, input2]
-        XCTAssert(tx.description == "Transaction(version: 0, lockTime: 0, inputs: [Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 4294967295), sequence: 0x0, script: ''), Input(previousOutput: OutputPoint(hash: 0000000000000000000000000000000000000000000000000000000000000000, index: 42), sequence: 0x0, script: '')], outputs: [])")
+        XCTAssertEqual(tx.description, """
+        {"inputs":[{"previousOutput":{"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":4294967295},"script":"","sequence":0},{"previousOutput":{"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":42},"script":"","sequence":0}],"lockTime":0,"outputs":[],"version":0}
+        """)
         XCTAssertFalse(tx.isCoinbase)
     }
 
@@ -318,16 +359,16 @@ class TestTransaction: XCTestCase {
     }
 
     func test_from_data__insufficient_input_bytes__failure() {
-        let data = try! "0000000103" |> base16Decode
+        let data = "0000000103" |> dataLiteral
         XCTAssertThrowsError(try data |> deserializeTransaction)
     }
 
     func test_from_data__insufficient_output_bytes__failure() {
-        let data = try! "000000010003" |> base16Decode
+        let data = "000000010003" |> dataLiteral
         XCTAssertThrowsError(try data |> deserializeTransaction)
     }
 
-    lazy var TX1_RAW = try!
+    lazy var TX1_RAW =
     ("0100000001f08e44a96bfb5ae63eda1a6620adae37ee37ee4777fb0336e1bbbc" +
     "4de65310fc010000006a473044022050d8368cacf9bf1b8fb1f7cfd9aff63294" +
     "789eb1760139e7ef41f083726dadc4022067796354aba8f2e02363c5e510aa7e" +
@@ -335,7 +376,7 @@ class TestTransaction: XCTestCase {
     "12c517b7a482a203c8b2742985da0ac72cc078f2ffffffff02f0c9c467000000" +
     "001976a914d9d78e26df4e4601cf9b26d09c7b280ee764469f88ac80c4600f00" +
     "0000001976a9141ee32412020a324b93b1a1acfdfff6ab9ca8fac288ac000000" +
-    "00") |> base16Decode
+        "00") |> dataLiteral
 
     lazy var TX1 = try! TX1_RAW |> deserializeTransaction
 
@@ -350,7 +391,7 @@ class TestTransaction: XCTestCase {
         XCTAssertEqual(TX1 |> serialize, TX1_RAW)
     }
 
-    lazy var TX4_RAW = try!
+    lazy var TX4_RAW =
     ("010000000364e62ad837f29617bafeae951776e7a6b3019b2da37827921548d1" +
     "a5efcf9e5c010000006b48304502204df0dc9b7f61fbb2e4c8b0e09f3426d625" +
     "a0191e56c48c338df3214555180eaf022100f21ac1f632201154f3c69e1eadb5" +
@@ -367,7 +408,7 @@ class TestTransaction: XCTestCase {
     "5a06201d5cf61400e96fa4a7514fc12ab45166ace618d68b8066c9c585f9ffff" +
     "ffff02c0e1e400000000001976a914884c09d7e1f6420976c40e040c30b2b622" +
     "10c3d488ac20300500000000001976a914905f933de850988603aafeeb2fd7fc" +
-    "e61e66fe5d88ac00000000") |> base16Decode
+        "e61e66fe5d88ac00000000") |> dataLiteral
 
     lazy var TX4 = try! TX4_RAW |> deserializeTransaction
 
@@ -381,7 +422,7 @@ class TestTransaction: XCTestCase {
         XCTAssertEqual(TX4 |> serialize, TX4_RAW)
     }
 
-    lazy var TX5_RAW = try!
+    lazy var TX5_RAW =
     ("01000000023562c207a2a505820324aa03b769ee9c04a221eff59fdab6d52c312544a" +
     "c4b21020000006a473044022075d3dd4cd26137f50d1b8c18b5ecbd13b7309b801f62" +
     "83ebb951b137972d6e5b02206776f5e3acb2d996a9553f2438a4d2566c1fd786d9075" +
@@ -391,7 +432,7 @@ class TestTransaction: XCTestCase {
     "90b3f2aa8c9ae25aa575600de38c79eafc925602202ca57bcd29d38a3e6aebd6809f7" +
     "be4379d86f173b2ad2d42892dcb1dccca14b60121029caef1b63490b7deabc9547e3e" +
     "5d8b13c004b4bfd04dfae270874d569e5b89a8ffffffff01763d0300000000001976a" +
-    "914e0d40d609d0282cc97314e454d194f65c16c257888ac00000000") |> base16Decode
+        "914e0d40d609d0282cc97314e454d194f65c16c257888ac00000000") |> dataLiteral
 
     lazy var TX5 = try! TX5_RAW |> deserializeTransaction
 
@@ -403,7 +444,7 @@ class TestTransaction: XCTestCase {
     func test_is_oversized_coinbase__script_size_below_min__returns_true() {
         var tx = Transaction()
         var input = Input()
-        input.previousOutput.hash = .null
+        input.previousOutput.hash = nullHashDigest
         input.previousOutput.index = OutputPoint.nullIndex
         tx.inputs.append(input)
         XCTAssertTrue(tx.isCoinbase)
@@ -411,11 +452,11 @@ class TestTransaction: XCTestCase {
         XCTAssertTrue(tx.isOversizedCoinbase)
     }
 
-    lazy var TX6_RAW = try!
+    lazy var TX6_RAW =
     ("010000000100000000000000000000000000000000000000000000000000000000000" +
     "00000ffffffff23039992060481e1e157082800def50009dfdc102f42697446757279" +
     "2f5345475749542f00000000015b382d4b000000001976a9148cf4f6175b2651dcdff" +
-    "0051970a917ea10189c2d88ac00000000") |> base16Decode
+        "0051970a917ea10189c2d88ac00000000") |> dataLiteral
 
     lazy var TX6 = try! TX6_RAW |> deserializeTransaction
 
@@ -432,7 +473,7 @@ class TestTransaction: XCTestCase {
     func test_is_null_non_coinbase__null_input_prevout__returns_true() {
         var tx = Transaction()
         tx.inputs.append(Input())
-        tx.inputs.append(Input(previousOutput: OutputPoint(hash: HashDigest.null, index: OutputPoint.nullIndex)))
+        tx.inputs.append(Input(previousOutput: OutputPoint(hash: nullHashDigest, index: OutputPoint.nullIndex)))
         XCTAssertFalse(tx.isCoinbase)
         XCTAssertTrue(tx.inputs.last!.previousOutput.isNull)
         XCTAssertTrue(tx.isNullNonCoinbase)

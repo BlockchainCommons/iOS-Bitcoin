@@ -20,27 +20,9 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
-/// Decode a binary transaction to JSON format.
-public func transactionDecode(isPretty: Bool) -> (_ data: Data) throws -> String {
-    return { data in
-        return try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
-            var decoded: UnsafeMutablePointer<Int8>!
-            var decodedLength = 0
-            if let error = BitcoinError(rawValue: _transactionDecode(dataBytes, data.count, isPretty, &decoded, &decodedLength)) {
-                throw error
-            }
-            return receiveString(bytes: decoded, count: decodedLength)
-        }
-    }
-}
-
-/// Decode a binary transaction to JSON format.
-public func transactionDecode(_ data: Data) throws -> String {
-    return try data |> transactionDecode(isPretty: false)
-}
-
-public struct Transaction: InstanceContainer {
+public struct Transaction: InstanceContainer, Encodable {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
@@ -177,7 +159,7 @@ public struct Transaction: InstanceContainer {
         var hash: UnsafeMutablePointer<UInt8>!
         var hashLength = 0
         _transactionHash(wrapped.instance, &hash, &hashLength)
-        return try! receiveData(bytes: hash, count: hashLength) |> toHashDigest
+        return try! receiveData(bytes: hash, count: hashLength) |> hashDigest
     }
 
     public var totalInputValue: UInt64 {
@@ -219,11 +201,26 @@ public struct Transaction: InstanceContainer {
     public var isInternalDoubleSpend: Bool {
         return _transactionIsInternalDoubleSpend(wrapped.instance)
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case version
+        case lockTime
+        case inputs
+        case outputs
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(version, forKey: .version)
+        try container.encode(lockTime, forKey: .lockTime)
+        try container.encode(inputs, forKey: .inputs)
+        try container.encode(outputs, forKey: .outputs)
+    }
 }
 
 extension Transaction: CustomStringConvertible {
     public var description: String {
-        return "Transaction(version: \(version), lockTime: \(lockTime), inputs: \(inputs), outputs: \(outputs))"
+        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
     }
 }
 
@@ -235,4 +232,23 @@ public func serialize(_ transaction: Transaction) -> Data {
 
 public func deserializeTransaction(_ data: Data) throws -> Transaction {
     return try Transaction.deserialize(data: data)
+}
+
+/// Decode a binary transaction to JSON format.
+public func transactionDecode(isPretty: Bool) -> (_ data: Data) throws -> String {
+    return { data in
+        return try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+            var decoded: UnsafeMutablePointer<Int8>!
+            var decodedLength = 0
+            if let error = BitcoinError(rawValue: _transactionDecode(dataBytes, data.count, isPretty, &decoded, &decodedLength)) {
+                throw error
+            }
+            return receiveString(bytes: decoded, count: decodedLength)
+        }
+    }
+}
+
+/// Decode a binary transaction to JSON format.
+public func transactionDecode(_ data: Data) throws -> String {
+    return try data |> transactionDecode(isPretty: false)
 }

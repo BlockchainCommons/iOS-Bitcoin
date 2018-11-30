@@ -24,4 +24,5 @@ Pod::Spec.new do |s|
 
     s.dependency 'CBitcoin'
     s.dependency 'WolfPipe'
+    s.dependency 'WolfFoundation'
 end

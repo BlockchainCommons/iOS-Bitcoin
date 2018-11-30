@@ -7,6 +7,7 @@ pod 'WolfNumerics', :path => '../../WolfNumerics'
 pod 'WolfPipe', :path => '../../WolfPipe'
 pod 'WolfWith', :path => '../../WolfWith'
 pod 'WolfStrings', :path => '../../WolfStrings'
+pod 'WolfFoundation', :path => '../../WolfFoundation'
 
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'

@@ -19,25 +19,31 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
+import WolfPipe
+
+public enum Base85Tag { }
+public typealias Base85 = Tagged<Base85Tag, String>
+public func base85(_ string: String) -> Base85 { return Base85(rawValue: string) }
 
 /// Encodes the data as a base85 string.
-public func base85Encode(_ data: Data) -> String {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+public func toBase85(_ data: Data) -> Base85 {
+    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base85 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _base85Encode(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count)
+        _encodeBase85(dataBytes, data.count, &bytes, &count)
+        return receiveString(bytes: bytes, count: count) |> base85
     }
 }
 
 /// Decodes the base85 format string.
 ///
 /// Throws if the string is not valid base85.
-public func base85Decode(_ string: String) throws -> Data {
-    return try string.withCString { (stringBytes) in
+public func toData(_ base85: Base85) throws -> Data {
+    return try base85.rawValue.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        if let error = BitcoinError(rawValue: _base85Decode(stringBytes, &bytes, &count)) {
+        if let error = BitcoinError(rawValue: _decodeBase85(stringBytes, &bytes, &count)) {
             throw error
         }
         return receiveData(bytes: bytes, count: count)

@@ -22,19 +22,20 @@ import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
+import WolfFoundation
 
 class TestPaymentAddress: XCTestCase {
     func testAddressEncode() {
-        let ripemd160 = try! "b472a266d0bd89c13706a4132ccfb16f7c3b9fcb" |> base16Decode
-        XCTAssert(ripemd160 |> addressEncode == "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E")
-        XCTAssert(ripemd160 |> addressEncode(network: .testnet) == "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58")
+        let hash = try! "b472a266d0bd89c13706a4132ccfb16f7c3b9fcb" |> dataLiteral |> ripemd160
+        XCTAssert(hash |> addressEncode == "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E")
+        XCTAssert(hash |> addressEncode(network: .testnet) == "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58")
     }
 
     func testAddressDecode() {
-        let mainnetAddress = "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
-        let testnetAddress = "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58"
+        let mainnetAddress: PaymentAddress = "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
+        let testnetAddress: PaymentAddress = "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58"
 
-        let f = addressDecode >>> toJSON >>> fromUTF8
+        let f = addressDecode >>> toJSONStringWithOutputFormatting(.sortedKeys)
         XCTAssert(try! mainnetAddress |> f == """
             {"checksum":2743498322,"payload":"b472a266d0bd89c13706a4132ccfb16f7c3b9fcb","prefix":0}
             """)

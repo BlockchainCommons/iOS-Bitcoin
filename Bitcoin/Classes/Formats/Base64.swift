@@ -19,25 +19,31 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
+import WolfPipe
+
+public enum Base64Tag { }
+public typealias Base64 = Tagged<Base64Tag, String>
+public func base64(_ string: String) -> Base64 { return Base64(rawValue: string) }
 
 /// Encodes the data as a base64 string.
-public func base64Encode(_ data: Data) -> String {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+public func toBase64(_ data: Data) -> Base64 {
+    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base64 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _base64Encode(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count)
+        _encodeBase64(dataBytes, data.count, &bytes, &count)
+        return receiveString(bytes: bytes, count: count) |> base64
     }
 }
 
 /// Decodes the base64 format string.
 ///
 /// Throws if the string is not valid base64.
-public func base64Decode(_ string: String) throws -> Data {
-    return try string.withCString { (stringBytes) in
+public func toData(_ base64: Base64) throws -> Data {
+    return try base64.rawValue.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        if let error = BitcoinError(rawValue: _base64Decode(stringBytes, &bytes, &count)) {
+        if let error = BitcoinError(rawValue: _decodeBase64(stringBytes, &bytes, &count)) {
             throw error
         }
         return receiveData(bytes: bytes, count: count)

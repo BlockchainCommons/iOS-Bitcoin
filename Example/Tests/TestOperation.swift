@@ -27,13 +27,13 @@ class TestOperation: XCTestCase {
     func test1() {
         let operation = Bitcoin.Operation()
         XCTAssertFalse(operation.isValid)
-        print(operation.data |> base16Encode)
+        print(operation.data |> toBase16)
         XCTAssert(operation.data.isEmpty)
         XCTAssert(operation.opcode == .disabledXor)
     }
 
     func test2() {
-        let data = try! "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" |> base16Decode
+        let data = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" |> dataLiteral
         let operation = try! Operation(data: data)
         XCTAssert(operation.isValid)
         XCTAssert(operation.opcode == .pushSize32)
@@ -41,7 +41,7 @@ class TestOperation: XCTestCase {
     }
 
     func test3() {
-        let data = try! "23156214" |> base16Decode
+        let data = "23156214" |> dataLiteral
         let operation = try! Operation(data: data)
         XCTAssert(operation.isValid)
         let operation2 = operation
@@ -54,7 +54,7 @@ class TestOperation: XCTestCase {
     }
 
     func test5() {
-        let rawOperation = try! "00" |> base16Decode
+        let rawOperation = "00" |> dataLiteral
         let operation = try! Operation.deserialize(data: rawOperation)
         XCTAssert(operation.isValid)
         XCTAssert(operation.serialized == rawOperation)
@@ -68,7 +68,7 @@ class TestOperation: XCTestCase {
 
     func test6() {
         let data75 = Data(repeating: ".".asciiByte, count: 75)
-        let rawOperation = try! ("4b" |> base16Decode) + data75
+        let rawOperation = ("4b" |> dataLiteral) + data75
         let operation = try! Operation.deserialize(data: rawOperation)
         XCTAssert(operation.isValid)
         XCTAssert(operation.serialized == rawOperation)
@@ -90,17 +90,17 @@ class TestOperation: XCTestCase {
     }
 
     func test8() {
-        XCTAssert(try! "07" |> base16Decode |> toOperation(isMinimal: true) |> toString == "7")
-        XCTAssert(try! "07" |> base16Decode |> toOperation(isMinimal: false) |> toString == "[07]")
-        XCTAssert(try! "42" |> base16Decode |> toOperation |> toString == "[42]")
-        XCTAssert(try! "112233" |> base16Decode |> toOperation |> toString == "[112233]")
+        XCTAssert(try! "07" |> dataLiteral |> toOperation(isMinimal: true) |> toString == "7")
+        XCTAssert(try! "07" |> dataLiteral |> toOperation(isMinimal: false) |> toString == "[07]")
+        XCTAssert(try! "42" |> dataLiteral |> toOperation |> toString == "[42]")
+        XCTAssert(try! "112233" |> dataLiteral |> toOperation |> toString == "[112233]")
     }
 
     func test9() {
-        XCTAssert(try! "03112233" |> base16Decode |> deserializeOperation |> toString == "[112233]")
-        XCTAssert(try! "4c03112233" |> base16Decode |> deserializeOperation |> toString == "[1.112233]")
-        XCTAssert(try! "4d0300112233" |> base16Decode |> deserializeOperation |> toString == "[2.112233]")
-        XCTAssert(try! "4e03000000112233" |> base16Decode |> deserializeOperation |> toString == "[4.112233]")
+        XCTAssert(try! "03112233" |> dataLiteral |> deserializeOperation |> toString == "[112233]")
+        XCTAssert(try! "4c03112233" |> dataLiteral |> deserializeOperation |> toString == "[1.112233]")
+        XCTAssert(try! "4d0300112233" |> dataLiteral |> deserializeOperation |> toString == "[2.112233]")
+        XCTAssert(try! "4e03000000112233" |> dataLiteral |> deserializeOperation |> toString == "[4.112233]")
     }
 
     func test10() {
@@ -113,7 +113,7 @@ class TestOperation: XCTestCase {
     func test11() {
         func f(_ operationString: String, _ opcode: Opcode, _ dataString: String = "") -> Bool {
             let op = try! operationString |> toOperation
-            let data = try! dataString |> base16Decode
+            let data = try! Base16(rawValue: dataString) |> toData
             guard op.opcode == opcode else { return false }
             guard op.data == data else { return false }
             return true

@@ -19,8 +19,10 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
+import WolfPipe
 
-public struct Input: InstanceContainer {
+public struct Input: InstanceContainer, Encodable {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
@@ -109,11 +111,24 @@ public struct Input: InstanceContainer {
     public var isValid: Bool {
         return _inputIsValid(wrapped.instance)
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case previousOutput
+        case sequence
+        case script
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(previousOutput, forKey: .previousOutput)
+        try container.encode(sequence, forKey: .sequence)
+        try container.encode(scriptString, forKey: .script)
+    }
 }
 
 extension Input: CustomStringConvertible {
     public var description: String {
-        return "Input(previousOutput: \(previousOutput), sequence: 0x\(String(sequence, radix: 16)), script: '\(scriptString)')"
+        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
     }
 }
 

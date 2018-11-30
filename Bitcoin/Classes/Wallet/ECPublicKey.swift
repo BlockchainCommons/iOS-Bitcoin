@@ -25,28 +25,60 @@ public let ecCompressedPublicKeySize: Int = { return _ecCompressedPublicKeySize(
 public let ecUncompressedPublicKeySize: Int = { return _ecUncompressedPublicKeySize() }()
 
 public class ECPublicKey: ECKey {
-    public let data: Data
+    public func decompress() throws -> ECPublicKey {
+        return self
+    }
 
-    init(data: Data) {
-        self.data = data
+    public func compress() throws -> ECPublicKey {
+        return self
     }
 }
 
-public class ECCompressedPublicKey: ECPublicKey {
-    public init(_ data: Data) throws {
-        guard data.count == ecCompressedPublicKeySize else {
+public final class ECCompressedPublicKey: ECPublicKey {
+    public init(_ rawValue: Data) throws {
+        guard rawValue.count == ecCompressedPublicKeySize else {
             throw BitcoinError.invalidDataSize
         }
-        super.init(data: data)
+        super.init(rawValue: rawValue)
+    }
+
+    required init(rawValue: Data) {
+        fatalError("init(rawValue:) has not been implemented")
+    }
+
+    public override func decompress() throws -> ECPublicKey {
+        return try! rawValue.withUnsafeBytes { (compressedBytes: UnsafePointer<UInt8>) in
+            var uncompressed: UnsafeMutablePointer<UInt8>!
+            var uncompressedLength = 0
+            if let error = BitcoinError(rawValue: _decompress(compressedBytes, &uncompressed, &uncompressedLength)) {
+                throw error
+            }
+            return try ECUncompressedPublicKey(receiveData(bytes: uncompressed, count: uncompressedLength))
+        }
     }
 }
 
-public class ECUncompressedPublicKey: ECPublicKey {
-    public init(_ data: Data) throws {
-        guard data.count == ecUncompressedPublicKeySize else {
+public final class ECUncompressedPublicKey: ECPublicKey {
+    public init(_ rawValue: Data) throws {
+        guard rawValue.count == ecUncompressedPublicKeySize else {
             throw BitcoinError.invalidDataSize
         }
-        super.init(data: data)
+        super.init(rawValue: rawValue)
+    }
+
+    required init(rawValue: Data) {
+        fatalError("init(rawValue:) has not been implemented")
+    }
+
+    public override func compress() throws -> ECPublicKey {
+        return try! rawValue.withUnsafeBytes { (uncompressedBytes: UnsafePointer<UInt8>) in
+            var compressed: UnsafeMutablePointer<UInt8>!
+            var compressedLength = 0
+            if let error = BitcoinError(rawValue: _compress(uncompressedBytes, &compressed, &compressedLength)) {
+                throw error
+            }
+            return try ECCompressedPublicKey(receiveData(bytes: compressed, count: compressedLength))
+        }
     }
 }
 
@@ -66,10 +98,10 @@ public func toECPublicKey(_ data: Data) throws -> ECPublicKey {
 /// This is a curried function suitable for use with the pipe operator.
 public func toECPublicKey(isCompressed: Bool) -> (_ privateKey: ECPrivateKey) throws -> ECPublicKey {
     return { privateKey in
-        return try privateKey.data.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+        return try privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
             var publicKeyBytes: UnsafeMutablePointer<UInt8>!
             var publicKeyLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes, privateKey.data.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
+            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes, privateKey.rawValue.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
                 throw error
             }
             let data = receiveData(bytes: publicKeyBytes, count: publicKeyLength)
@@ -99,13 +131,21 @@ public enum ECPaymentAddressVersion: UInt8 {
 /// Convert an EC public key to a payment address.
 public func toECPaymentAddress(version: ECPaymentAddressVersion) -> (_ publicKey: ECPublicKey) throws -> String {
     return { publicKey in
-        return try publicKey.data.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
+        return try publicKey.rawValue.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
             var addressBytes: UnsafeMutablePointer<Int8>!
             var addressLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey.data.count, version.rawValue, &addressBytes, &addressLength)) {
+            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey.rawValue.count, version.rawValue, &addressBytes, &addressLength)) {
                 throw error
             }
             return receiveString(bytes: addressBytes, count: addressLength)
         }
     }
+}
+
+public func decompress(_ key: ECPublicKey) throws -> ECPublicKey {
+    return try key.decompress()
+}
+
+public func compress(_ key: ECPublicKey) throws -> ECPublicKey {
+    return try key.compress()
 }

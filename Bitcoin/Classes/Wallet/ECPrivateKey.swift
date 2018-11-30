@@ -23,14 +23,20 @@ import WolfPipe
 
 public let ecPrivateKeySize: Int = { return _ecPrivateKeySize() }()
 
-public struct ECPrivateKey: ECKey {
-    public let data: Data
+public class ECPrivateKey: ECKey {
+    public init() {
+        super.init(rawValue: seed())
+    }
 
-    public init(_ data: Data) throws {
-        guard data.count == ecPrivateKeySize else {
+    public init(_ rawValue: Data) throws {
+        guard rawValue.count == ecPrivateKeySize else {
             throw BitcoinError.invalidDataSize
         }
-        self.data = data
+        super.init(rawValue: rawValue)
+    }
+    
+    public required init(rawValue: Data) {
+        fatalError("init(rawValue:) has not been implemented")
     }
 }
 
@@ -49,42 +55,6 @@ public func newECPrivateKey(_ seed: Data) throws -> ECPrivateKey {
     var privateKeyLength: Int = 0
     try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
         if let error = BitcoinError(rawValue: _ecNewPrivateKey(seedBytes, seed.count, &privateKeyBytes, &privateKeyLength)) {
-            throw error
-        }
-    }
-    return try ECPrivateKey(receiveData(bytes: privateKeyBytes, count: privateKeyLength))
-}
-
-public enum WIFVersion: UInt8 {
-    case mainnet = 0x80
-    case testnet = 0xef
-}
-
-/// Convert an EC private key to a WIF private key.
-public func toWIF(version: WIFVersion, isCompressed: Bool = true) -> (_ privateKey: ECPrivateKey) throws -> String {
-    return { privateKey in
-        var wifBytes: UnsafeMutablePointer<Int8>!
-        var wifLength: Int = 0
-        try privateKey.data.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _ecPrivateKeyToWIF(privateKeyBytes, privateKey.data.count, version.rawValue, isCompressed, &wifBytes, &wifLength)) {
-                throw error
-            }
-        }
-        return receiveString(bytes: wifBytes, count: wifLength)
-    }
-}
-
-/// Convert an EC private key to a WIF private key.
-public func toWIF(_ privateKey: ECPrivateKey) throws -> String {
-    return try privateKey |> toWIF(version: .mainnet)
-}
-
-/// Convert a WIF private key to an EC private key.
-public func wifToECPrivateKey(_ wif: String) throws -> ECPrivateKey {
-    var privateKeyBytes: UnsafeMutablePointer<UInt8>!
-    var privateKeyLength: Int = 0
-    try wif.withCString { wifString in
-        if let error = BitcoinError(rawValue: _wifToECPrivateKey(wifString, &privateKeyBytes, &privateKeyLength)) {
             throw error
         }
     }

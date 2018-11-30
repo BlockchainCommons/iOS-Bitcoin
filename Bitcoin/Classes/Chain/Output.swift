@@ -19,8 +19,10 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
+import WolfPipe
 
-public struct Output: InstanceContainer {
+public struct Output: InstanceContainer, Encodable {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
@@ -49,13 +51,13 @@ public struct Output: InstanceContainer {
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
-    public init(value: UInt64, paymentAddress: String) throws {
+    public init(value: Satoshis, paymentAddress: String) throws {
         self.init()
         self.value = value
         try setPaymentAddress(paymentAddress)
     }
 
-    public init(value: UInt64) {
+    public init(value: Satoshis) {
         self.init()
         self.value = value
     }
@@ -71,16 +73,16 @@ public struct Output: InstanceContainer {
         }
     }
 
-    public var value: UInt64 {
+    public var value: Satoshis {
         get {
-            return _outputGetValue(wrapped.instance)
+            return Satoshis(rawValue: _outputGetValue(wrapped.instance))
         }
 
         set {
             if !isKnownUniquelyReferenced(&wrapped) {
                 wrapped = WrappedInstance(_outputCopy(wrapped.instance))
             }
-            _outputSetValue(wrapped.instance, newValue)
+            _outputSetValue(wrapped.instance, newValue.rawValue)
         }
     }
 
@@ -90,11 +92,22 @@ public struct Output: InstanceContainer {
         _outputGetScript(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
+
+    public enum CodingKeys: String, CodingKey {
+        case value
+        case script
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.container(keyedBy: CodingKeys.self)
+        try container.encode(value, forKey: .value)
+        try container.encode(script, forKey: .script)
+    }
 }
 
 extension Output: CustomStringConvertible {
     public var description: String {
-        return "Output(value: \(value), script: '\(script)')"
+        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
     }
 }
 

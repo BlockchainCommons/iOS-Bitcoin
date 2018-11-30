@@ -18,20 +18,34 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-/// Parsed ECDSA signature
-public struct ECSignature {
-    public let data: Data
+import CBitcoin
+import WolfPipe
+import WolfFoundation
 
-    public init(_ data: Data) throws {
-        guard data.count == 64 else {
-            throw BitcoinError.invalidDataSize
+public enum ECSignatureTag { }
+/// Parsed ECDSA signature
+public typealias ECSignature = Tagged<ECSignatureTag, Data>
+
+public func ecSignature(_ data: Data) throws -> ECSignature {
+    guard data.count == 64 else {
+        throw BitcoinError.invalidDataSize
+    }
+    return ECSignature(rawValue: data)
+}
+
+public func toECSignature(isStrict: Bool) -> (_ derSignature: DERSignature) throws -> ECSignature {
+    return { derSignature in
+        try derSignature.rawValue.withUnsafeBytes { (derSignatureBytes: UnsafePointer<UInt8>) in
+            var ecSignatureBytes: UnsafeMutablePointer<UInt8>!
+            var ecSignatureLength = 0
+            if let error = BitcoinError(rawValue: _parseSignature(derSignatureBytes, derSignature.rawValue.count, isStrict, &ecSignatureBytes, &ecSignatureLength)) {
+                throw error
+            }
+            return try receiveData(bytes: ecSignatureBytes, count: ecSignatureLength) |> ecSignature
         }
-        self.data = data
     }
 }
 
-// MARK: - Free functions
-
-public func toECSignature(_ data: Data) throws -> ECSignature {
-    return try ECSignature(data)
+public func toECSignature(_ derSignature: DERSignature) throws -> ECSignature {
+    return try derSignature |> toECSignature(isStrict: true)
 }

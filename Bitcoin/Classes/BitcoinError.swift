@@ -52,6 +52,7 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
     case invalidData = 15
     case invalidOpcode = 16
     case invalidSignature = 17
+    case signingFailed = 18
 
     public var description: String {
         switch self {
@@ -89,6 +90,8 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
             return "Invalid opcode"
         case .invalidSignature:
             return "Invalid signature"
+        case .signingFailed:
+            return "Signing failed"
         }
     }
 }

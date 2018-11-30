@@ -20,49 +20,26 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
+public enum DERSignatureTag { }
 /// A DER-encoded signature
-public struct DERSignature {
-    public let data: Data
+public typealias DERSignature = Tagged<DERSignatureTag, Data>
 
-    public init(_ data: Data) throws {
-        guard data.count <= 72 else {
-            throw BitcoinError.invalidDataSize
-        }
-        self.data = data
+public func derSignature(_ data: Data) throws -> DERSignature {
+    guard (64 ... 72).contains(data.count) else {
+        throw BitcoinError.invalidDataSize
     }
+    return DERSignature(rawValue: data)
 }
 
-// MARK: - Free functions
-
-public func toDERSignature(_ data: Data) throws -> DERSignature {
-    return try DERSignature(data)
-}
-
-public func derEncode(_ ecSignature: ECSignature) throws -> DERSignature {
-    return try ecSignature.data.withUnsafeBytes { (ecSignatureBytes: UnsafePointer<UInt8>) in
+public func toDERSignature(_ ecSignature: ECSignature) throws -> DERSignature {
+    return try ecSignature.rawValue.withUnsafeBytes { (ecSignatureBytes: UnsafePointer<UInt8>) in
         var derSignatureBytes: UnsafeMutablePointer<UInt8>!
         var derSignatureLength = 0
         if let error = BitcoinError(rawValue: _encodeSignature(ecSignatureBytes, &derSignatureBytes, &derSignatureLength)) {
             throw error
         }
-        return try DERSignature(receiveData(bytes: derSignatureBytes, count: derSignatureLength))
+        return try receiveData(bytes: derSignatureBytes, count: derSignatureLength) |> derSignature
     }
-}
-
-public func derDecode(isStrict: Bool) -> (_ derSignature: DERSignature) throws -> ECSignature {
-    return { derSignature in
-        try derSignature.data.withUnsafeBytes { (derSignatureBytes: UnsafePointer<UInt8>) in
-            var ecSignatureBytes: UnsafeMutablePointer<UInt8>!
-            var ecSignatureLength = 0
-            if let error = BitcoinError(rawValue: _parseSignature(derSignatureBytes, derSignature.data.count, isStrict, &ecSignatureBytes, &ecSignatureLength)) {
-                throw error
-            }
-            return try ECSignature(receiveData(bytes: ecSignatureBytes, count: ecSignatureLength))
-        }
-    }
-}
-
-public func derDecode(_ derSignature: DERSignature) throws -> ECSignature {
-    return try derSignature |> derDecode(isStrict: true)
 }

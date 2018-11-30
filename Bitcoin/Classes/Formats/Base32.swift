@@ -20,36 +20,41 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
+
+public enum Base32Tag { }
+public typealias Base32 = Tagged<Base32Tag, String>
+public func base32(_ string: String) -> Base32 { return Base32(rawValue: string) }
 
 /// Convert the data to Base32 with the provided prefix.
-public func base32Encode(prefix: String, payload: Data) -> String {
-    return payload.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> String in
+public func toBase32(prefix: String, payload: Data) -> Base32 {
+    return payload.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base32 in
         prefix.withCString { prefixBytes in
             var bytes: UnsafeMutablePointer<Int8>!
             var count: Int = 0
-            _base32Encode(prefixBytes, dataBytes, payload.count, &bytes, &count)
-            return receiveString(bytes: bytes, count: count)
+            _encodeBase32(prefixBytes, dataBytes, payload.count, &bytes, &count)
+            return receiveString(bytes: bytes, count: count) |> base32
         }
     }
 }
 
 /// Convert the data to Base32 with the provided prefix.
-public func base32Encode(prefix: String) -> (_ payload: Data) -> String {
+public func toBase32(prefix: String) -> (_ payload: Data) -> Base32 {
     return { payload in
-        base32Encode(prefix: prefix, payload: payload)
+        toBase32(prefix: prefix, payload: payload)
     }
 }
 
 /// Decodes the base32 format string.
 ///
 /// Throws if the string is not valid base32.
-public func base32Decode(_ string: String) throws -> (prefix: String, payload: Data) {
-    return try string.withCString { (stringBytes) in
+public func toData(_ base32: Base32) throws -> (prefix: String, payload: Data) {
+    return try base32.rawValue.withCString { (stringBytes) in
         var prefixBytes: UnsafeMutablePointer<Int8>!
         var prefixCount: Int = 0
         var payloadBytes: UnsafeMutablePointer<UInt8>!
         var payloadCount: Int = 0
-        if let error = BitcoinError(rawValue: _base32Decode(stringBytes, &prefixBytes, &prefixCount, &payloadBytes, &payloadCount)) {
+        if let error = BitcoinError(rawValue: _decodeBase32(stringBytes, &prefixBytes, &prefixCount, &payloadBytes, &payloadCount)) {
             throw error
         }
         let prefix = receiveString(bytes: prefixBytes, count: prefixCount)

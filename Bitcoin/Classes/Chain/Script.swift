@@ -165,25 +165,25 @@ public func generateSignatureHash(transaction: Transaction, inputIndex: UInt32, 
     var hash: UnsafeMutablePointer<UInt8>!
     var hashLength = 0
     _generateSignatureHash(transaction.wrapped.instance, inputIndex, script.wrapped.instance, sigHashType.rawValue, scriptVersion.rawValue, value, &hash, &hashLength)
-    return try! receiveData(bytes: hash, count: hashLength) |> toHashDigest
+    return try! receiveData(bytes: hash, count: hashLength) |> hashDigest
 }
 
 public func checkSignature(_ signature: ECSignature, sigHashType: SigHashAlgorithm, publicKey: ECPublicKey, script: Script, transaction: Transaction, inputIndex: UInt32, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> Bool {
-    return signature.data.withUnsafeBytes { (signatureBytes: UnsafePointer<UInt8>) in
-        publicKey.data.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
-        _checkSignature(signatureBytes, sigHashType.rawValue, publicKeyBytes, publicKey.data.count, script.wrapped.instance, transaction.wrapped.instance, inputIndex, scriptVersion.rawValue, value)
+    return signature.rawValue.withUnsafeBytes { signatureBytes in
+        publicKey.rawValue.withUnsafeBytes { publicKeyBytes in
+            _checkSignature(signatureBytes, sigHashType.rawValue, publicKeyBytes, publicKey.rawValue.count, script.wrapped.instance, transaction.wrapped.instance, inputIndex, scriptVersion.rawValue, value)
         }
     }
 }
 
 public func createEndorsement(privateKey: ECPrivateKey, script: Script, transaction: Transaction, inputIndex: UInt32, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) throws -> Endorsement {
-    return try privateKey.data.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
-        var endorsement: UnsafeMutablePointer<UInt8>!
+    return try privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+        var _endorsement: UnsafeMutablePointer<UInt8>!
         var endorsementLength = 0
-        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, inputIndex, sigHashType.rawValue, scriptVersion.rawValue, value, &endorsement, &endorsementLength)) {
+        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, inputIndex, sigHashType.rawValue, scriptVersion.rawValue, value, &_endorsement, &endorsementLength)) {
             throw error
         }
-        return try receiveData(bytes: endorsement, count: endorsementLength) |> toEndorsement
+        return try! receiveData(bytes: _endorsement, count: endorsementLength) |> endorsement
     }
 }
 
