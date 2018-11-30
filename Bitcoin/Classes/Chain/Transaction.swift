@@ -226,6 +226,10 @@ extension Transaction: CustomStringConvertible {
 
 // MARK: - Free functions
 
+func trim(_ string: String) -> String {
+    return string.trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
 public func serialize(_ transaction: Transaction) -> Data {
     return transaction.serialized
 }
@@ -243,7 +247,7 @@ public func transactionDecode(isPretty: Bool) -> (_ data: Data) throws -> String
             if let error = BitcoinError(rawValue: _transactionDecode(dataBytes, data.count, isPretty, &decoded, &decodedLength)) {
                 throw error
             }
-            return receiveString(bytes: decoded, count: decodedLength)
+            return receiveString(bytes: decoded, count: decodedLength) |> trim
         }
     }
 }

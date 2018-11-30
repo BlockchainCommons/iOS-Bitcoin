@@ -5,12 +5,12 @@ PODS:
     - WolfPipe
   - CBitcoin (0.1.0)
   - ExtensibleEnumeratedName (1.0.3)
-  - WolfFoundation (1.0.3):
+  - WolfFoundation (1.0.5):
     - WolfNumerics
     - WolfPipe
-  - WolfNumerics (2.0.1)
-  - WolfPipe (1.0.5)
-  - WolfStrings (1.0.4):
+  - WolfNumerics (2.0.2)
+  - WolfPipe (1.0.7)
+  - WolfStrings (1.0.5):
     - ExtensibleEnumeratedName
     - WolfNumerics
     - WolfPipe
@@ -47,12 +47,12 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Bitcoin: b61570c373fbad2c8712c53342537bf8f9e9512d
-  CBitcoin: dcb6627f93e09ab28fc132d738eddd6f75d71354
+  CBitcoin: dfd343a37554262ccf778a23eed7f252c2896eed
   ExtensibleEnumeratedName: c6caeb662f79105e7229a613f9043e8a7e15e642
-  WolfFoundation: 53ccda63e075f56e7395d25371ea041cbb65222d
-  WolfNumerics: b8da8b6bfd8fe20825c727a0a67f324e6f60e23c
-  WolfPipe: 13f96a573eb084aa343b6c971f6dbba2fcf73287
-  WolfStrings: cc6dd8513f1c864a1ae5a0004ab159dec8019dd0
+  WolfFoundation: 5e64d0970991e7cc29112a448a31770ac28df24e
+  WolfNumerics: b31de2e54d6d5fd318b08124a2548a1be84c13c0
+  WolfPipe: 55a03191ad6957664350ed0fbe716d8fb3b9ee32
+  WolfStrings: 12758c6e6d9f5e4edb15353f26bdea7187bdc9d1
   WolfWith: df7f308b44883b5cee2cce6220f468e6d8c16cb0
 
 PODFILE CHECKSUM: 1987696bbfe4524f16f7b893b5afbbb3fc10055a
