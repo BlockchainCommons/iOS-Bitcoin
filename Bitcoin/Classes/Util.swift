@@ -52,3 +52,7 @@ func receiveInstances<T: InstanceContainer>(instances: UnsafeMutablePointer<Opaq
     let buffer = UnsafeBufferPointer<OpaquePointer>(start: instances, count: count)
     return buffer.map { T(instance: $0) }
 }
+
+func trim(_ string: String) -> String {
+    return string.trimmingCharacters(in: .whitespacesAndNewlines)
+}

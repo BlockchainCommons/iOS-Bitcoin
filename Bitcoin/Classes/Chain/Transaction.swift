@@ -226,10 +226,6 @@ extension Transaction: CustomStringConvertible {
 
 // MARK: - Free functions
 
-func trim(_ string: String) -> String {
-    return string.trimmingCharacters(in: .whitespacesAndNewlines)
-}
-
 public func serialize(_ transaction: Transaction) -> Data {
     return transaction.serialized
 }
