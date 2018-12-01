@@ -52,7 +52,7 @@ class TestEllipticCurve: XCTestCase {
     }
 
     func test_sign__positive() {
-        XCTAssertEqual(sign(hash: SIGHASH3, privateKey: SECRET3), EC_SIGNATURE3)
+        XCTAssertEqual(SIGHASH3 |> sign(with: SECRET3), EC_SIGNATURE3)
     }
 
     func test_encode_signature__positive() {

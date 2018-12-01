@@ -21,29 +21,45 @@
 import CBitcoin
 import WolfPipe
 
-public func sign(hash: HashDigest, privateKey: ECPrivateKey) -> ECSignature {
-    return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> ECSignature in
-        privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) -> ECSignature in
-            var signature: UnsafeMutablePointer<UInt8>!
-            var signatureLength = 0
-            _sign(hashBytes, privateKeyBytes, &signature, &signatureLength)
-            return try! receiveData(bytes: signature, count: signatureLength) |> ecSignature
+public func signMessage(with privateKey: ECPrivateKey) -> (_ message: Data) -> ECSignature {
+    return { message in
+        message |> toSHA256 |> sign(with: privateKey)
+    }
+}
+
+public func verifySignature(publicKey: ECPublicKey, signature: ECSignature) -> (_ message: Data) -> Bool {
+    return { message in
+        message |> toSHA256 |> verifySignature(publicKey: publicKey, signature: signature)
+    }
+}
+
+public func sign(with privateKey: ECPrivateKey) -> (_ hash: HashDigest) -> ECSignature {
+    return { hash in
+        return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> ECSignature in
+            privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) -> ECSignature in
+                var signature: UnsafeMutablePointer<UInt8>!
+                var signatureLength = 0
+                _sign(hashBytes, privateKeyBytes, &signature, &signatureLength)
+                return try! receiveData(bytes: signature, count: signatureLength) |> ecSignature
+            }
         }
     }
 }
 
-public func verifySignature(hash: HashDigest, publicKey: ECPublicKey, signature: ECSignature) -> Bool {
-    return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) in
-        publicKey.rawValue.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
-            signature.rawValue.withUnsafeBytes { (signatureBytes: UnsafePointer<UInt8>) in
-                _verifySignature(publicKeyBytes, publicKey.rawValue.count, hashBytes, signatureBytes)
+public func verifySignature(publicKey: ECPublicKey, signature: ECSignature) -> (_ hash: HashDigest) -> Bool {
+    return { hash in
+        return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) in
+            publicKey.rawValue.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
+                signature.rawValue.withUnsafeBytes { (signatureBytes: UnsafePointer<UInt8>) in
+                    _verifySignature(publicKeyBytes, publicKey.rawValue.count, hashBytes, signatureBytes)
+                }
             }
         }
     }
 }
 
 /// Create a message signature.
-public func messageSign(wif: WIF) -> (_ message: Data) -> String {
+public func signMessage(with wif: WIF) -> (_ message: Data) -> String {
     return { message in
         wif.rawValue.withCString { (wifString: UnsafePointer<Int8>) in
             message.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
@@ -57,7 +73,7 @@ public func messageSign(wif: WIF) -> (_ message: Data) -> String {
 }
 
 /// Validate a message signature.
-public func messageValidate(paymentAddress: PaymentAddress, signature: String) -> (_ message: Data) -> Bool {
+public func validateMessage(paymentAddress: PaymentAddress, signature: String) -> (_ message: Data) -> Bool {
     return { message in
         paymentAddress.rawValue.withCString { (paymentAddressString: UnsafePointer<Int8>) in
             signature.withCString { (signatureString: UnsafePointer<Int8>) in

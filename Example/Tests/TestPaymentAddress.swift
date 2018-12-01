@@ -26,7 +26,7 @@ import WolfFoundation
 
 class TestPaymentAddress: XCTestCase {
     func testAddressEncode() {
-        let hash = try! "b472a266d0bd89c13706a4132ccfb16f7c3b9fcb" |> dataLiteral |> ripemd160
+        let hash = try! "b472a266d0bd89c13706a4132ccfb16f7c3b9fcb" |> dataLiteral |> shortHash
         XCTAssert(hash |> addressEncode == "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E")
         XCTAssert(hash |> addressEncode(network: .testnet) == "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58")
     }

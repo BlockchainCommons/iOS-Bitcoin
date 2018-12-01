@@ -85,7 +85,7 @@ public struct PaymentAddressVersion {
 }
 
 /// Convert a RIPEMD160 value to a payment address.
-public func addressEncode(version: UInt8) -> (_ ripemd160: RIPEMD160) -> PaymentAddress {
+public func addressEncode(version: UInt8) -> (_ ripemd160: ShortHash) -> PaymentAddress {
     return { ripemd160 in
         ripemd160.rawValue.withUnsafeBytes { (ripemd160Bytes: UnsafePointer<UInt8>) in
             var address: UnsafeMutablePointer<Int8>!
@@ -97,12 +97,12 @@ public func addressEncode(version: UInt8) -> (_ ripemd160: RIPEMD160) -> Payment
 }
 
 /// Convert a RIPEMD160 value to a payment address.
-public func addressEncode(network: PaymentAddressNetwork = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ ripemd160: RIPEMD160) -> PaymentAddress {
+public func addressEncode(network: PaymentAddressNetwork = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ ripemd160: ShortHash) -> PaymentAddress {
     return addressEncode(version: PaymentAddressVersion(network: network, type: type).version)
 }
 
 /// Convert a RIPEMD160 value to a payment address.
-public func addressEncode(_ ripemd160: RIPEMD160) -> PaymentAddress {
+public func addressEncode(_ ripemd160: ShortHash) -> PaymentAddress {
     return ripemd160 |> addressEncode()
 }
 
