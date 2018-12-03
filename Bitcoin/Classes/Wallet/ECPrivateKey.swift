@@ -24,8 +24,8 @@ import WolfPipe
 public let ecPrivateKeySize: Int = { return _ecPrivateKeySize() }()
 
 public class ECPrivateKey: ECKey {
-    public init() {
-        super.init(rawValue: seed())
+    public convenience init() {
+        try! self.init(seed(count: ecPrivateKeySize))
     }
 
     public init(_ rawValue: Data) throws {
