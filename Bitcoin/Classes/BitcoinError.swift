@@ -18,11 +18,13 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-public struct LibBitcoinResult: Error, CustomStringConvertible {
-    public let code: UInt32
+import WolfFoundation
+
+public struct LibBitcoinResult: CodedError, CustomStringConvertible {
+    public let code: Int
 
     public init(code: UInt32) {
-        self.code = code
+        self.code = Int(code)
     }
 
     public var isSuccess: Bool {
