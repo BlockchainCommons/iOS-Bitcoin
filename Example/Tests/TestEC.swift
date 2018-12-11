@@ -47,7 +47,7 @@ class TestEC: XCTestCase {
 
     func testToWIF() {
         let f = base16 >>> toData >>> toECPrivateKey >>> toWIF
-        let g = { base16 >>> toData >>> toECPrivateKey >>> toWIF(version: .mainnet, isCompressed: $0) }
+        let g = { base16 >>> toData >>> toECPrivateKey >>> toWIF(network: .mainnet, isCompressed: $0) }
         XCTAssert(try! "8ed1d17dabce1fccbbe5e9bf008b318334e5bcc78eb9e7c1ea850b7eb0ddb9c8" |> f == "L21LJEeJwK35wby1BeTjwWssrhrgQE2MZrpTm2zbMC677czAHHu3")
         XCTAssert(try! "8ed1d17dabce1fccbbe5e9bf008b318334e5bcc78eb9e7c1ea850b7eb0ddb9c8" |> g(false) == "5JuBiWpsjfXNxsWuc39KntBAiAiAP2bHtrMGaYGKCppq4MuVcQL")
         XCTAssert(try! "0C28FCA386C7A227600B2FE50B7CAE11EC86D3BF1FBE471BE89827E19D72AA1D" |> g(false) == "5HueCGU8rMjxEXxiPuD5BDku4MkFqeZyd4dZ1jvhTVqvbTLvyTJ")

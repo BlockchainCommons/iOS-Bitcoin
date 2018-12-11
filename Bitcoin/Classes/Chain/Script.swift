@@ -228,7 +228,7 @@ public func scriptToAddress(version: UInt8) -> (_ script: String) throws -> Stri
 }
 
 /// Create a BIP16 pay-to-script-hash address from a script.
-public func scriptToAddress(network: PaymentAddressNetwork) -> (_ script: String) throws -> String {
+public func scriptToAddress(network: Network) -> (_ script: String) throws -> String {
     return scriptToAddress(version: PaymentAddressVersion(network: network, type: .p2sh).version)
 }
 

@@ -27,18 +27,24 @@ public typealias WIF = Tagged<WIFTag, String>
 
 public func wif(_ string: String) -> WIF { return WIF(rawValue: string) }
 
-public enum WIFVersion: UInt8 {
-    case mainnet = 0x80
-    case testnet = 0xef
+extension Network {
+    public var wifVersion: UInt8 {
+        switch self {
+        case .mainnet:
+            return 0x80
+        case .testnet:
+            return 0xef
+        }
+    }
 }
 
 /// Convert an EC private key to a WIF private key.
-public func toWIF(version: WIFVersion, isCompressed: Bool = true) -> (_ privateKey: ECPrivateKey) throws -> WIF {
+public func toWIF(network: Network, isCompressed: Bool = true) -> (_ privateKey: ECPrivateKey) throws -> WIF {
     return { privateKey in
         var wifBytes: UnsafeMutablePointer<Int8>!
         var wifLength: Int = 0
         try privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _ecPrivateKeyToWIF(privateKeyBytes, privateKey.rawValue.count, version.rawValue, isCompressed, &wifBytes, &wifLength)) {
+            if let error = BitcoinError(rawValue: _ecPrivateKeyToWIF(privateKeyBytes, privateKey.rawValue.count, network.wifVersion, isCompressed, &wifBytes, &wifLength)) {
                 throw error
             }
         }
@@ -48,7 +54,7 @@ public func toWIF(version: WIFVersion, isCompressed: Bool = true) -> (_ privateK
 
 /// Convert an EC private key to a WIF private key.
 public func toWIF(_ privateKey: ECPrivateKey) throws -> WIF {
-    return try privateKey |> toWIF(version: .mainnet)
+    return try privateKey |> toWIF(network: .mainnet)
 }
 
 /// Convert a WIF private key to an EC private key.
