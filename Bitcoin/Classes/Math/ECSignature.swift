@@ -26,7 +26,7 @@ public enum ECSignatureTag { }
 /// Parsed ECDSA signature
 public typealias ECSignature = Tagged<ECSignatureTag, Data>
 
-public func ecSignature(_ data: Data) throws -> ECSignature {
+public func tagECSignature(_ data: Data) throws -> ECSignature {
     guard data.count == 64 else {
         throw BitcoinError.invalidDataSize
     }
@@ -41,7 +41,7 @@ public func toECSignature(isStrict: Bool) -> (_ derSignature: DERSignature) thro
             if let error = BitcoinError(rawValue: _parseSignature(derSignatureBytes, derSignature.rawValue.count, isStrict, &ecSignatureBytes, &ecSignatureLength)) {
                 throw error
             }
-            return try receiveData(bytes: ecSignatureBytes, count: ecSignatureLength) |> ecSignature
+            return try receiveData(bytes: ecSignatureBytes, count: ecSignatureLength) |> tagECSignature
         }
     }
 }

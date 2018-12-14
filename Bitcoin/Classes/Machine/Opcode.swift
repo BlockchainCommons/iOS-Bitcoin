@@ -296,43 +296,7 @@ public enum Opcode: UInt8 {
         return Opcode(rawValue: opcode)!
     }
 
-    public static func makeFrom(hexadecimal: String) throws -> Opcode {
-        let opcode = try hexadecimal.withCString { (hexBytes: UnsafePointer<Int8>) -> UInt8 in
-            var opcode: UInt8 = 0
-            if let error = BitcoinError(rawValue: _opcodeFromHexadecimal(hexBytes, &opcode)) {
-                throw error
-            }
-            return opcode
-        }
-        return Opcode(rawValue: opcode)!
-    }
-
-    public init?(mnemonic: String, rules: RuleFork = .allRules) {
-        do {
-            let opcode = try Opcode.makeFrom(mnemonic: mnemonic)
-            self.init(rawValue: opcode.rawValue)
-        } catch {
-            return nil
-        }
-    }
-
-    public init?(hexadecimal: String) {
-        do {
-            let opcode = try Opcode.makeFrom(hexadecimal: hexadecimal)
-            self.init(rawValue: opcode.rawValue)
-        } catch {
-            return nil
-        }
-    }
-
-    public var hexadecimal: String {
-        var string: UnsafeMutablePointer<Int8>!
-        var count = 0
-        _opcodeToHexadecimal(rawValue, &string, &count)
-        return receiveString(bytes: string, count: count)
-    }
-
-    public func toString(with rules: RuleFork = .allRules) -> String {
+    func toStringInternal(with rules: RuleFork = .allRules) -> String {
         var string: UnsafeMutablePointer<Int8>!
         var count = 0
         _opcodeToString(rawValue, rules.rawValue, &string, &count)
@@ -342,7 +306,7 @@ public enum Opcode: UInt8 {
 
 extension Opcode: CustomStringConvertible {
     public var description: String {
-        return toString()
+        return self |> toString
     }
 }
 
@@ -352,20 +316,21 @@ public func toOpcode(_ string: String) throws -> Opcode {
     return try Opcode.makeFrom(mnemonic: string)
 }
 
-public func hexadecimalToOpcode(_ string: String) throws -> Opcode {
-    return try Opcode.makeFrom(hexadecimal: string)
-}
-
-public func toString(_ opcode: Opcode, rules: RuleFork) -> String {
-    return opcode.toString(with: rules)
-}
-
 public func toString(rules: RuleFork) -> (_ opcode: Opcode) -> String {
     return { opcode in
-        opcode.toString(with: rules)
+        opcode.toStringInternal(with: rules)
     }
 }
 
-public func toHexadecimal(_ opcode: Opcode) -> String {
-    return opcode.hexadecimal
+public func toString(_ opcode: Opcode) -> String {
+    return opcode |> toString(rules: .allRules)
+}
+
+public func toOpcode(_ i: UInt8) -> Opcode {
+    return Opcode(rawValue: i)!
+}
+
+public func toOpcode(_ data: Data) throws -> Opcode {
+    guard data.count == 1 else { throw BitcoinError.invalidDataSize }
+    return data[0] |> toOpcode
 }

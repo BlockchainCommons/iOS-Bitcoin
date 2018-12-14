@@ -24,7 +24,7 @@ import WolfPipe
 
 public enum Base85Tag { }
 public typealias Base85 = Tagged<Base85Tag, String>
-public func base85(_ string: String) -> Base85 { return Base85(rawValue: string) }
+public func tagBase85(_ string: String) -> Base85 { return Base85(rawValue: string) }
 
 /// Encodes the data as a base85 string.
 public func toBase85(_ data: Data) -> Base85 {
@@ -32,7 +32,7 @@ public func toBase85(_ data: Data) -> Base85 {
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
         _encodeBase85(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count) |> base85
+        return receiveString(bytes: bytes, count: count) |> tagBase85
     }
 }
 

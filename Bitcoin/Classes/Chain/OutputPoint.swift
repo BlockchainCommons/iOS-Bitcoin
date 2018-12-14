@@ -85,7 +85,7 @@ public struct OutputPoint: InstanceContainer, Encodable {
             var hashBytes: UnsafeMutablePointer<UInt8>!
             var hashLength = 0
             _outputPointGetHash(wrapped.instance, &hashBytes, &hashLength)
-            return try! receiveData(bytes: hashBytes, count: hashLength) |> hashDigest
+            return try! receiveData(bytes: hashBytes, count: hashLength) |> tagHashDigest
         }
 
         set {

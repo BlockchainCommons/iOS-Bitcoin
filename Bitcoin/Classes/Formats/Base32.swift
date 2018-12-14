@@ -24,7 +24,7 @@ import WolfFoundation
 
 public enum Base32Tag { }
 public typealias Base32 = Tagged<Base32Tag, String>
-public func base32(_ string: String) -> Base32 { return Base32(rawValue: string) }
+public func tagBase32(_ string: String) -> Base32 { return Base32(rawValue: string) }
 
 /// Convert the data to Base32 with the provided prefix.
 public func toBase32(prefix: String, payload: Data) -> Base32 {
@@ -33,7 +33,7 @@ public func toBase32(prefix: String, payload: Data) -> Base32 {
             var bytes: UnsafeMutablePointer<Int8>!
             var count: Int = 0
             _encodeBase32(prefixBytes, dataBytes, payload.count, &bytes, &count)
-            return receiveString(bytes: bytes, count: count) |> base32
+            return receiveString(bytes: bytes, count: count) |> tagBase32
         }
     }
 }

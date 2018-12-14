@@ -165,7 +165,7 @@ public func generateSignatureHash(transaction: Transaction, inputIndex: UInt32, 
     var hash: UnsafeMutablePointer<UInt8>!
     var hashLength = 0
     _generateSignatureHash(transaction.wrapped.instance, inputIndex, script.wrapped.instance, sigHashType.rawValue, scriptVersion.rawValue, value, &hash, &hashLength)
-    return try! receiveData(bytes: hash, count: hashLength) |> hashDigest
+    return try! receiveData(bytes: hash, count: hashLength) |> tagHashDigest
 }
 
 public func checkSignature(_ signature: ECSignature, sigHashType: SigHashAlgorithm, publicKey: ECPublicKey, script: Script, transaction: Transaction, inputIndex: UInt32, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> Bool {
@@ -183,7 +183,7 @@ public func createEndorsement(privateKey: ECPrivateKey, script: Script, transact
         if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, inputIndex, sigHashType.rawValue, scriptVersion.rawValue, value, &_endorsement, &endorsementLength)) {
             throw error
         }
-        return try! receiveData(bytes: _endorsement, count: endorsementLength) |> endorsement
+        return try! receiveData(bytes: _endorsement, count: endorsementLength) |> tagEndorsement
     }
 }
 

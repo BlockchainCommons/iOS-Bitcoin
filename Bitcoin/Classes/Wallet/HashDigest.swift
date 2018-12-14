@@ -24,11 +24,11 @@ import WolfFoundation
 public enum HashDigestTag { }
 public typealias HashDigest = Tagged<HashDigestTag, Data>
 
-public let nullHashDigest = try! Data(repeatElement(0, count: 32)) |> hashDigest
+public let nullHashDigest = try! Data(repeatElement(0, count: 32)) |> tagHashDigest
 
 //// MARK: - Free functions
 
-public func hashDigest(_ data: Data) throws -> HashDigest {
+public func tagHashDigest(_ data: Data) throws -> HashDigest {
     guard data.count == 32 else {
         throw BitcoinError.invalidDataSize
     }
@@ -40,5 +40,5 @@ public func hashEncode(_ hash: HashDigest) -> String {
 }
 
 public func hashDecode(_ string: String) throws -> HashDigest {
-    return try string |> dataLiteral |> reversed |> hashDigest
+    return try string |> dataLiteral |> reversed |> tagHashDigest
 }

@@ -24,6 +24,17 @@ import WolfPipe
 import WolfFoundation
 
 class TestHash: XCTestCase {
+    func testHashSizes() {
+        XCTAssertNoThrow(try "8099ed424ffa0d81a42f75b61aff1f22ef7bfd11" |> tagBase16 |> toData |> tagShortHash)
+        XCTAssertThrowsError(try "00112233" |> tagBase16 |> toData |> tagShortHash)
+
+        XCTAssertNoThrow(try "b34ae13c097ec7a206b515b0cc3ff4b2c2f4e0fce30298604be140cdc7a76b74" |> tagBase16 |> toData |> tagHashDigest)
+        XCTAssertThrowsError(try "00112233" |> tagBase16 |> toData |> tagHashDigest)
+
+        XCTAssertNoThrow(try "a26171d120b6e921e28c98c94a8a9ef540bb642b1da24b7aed830401d180ee62f2297a0f91f6b218539f04ae8db70779e7241e66e9d92f97bf75d20d6b23720a" |> tagBase16 |> toData |> tagLongHash)
+        XCTAssertThrowsError(try "00112233" |> tagBase16 |> toData |> tagLongHash)
+    }
+
     func testHash() {
         let message = "The quick brown 🦊 jumps over the lazy 🐶." |> toUTF8
         XCTAssert(message |> toRIPEMD160 |> rawValue |> toBase16 == "8099ed424ffa0d81a42f75b61aff1f22ef7bfd11")

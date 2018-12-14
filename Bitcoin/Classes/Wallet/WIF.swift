@@ -25,7 +25,7 @@ import WolfFoundation
 public enum WIFTag { }
 public typealias WIF = Tagged<WIFTag, String>
 
-public func wif(_ string: String) -> WIF { return WIF(rawValue: string) }
+public func tagWIF(_ string: String) -> WIF { return WIF(rawValue: string) }
 
 extension Network {
     public var wifVersion: UInt8 {
@@ -48,7 +48,7 @@ public func toWIF(network: Network, isCompressed: Bool = true) -> (_ privateKey:
                 throw error
             }
         }
-        return receiveString(bytes: wifBytes, count: wifLength) |> wif
+        return receiveString(bytes: wifBytes, count: wifLength) |> tagWIF
     }
 }
 

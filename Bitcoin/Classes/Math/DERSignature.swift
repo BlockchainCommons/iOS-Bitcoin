@@ -26,7 +26,7 @@ public enum DERSignatureTag { }
 /// A DER-encoded signature
 public typealias DERSignature = Tagged<DERSignatureTag, Data>
 
-public func derSignature(_ data: Data) throws -> DERSignature {
+public func tagDERSignature(_ data: Data) throws -> DERSignature {
     guard (64 ... 72).contains(data.count) else {
         throw BitcoinError.invalidDataSize
     }
@@ -40,6 +40,6 @@ public func toDERSignature(_ ecSignature: ECSignature) throws -> DERSignature {
         if let error = BitcoinError(rawValue: _encodeSignature(ecSignatureBytes, &derSignatureBytes, &derSignatureLength)) {
             throw error
         }
-        return try receiveData(bytes: derSignatureBytes, count: derSignatureLength) |> derSignature
+        return try receiveData(bytes: derSignatureBytes, count: derSignatureLength) |> tagDERSignature
     }
 }

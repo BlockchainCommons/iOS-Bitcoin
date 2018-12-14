@@ -24,7 +24,7 @@ import WolfPipe
 
 public enum Base64Tag { }
 public typealias Base64 = Tagged<Base64Tag, String>
-public func base64(_ string: String) -> Base64 { return Base64(rawValue: string) }
+public func tagBase64(_ string: String) -> Base64 { return Base64(rawValue: string) }
 
 /// Encodes the data as a base64 string.
 public func toBase64(_ data: Data) -> Base64 {
@@ -32,7 +32,7 @@ public func toBase64(_ data: Data) -> Base64 {
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
         _encodeBase64(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count) |> base64
+        return receiveString(bytes: bytes, count: count) |> tagBase64
     }
 }
 

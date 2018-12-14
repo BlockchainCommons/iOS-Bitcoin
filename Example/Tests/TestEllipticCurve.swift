@@ -36,9 +36,9 @@ class TestEllipticCurve: XCTestCase {
 
     // Scenario 3
     let SECRET3 = try! "ce8f4b713ffdd2658900845251890f30371856be201cd1f5b3d970f793634333" |> dataLiteral |> reversed |> toECPrivateKey
-    let SIGHASH3 = try! "f89572635651b2e4f89778350616989183c98d1a721c911324bf9f17a0cf5bf0" |> dataLiteral |> reversed |> hashDigest
-    let EC_SIGNATURE3 = try! "4832febef8b31c7c922a15cb4063a43ab69b099bba765e24facef50dfbb4d057928ed5c6b6886562c2fe6972fd7c7f462e557129067542cce6b37d72e5ea5037" |> dataLiteral |> ecSignature
-    let DER_SIGNATURE3 = try! "3044022057d0b4fb0df5cefa245e76ba9b099bb63aa46340cb152a927c1cb3f8befe324802203750eae5727db3e6cc4275062971552e467f7cfd7269fec2626588b6c6d58e92" |> dataLiteral |> derSignature
+    let SIGHASH3 = try! "f89572635651b2e4f89778350616989183c98d1a721c911324bf9f17a0cf5bf0" |> dataLiteral |> reversed |> tagHashDigest
+    let EC_SIGNATURE3 = try! "4832febef8b31c7c922a15cb4063a43ab69b099bba765e24facef50dfbb4d057928ed5c6b6886562c2fe6972fd7c7f462e557129067542cce6b37d72e5ea5037" |> dataLiteral |> tagECSignature
+    let DER_SIGNATURE3 = try! "3044022057d0b4fb0df5cefa245e76ba9b099bb63aa46340cb152a927c1cb3f8befe324802203750eae5727db3e6cc4275062971552e467f7cfd7269fec2626588b6c6d58e92" |> dataLiteral |> tagDERSignature
 
     // EC_SUM
     let GENERATOR_POINT_MULT_4 = "02e493dbf1c10d80f3581e4904930b1404cc6c13900ee0758474fa94abe8c4cd13" |> dataLiteral
@@ -48,7 +48,14 @@ class TestEllipticCurve: XCTestCase {
     }
 
     func test_decompress__positive() {
-        XCTAssertEqual(try! COMPRESSED1 |> decompress, UNCOMPRESSED1)
+        let uncompressed = try! COMPRESSED1 |> decompress
+        XCTAssertEqual(uncompressed, UNCOMPRESSED1)
+        let compressed = try! uncompressed |> compress
+        XCTAssertEqual(compressed, COMPRESSED1)
+
+        // Redundant compression/decompression
+        XCTAssertEqual(try! COMPRESSED1 |> compress, compressed)
+        XCTAssertEqual(try! UNCOMPRESSED1 |> decompress, uncompressed)
     }
 
     func test_sign__positive() {
@@ -57,6 +64,20 @@ class TestEllipticCurve: XCTestCase {
 
     func test_encode_signature__positive() {
         XCTAssertEqual(try! EC_SIGNATURE3 |> toDERSignature, DER_SIGNATURE3)
+    }
+
+    func testSignMessage() {
+        let message = "The quick brown 🦊 jumps over the lazy 🐶." |> toUTF8
+        let privateKey = ECPrivateKey()
+        let signature = message |> signMessage(with: privateKey)
+        let publicKey = try! privateKey |> toECPublicKey
+        XCTAssertTrue(message |> verifySignature(publicKey: publicKey, signature: signature))
+    }
+
+    func testInvalidKeyLengths() {
+        let data = try! "01020304" |> tagHex |> toData
+        XCTAssertThrowsError(try data |> toECPrivateKey)
+        XCTAssertThrowsError(try data |> toECPublicKey)
     }
 }
 

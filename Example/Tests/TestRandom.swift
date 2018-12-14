@@ -32,4 +32,14 @@ class TestRandom: XCTestCase {
         let bip39seed = seed(bits: 512, using: &rng)
         XCTAssert(bip39seed |> toBase16 == "ff2a8b2622253ea52073d2798bf1880ef7f97047cbc41e00f9c9a5b3fa76f263a913c5a78ed3ed208a1a3356294cc535e35e526c2866451d61f2995df29d6137")
     }
+
+    func testSeed2() {
+        let data = seed()
+        XCTAssertEqual(data.count, minimumSeedSize)
+    }
+
+    func testSeed3() {
+        let data = seed(bits: 9)
+        XCTAssertEqual(data.count, 2)
+    }
 }

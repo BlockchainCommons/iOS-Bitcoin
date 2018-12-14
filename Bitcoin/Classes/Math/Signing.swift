@@ -40,7 +40,7 @@ public func sign(with privateKey: ECPrivateKey) -> (_ hash: HashDigest) -> ECSig
                 var signature: UnsafeMutablePointer<UInt8>!
                 var signatureLength = 0
                 _sign(hashBytes, privateKeyBytes, &signature, &signatureLength)
-                return try! receiveData(bytes: signature, count: signatureLength) |> ecSignature
+                return try! receiveData(bytes: signature, count: signatureLength) |> tagECSignature
             }
         }
     }

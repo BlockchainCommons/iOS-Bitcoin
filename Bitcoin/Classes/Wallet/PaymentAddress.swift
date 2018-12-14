@@ -24,7 +24,7 @@ import WolfFoundation
 
 public enum PaymentAddressTag { }
 public typealias PaymentAddress = Tagged<PaymentAddressTag, String>
-public func paymentAddress(_ string: String) -> PaymentAddress { return PaymentAddress(rawValue: string) }
+public func tagPaymentAddress(_ string: String) -> PaymentAddress { return PaymentAddress(rawValue: string) }
 
 public enum PaymentAddressType {
     case p2pkh
@@ -86,7 +86,7 @@ public func addressEncode(version: UInt8) -> (_ ripemd160: ShortHash) -> Payment
             var address: UnsafeMutablePointer<Int8>!
             var addressLength = 0
             _addressEncode(ripemd160Bytes, version, &address, &addressLength)
-            return receiveString(bytes: address, count: addressLength) |> paymentAddress
+            return receiveString(bytes: address, count: addressLength) |> tagPaymentAddress
         }
     }
 }
@@ -129,7 +129,7 @@ public func addressEmbed(version: UInt8) -> (_ data: Data) -> PaymentAddress {
             var address: UnsafeMutablePointer<Int8>!
             var addressLength = 0
             _addressEmbed(dataBytes, data.count, version, &address, &addressLength)
-            return receiveString(bytes: address, count: addressLength) |> paymentAddress
+            return receiveString(bytes: address, count: addressLength) |> tagPaymentAddress
         }
     }
 }

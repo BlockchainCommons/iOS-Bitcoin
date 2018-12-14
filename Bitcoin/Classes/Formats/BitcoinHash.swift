@@ -24,7 +24,7 @@ import WolfPipe
 
 public enum BitcoinHashTag { }
 public typealias BitcoinHash = Tagged<BitcoinHashTag, String>
-public func bitcoinHash(_ string: String) -> BitcoinHash { return BitcoinHash(rawValue: string) }
+public func tagBitcoinHash(_ string: String) -> BitcoinHash { return BitcoinHash(rawValue: string) }
 
 /// Encodes the bitcoin hash as a string.
 ///

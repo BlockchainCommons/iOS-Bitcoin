@@ -76,24 +76,27 @@ class TestOpcode: XCTestCase {
     }
 
     func testToHexadecimal() {
-        XCTAssert(Opcode.pushSize0 |> toHexadecimal == "0x00")
-        XCTAssert(Opcode.pushSize42 |> toHexadecimal == "0x2a")
-        XCTAssert(Opcode.reserved255 |> toHexadecimal == "0xff")
+        XCTAssert(Opcode.pushSize0.rawValue == 0x00)
+        XCTAssert(Opcode.pushSize42.rawValue == 0x2a)
+        XCTAssert(Opcode.reserved255.rawValue == 0xff)
     }
 
     func testHexadecimalToOpcode() {
-        XCTAssertThrowsError(try "" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "bogus" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "0x" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "0xf" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "0xffe" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "0xffee" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "0X4f" |> hexadecimalToOpcode)
-        XCTAssertThrowsError(try "42" |> hexadecimalToOpcode)
-        XCTAssert(try! "0xff" |> hexadecimalToOpcode == .reserved255)
-        XCTAssert(try! "0xFE" |> hexadecimalToOpcode == .reserved254)
-        XCTAssert(try! "0xFe" |> hexadecimalToOpcode == .reserved254)
-        XCTAssert(try! "0x42" |> hexadecimalToOpcode == .pushSize66)
-        XCTAssert(try! "0x4f" |> hexadecimalToOpcode == .pushNegative1)
+        XCTAssertThrowsError(try "0001" |> tagBase16 |> toData |> toOpcode)
+        XCTAssert(try! "ff" |> tagBase16 |> toData |> toOpcode == .reserved255)
+        XCTAssert(try! "FE" |> tagBase16 |> toData |> toOpcode == .reserved254)
+        XCTAssert(try! "Fe" |> tagBase16 |> toData |> toOpcode == .reserved254)
+        XCTAssert(try! "42" |> tagBase16 |> toData |> toOpcode == .pushSize66)
+        XCTAssert(try! "4f" |> tagBase16 |> toData |> toOpcode == .pushNegative1)
+    }
+
+    func testInvalidOpcodeMnemonic() {
+        XCTAssertThrowsError(try "FOO" |> toOpcode)
+    }
+
+    func testOpcodeDescription() {
+        let opcode = try! "nop" |> toOpcode
+        XCTAssertEqual(opcode.description, "nop")
+        XCTAssertEqual(opcode |> toString, "nop")
     }
 }

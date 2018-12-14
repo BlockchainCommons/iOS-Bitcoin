@@ -24,7 +24,7 @@ import WolfPipe
 
 public enum Base16Tag { }
 public typealias Base16 = Tagged<Base16Tag, String>
-public func base16(_ string: String) -> Base16 { return Base16(rawValue: string) }
+public func tagBase16(_ string: String) -> Base16 { return Base16(rawValue: string) }
 
 /// Encodes the data as a base16 (hex) string.
 public func toBase16(_ data: Data) -> Base16 {
@@ -32,7 +32,7 @@ public func toBase16(_ data: Data) -> Base16 {
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
         _encodeBase16(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count) |> base16
+        return receiveString(bytes: bytes, count: count) |> tagBase16
     }
 }
 
@@ -51,5 +51,5 @@ public func toData(_ base16: Base16) throws -> Data {
 }
 
 public func dataLiteral(_ string: String) -> Data {
-    return try! string |> base16 |> toData
+    return try! string |> tagBase16 |> toData
 }

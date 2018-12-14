@@ -25,7 +25,7 @@ import WolfStrings
 
 class TestScript: XCTestCase {
     func testScriptDecode() {
-        let f = base16 >>> toData >>> scriptDecode
+        let f = tagBase16 >>> toData >>> scriptDecode
         XCTAssert(try! "76a91418c0bd8d1818f1bf99cb1df2269c645318ef7b7388ac" |> f == "dup hash160 [18c0bd8d1818f1bf99cb1df2269c645318ef7b73] equalverify checksig")
         XCTAssert(try! "04cf2e5b02d6f02340f5a9defbbf710c388b8451c82145b1419fe9696837b1cdefc569a2a79baa6da2f747c3b35a102a081dfd5e799abc41262103e0d17114770b" |> f == "[cf2e5b02] 0xd6 0xf0 [40f5a9defbbf710c388b8451c82145b1419fe9696837b1cdefc569a2a79baa6da2f747] 0xc3 nop4 10 [2a081dfd5e799abc41262103e0d17114] nip <invalid>")
         XCTAssert(try! "4730440220688fb2aef767f21127b375d50d0ab8f7a1abaecad08e7c4987f7305c90e5a02502203282909b7863149bf4c92589764df80744afb509b949c06bfbeb28864277d88d0121025334b571c11e22967452f195509260f6a6dd10357fc4ad76b1c0aa5981ac254e" |> f == "[30440220688fb2aef767f21127b375d50d0ab8f7a1abaecad08e7c4987f7305c90e5a02502203282909b7863149bf4c92589764df80744afb509b949c06bfbeb28864277d88d01] [025334b571c11e22967452f195509260f6a6dd10357fc4ad76b1c0aa5981ac254e]")
@@ -103,7 +103,7 @@ class TestScript: XCTestCase {
 
     func test_script__one_hash__literal__same() {
         let hashOne = try! "0000000000000000000000000000000000000000000000000000000000000001" |> hashDecode
-        let oneHash = try! Data([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) |> hashDigest
+        let oneHash = try! Data([1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]) |> tagHashDigest
         XCTAssert(hashOne == oneHash)
     }
 
@@ -1121,7 +1121,7 @@ class TestScript: XCTestCase {
 
     func test_script__checksig__single__uses_one_hash() {
         let transaction = try! "0100000002dc38e9359bd7da3b58386204e186d9408685f427f5e513666db735aa8a6b2169000000006a47304402205d8feeb312478e468d0b514e63e113958d7214fa572acd87079a7f0cc026fc5c02200fa76ea05bf243af6d0f9177f241caf606d01fcfd5e62d6befbca24e569e5c27032102100a1a9ca2c18932d6577c58f225580184d0e08226d41959874ac963e3c1b2feffffffffdc38e9359bd7da3b58386204e186d9408685f427f5e513666db735aa8a6b2169010000006b4830450220087ede38729e6d35e4f515505018e659222031273b7366920f393ee3ab17bc1e022100ca43164b757d1a6d1235f13200d4b5f76dd8fda4ec9fc28546b2df5b1211e8df03210275983913e60093b767e85597ca9397fb2f418e57f998d6afbbc536116085b1cbffffffff0140899500000000001976a914fcc9b36d38cf55d7d5b4ee4dddb6b2c17612f48c88ac00000000" |> dataLiteral |> deserializeTransaction
-        let signature = try! "30450220087ede38729e6d35e4f515505018e659222031273b7366920f393ee3ab17bc1e022100ca43164b757d1a6d1235f13200d4b5f76dd8fda4ec9fc28546b2df5b1211e8df" |> dataLiteral |> derSignature |> toECSignature
+        let signature = try! "30450220087ede38729e6d35e4f515505018e659222031273b7366920f393ee3ab17bc1e022100ca43164b757d1a6d1235f13200d4b5f76dd8fda4ec9fc28546b2df5b1211e8df" |> dataLiteral |> tagDERSignature |> toECSignature
         let publicKey = try! "0275983913e60093b767e85597ca9397fb2f418e57f998d6afbbc536116085b1cb" |> dataLiteral |> toECPublicKey
         let script = try! "76a91433cef61749d11ba2adf091a5e045678177fe3a6d88ac" |> dataLiteral |> deserializeScript
         XCTAssert(checkSignature(signature, sigHashType: .single, publicKey: publicKey, script: script, transaction: transaction, inputIndex: 1))
@@ -1129,7 +1129,7 @@ class TestScript: XCTestCase {
 
     func test_script__checksig__normal__success() {
         let transaction = try! "0100000002dc38e9359bd7da3b58386204e186d9408685f427f5e513666db735aa8a6b2169000000006a47304402205d8feeb312478e468d0b514e63e113958d7214fa572acd87079a7f0cc026fc5c02200fa76ea05bf243af6d0f9177f241caf606d01fcfd5e62d6befbca24e569e5c27032102100a1a9ca2c18932d6577c58f225580184d0e08226d41959874ac963e3c1b2feffffffffdc38e9359bd7da3b58386204e186d9408685f427f5e513666db735aa8a6b2169010000006b4830450220087ede38729e6d35e4f515505018e659222031273b7366920f393ee3ab17bc1e022100ca43164b757d1a6d1235f13200d4b5f76dd8fda4ec9fc28546b2df5b1211e8df03210275983913e60093b767e85597ca9397fb2f418e57f998d6afbbc536116085b1cbffffffff0140899500000000001976a914fcc9b36d38cf55d7d5b4ee4dddb6b2c17612f48c88ac00000000" |> dataLiteral |> deserializeTransaction
-        let signature = try! "304402205d8feeb312478e468d0b514e63e113958d7214fa572acd87079a7f0cc026fc5c02200fa76ea05bf243af6d0f9177f241caf606d01fcfd5e62d6befbca24e569e5c27" |> dataLiteral |> derSignature |> toECSignature
+        let signature = try! "304402205d8feeb312478e468d0b514e63e113958d7214fa572acd87079a7f0cc026fc5c02200fa76ea05bf243af6d0f9177f241caf606d01fcfd5e62d6befbca24e569e5c27" |> dataLiteral |> tagDERSignature |> toECSignature
         let publicKey = try! "02100a1a9ca2c18932d6577c58f225580184d0e08226d41959874ac963e3c1b2fe" |> dataLiteral |> toECPublicKey
         let script = try! "76a914fcc9b36d38cf55d7d5b4ee4dddb6b2c17612f48c88ac" |> dataLiteral |> deserializeScript
         XCTAssert(checkSignature(signature, sigHashType: .single, publicKey: publicKey, script: script, transaction: transaction, inputIndex: 0))
@@ -1138,7 +1138,7 @@ class TestScript: XCTestCase {
     func test_script__create_endorsement__single_input_single_output__expected() {
         let transaction = try! "0100000001b3807042c92f449bbf79b33ca59d7dfec7f4cc71096704a9c526dddf496ee0970100000000ffffffff01905f0100000000001976a91418c0bd8d1818f1bf99cb1df2269c645318ef7b7388ac00000000" |> dataLiteral |> deserializeTransaction
         let script = try! "dup hash160 [88350574280395ad2c3e2ee20e322073d94e5e40] equalverify checksig" |> toScript
-        let privateKey = try! "ce8f4b713ffdd2658900845251890f30371856be201cd1f5b3d970f793634333" |> bitcoinHash |> toData |> toECPrivateKey
+        let privateKey = try! "ce8f4b713ffdd2658900845251890f30371856be201cd1f5b3d970f793634333" |> tagBitcoinHash |> toData |> toECPrivateKey
 
         let endorsement = try! createEndorsement(privateKey: privateKey, script: script, transaction: transaction, inputIndex: 0, sigHashType: .all)
 
@@ -1148,7 +1148,7 @@ class TestScript: XCTestCase {
     func test_script__create_endorsement__single_input_no_output__expected() {
         let transaction = try! "0100000001b3807042c92f449bbf79b33ca59d7dfec7f4cc71096704a9c526dddf496ee0970000000000ffffffff0000000000" |> dataLiteral |> deserializeTransaction
         let script = try! "dup hash160 [88350574280395ad2c3e2ee20e322073d94e5e40] equalverify checksig" |> toScript
-        let privateKey = try! "ce8f4b713ffdd2658900845251890f30371856be201cd1f5b3d970f793634333" |> bitcoinHash |> toData |> toECPrivateKey
+        let privateKey = try! "ce8f4b713ffdd2658900845251890f30371856be201cd1f5b3d970f793634333" |> tagBitcoinHash |> toData |> toECPrivateKey
 
         let endorsement = try! createEndorsement(privateKey: privateKey, script: script, transaction: transaction, inputIndex: 0, sigHashType: .all)
 
@@ -1160,5 +1160,10 @@ class TestScript: XCTestCase {
         let script = try! "dup hash160 [88350574280395ad2c3e2ee20e322073d94e5e40] equalverify checksig" |> toScript
         let hash = generateSignatureHash(transaction: transaction, inputIndex: 0, script: script, sigHashType: .all)
         XCTAssert(hash.rawValue |> toBase16 == "f89572635651b2e4f89778350616989183c98d1a721c911324bf9f17a0cf5bf0")
+    }
+
+    func testEndorsementSize() {
+        XCTAssertNoThrow(try "b34ae13c097ec7a206b515b0cc3ff4b2c2f4e0fce30298604be140cdc7a76b74" |> tagBase16 |> toData |> tagEndorsement)
+        XCTAssertThrowsError(try "00112233" |> tagBase16 |> toData |> tagEndorsement)
     }
 }

@@ -36,7 +36,9 @@ public struct LibBitcoinResult: CodedError, CustomStringConvertible {
     }
 }
 
-public enum BitcoinError: Int, Error, CustomStringConvertible {
+public enum BitcoinError: Int, Error, CustomStringConvertible, CaseIterable {
+    private typealias `Self` = BitcoinError
+
     case errorCode = 1
     case invalidFormat = 2
     case invalidDataSize = 3
@@ -56,44 +58,29 @@ public enum BitcoinError: Int, Error, CustomStringConvertible {
     case invalidSignature = 17
     case signingFailed = 18
 
+    private static let descriptions: [BitcoinError: String] = [
+        .errorCode: "Error code",
+        .invalidFormat: "Invalid format",
+        .invalidDataSize: "Invalid data size",
+        .seedTooSmall: "Seed size too small",
+        .invalidSeedSize: "Invalid seed size",
+        .invalidSeed: "Invalid seed",
+        .unsupportedLanguage: "Unsupported language",
+        .invalidVersion: "Invalid version",
+        .privateKeyRequired: "Private key required",
+        .invalidKey: "Invalid key",
+        .invalidAddress: "Invalid address",
+        .invalidChecksum: "Invalid checksum",
+        .invalidScript: "Invalid script",
+        .invalidTransaction: "Invalid transaction",
+        .invalidData: "Invalid data",
+        .invalidOpcode: "Invalid opcode",
+        .invalidSignature: "Invalid signature",
+        .signingFailed: "Signing failed"
+    ]
+
     public var description: String {
-        switch self {
-        case .errorCode:
-            return "Error code"
-        case .invalidFormat:
-            return "Invalid format"
-        case .invalidDataSize:
-            return "Invalid data size"
-        case .seedTooSmall:
-            return "Seed size too small"
-        case .invalidSeedSize:
-            return "Invalid seed size"
-        case .invalidSeed:
-            return "Invalid seed"
-        case .unsupportedLanguage:
-            return "Unsupported language"
-        case .invalidVersion:
-            return "Invalid version"
-        case .privateKeyRequired:
-            return "Private key required"
-        case .invalidKey:
-            return "Invalid key"
-        case .invalidAddress:
-            return "Invalid address"
-        case .invalidChecksum:
-            return "Invalid checksum"
-        case .invalidScript:
-            return "Invalid script"
-        case .invalidTransaction:
-            return "Invalid transaction"
-        case .invalidData:
-            return "Invalid data"
-        case .invalidOpcode:
-            return "Invalid opcode"
-        case .invalidSignature:
-            return "Invalid signature"
-        case .signingFailed:
-            return "Signing failed"
-        }
+        assert(BitcoinError.allCases.count == Self.descriptions.count)
+        return Self.descriptions[self]!
     }
 }

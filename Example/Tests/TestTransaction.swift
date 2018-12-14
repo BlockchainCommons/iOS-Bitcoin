@@ -26,7 +26,7 @@ import WolfFoundation
 
 class TestTransaction: XCTestCase {
     func testTransactionDecode() {
-        let f = fromHex >>> transactionDecode
+        let f = tagBase16 >>> toData >>> transactionDecode
 
         let tx1 = "0100000001b3807042c92f449bbf79b33ca59d7dfec7f4cc71096704a9c526dddf496ee0970000000000ffffffff01c8af0000000000001976a91458b7a60f11a904feef35a639b6048de8dd4d9f1c88ac00000000"
         let tx1Decoded = """
@@ -58,8 +58,8 @@ class TestTransaction: XCTestCase {
         {"hash":"0000000000000000000000000000000000000000000000000000000000000000","index":0}
         """)
 
-        let hash = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3" |> dataLiteral |> hashDigest
-        let hash2 = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5" |> dataLiteral |> hashDigest
+        let hash = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b3" |> dataLiteral |> tagHashDigest
+        let hash2 = try! "97e06e49dfdd26c5a904670971ccf4c7fe7d9da53cb379bf9b442fc9427080b5" |> dataLiteral |> tagHashDigest
         var outputPoint = OutputPoint(hash: hash, index: 3)
         var outputPoint2 = outputPoint
         outputPoint.hash = hash2
@@ -112,7 +112,7 @@ class TestTransaction: XCTestCase {
     }
 
     private func makeInput(hash: String, index: UInt32, sequence: UInt32? = nil) -> Input {
-        let outputPoint = try! OutputPoint(hash: hash |> dataLiteral |> hashDigest, index: index)
+        let outputPoint = try! OutputPoint(hash: hash |> dataLiteral |> tagHashDigest, index: index)
         return Input(previousOutput: outputPoint, sequence: sequence)
     }
 

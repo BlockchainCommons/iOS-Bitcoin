@@ -25,13 +25,13 @@ import WolfFoundation
 
 class TestWrapped: XCTestCase {
     func testWrapEncode() {
-        let f = { base16 >>> toData >>> wrapEncode(version: $0) >>> toBase16 }
+        let f = { tagBase16 >>> toData >>> wrapEncode(version: $0) >>> toBase16 }
         XCTAssert(try! "031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd006" |> f(0) == "00031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd0065b09d03c")
         XCTAssert(try! "031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd006" |> f(42) == "2a031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd006298eebe4")
     }
 
     func testWrapDecode() {
-        let f = base16 >>> toData >>> wrapDecode >>> toJSONStringWithOutputFormatting(.sortedKeys)
+        let f = tagBase16 >>> toData >>> wrapDecode >>> toJSONStringWithOutputFormatting(.sortedKeys)
         XCTAssert(try! "00031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd0065b09d03c" |> f == """
             {"checksum":1020266843,"payload":"031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd006","prefix":0}
             """)

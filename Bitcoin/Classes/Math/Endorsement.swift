@@ -24,7 +24,7 @@ public enum EndorsementTag { }
 /// DER encoded signature with sighash byte for contract endorsement:
 public typealias Endorsement = Tagged<EndorsementTag, Data>
 
-public func endorsement(_ data: Data) throws -> Endorsement {
+public func tagEndorsement(_ data: Data) throws -> Endorsement {
     guard (9 ... 73).contains(data.count) else {
         throw BitcoinError.invalidDataSize
     }

@@ -24,10 +24,11 @@ import WolfFoundation
 
 public enum Base10Tag { }
 public typealias Base10 = Tagged<Base10Tag, String>
-public func base10(_ string: String) -> Base10 { return Base10(rawValue: string) }
+public func tagBase10(_ string: String) -> Base10 { return Base10(rawValue: string) }
 
 public enum SatoshisTag { }
 public typealias Satoshis = Tagged<SatoshisTag, UInt64>
+public func tagSatoshis(_ amount: UInt64) -> Satoshis { return Satoshis(rawValue: amount) }
 
 /// The number of decimal places in a bitcoin.
 public let btcDecimalPlaces: Int = {
@@ -56,7 +57,7 @@ public func toBase10(decimalPlaces: Int) -> (_ amount: UInt64) -> Base10 {
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
         _encodeBase10(amount, &bytes, &count, UInt8(decimalPlaces))
-        return receiveString(bytes: bytes, count: count) |> base10
+        return receiveString(bytes: bytes, count: count) |> tagBase10
     }
 }
 

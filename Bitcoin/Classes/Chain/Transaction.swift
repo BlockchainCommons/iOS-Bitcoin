@@ -159,7 +159,7 @@ public struct Transaction: InstanceContainer, Encodable {
         var hash: UnsafeMutablePointer<UInt8>!
         var hashLength = 0
         _transactionHash(wrapped.instance, &hash, &hashLength)
-        return try! receiveData(bytes: hash, count: hashLength) |> hashDigest
+        return try! receiveData(bytes: hash, count: hashLength) |> tagHashDigest
     }
 
     public var totalInputValue: UInt64 {

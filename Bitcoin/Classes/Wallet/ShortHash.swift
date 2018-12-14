@@ -24,7 +24,7 @@ import WolfFoundation
 public enum ShortHashTag { }
 public typealias ShortHash = Tagged<ShortHashTag, Data>
 
-public func shortHash(_ data: Data) throws -> ShortHash {
+public func tagShortHash(_ data: Data) throws -> ShortHash {
     guard data.count == 20 else {
         throw BitcoinError.invalidDataSize
     }

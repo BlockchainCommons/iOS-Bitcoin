@@ -24,11 +24,11 @@ import WolfPipe
 
 public enum Base58Tag { }
 public typealias Base58 = Tagged<Base58Tag, String>
-public func base58(_ string: String) -> Base58 { return Base58(rawValue: string) }
+public func tagBase58(_ string: String) -> Base58 { return Base58(rawValue: string) }
 
 public enum Base58CheckTag { }
 public typealias Base58Check = Tagged<Base58CheckTag, String>
-public func base58Check(_ string: String) -> Base58Check { return Base58Check(rawValue: string) }
+public func tagBase58Check(_ string: String) -> Base58Check { return Base58Check(rawValue: string) }
 
 extension Character {
     /// Returns true if the character is a valid base58 character, false otherwise.
@@ -53,7 +53,7 @@ public func toBase58(_ data: Data) -> Base58 {
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
         _encodeBase58(dataBytes, data.count, &bytes, &count)
-        return receiveString(bytes: bytes, count: count) |> base58
+        return receiveString(bytes: bytes, count: count) |> tagBase58
     }
 }
 
@@ -78,7 +78,7 @@ public func toBase58Check(version: UInt8) -> (_ data: Data) -> Base58Check {
             var bytes: UnsafeMutablePointer<Int8>!
             var count: Int = 0
             _encodeBase58Check(dataBytes, data.count, version, &bytes, &count)
-            return receiveString(bytes: bytes, count: count) |> base58Check
+            return receiveString(bytes: bytes, count: count) |> tagBase58Check
         }
     }
 }

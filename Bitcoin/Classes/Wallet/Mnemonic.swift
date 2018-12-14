@@ -24,7 +24,7 @@ import WolfFoundation
 
 public enum MnemonicTag { }
 public typealias Mnemonic = Tagged<MnemonicTag, String>
-public func mnemonic(_ string: String) -> Mnemonic { return Mnemonic(rawValue: string) }
+public func tagMnemonic(_ string: String) -> Mnemonic { return Mnemonic(rawValue: string) }
 
 /// A valid mnemonic word count is evenly divisible by this number.
 public let mnemonicWordMultiple: Int = { return _mnemonicWordMultiple() }()
@@ -60,7 +60,7 @@ public func newMnemonic(language: Language) -> (_ seed: Data) throws -> Mnemonic
                 throw error
             }
         }
-        return receiveString(bytes: mnemo, count: mnemoLength) |> mnemonic
+        return receiveString(bytes: mnemo, count: mnemoLength) |> tagMnemonic
     }
 }
 

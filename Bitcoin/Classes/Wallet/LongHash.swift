@@ -24,7 +24,7 @@ import WolfFoundation
 public enum LongHashTag { }
 public typealias LongHash = Tagged<LongHashTag, Data>
 
-public func longHash(_ data: Data) throws -> LongHash {
+public func tagLongHash(_ data: Data) throws -> LongHash {
     guard data.count == 64 else {
         throw BitcoinError.invalidDataSize
     }
