@@ -33,6 +33,21 @@ public struct Output: InstanceContainer, Encodable {
         self.init(instance: _outputNew())
     }
 
+    public init(value: Satoshis) {
+        self.init()
+        self.value = value
+    }
+
+    public init(value: Satoshis, paymentAddress: String) throws {
+        self.init(value: value)
+        try setPaymentAddress(paymentAddress)
+    }
+
+    public init(value: Satoshis, script: Script) {
+        self.init(value: value)
+        self.script = script
+    }
+
     public static func deserialize(data: Data) throws -> Output {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
@@ -49,17 +64,6 @@ public struct Output: InstanceContainer, Encodable {
         var dataLength = 0
         _outputSerialize(wrapped.instance, &dataBytes, &dataLength)
         return receiveData(bytes: dataBytes, count: dataLength)
-    }
-
-    public init(value: Satoshis, paymentAddress: String) throws {
-        self.init()
-        self.value = value
-        try setPaymentAddress(paymentAddress)
-    }
-
-    public init(value: Satoshis) {
-        self.init()
-        self.value = value
     }
 
     public mutating func setPaymentAddress(_ paymentAddress: String) throws {
@@ -86,11 +90,24 @@ public struct Output: InstanceContainer, Encodable {
         }
     }
 
-    public var script: String {
+    public var scriptString: String {
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _outputGetScript(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
+        _outputGetScriptString(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
+    }
+
+    public var script: Script {
+        get {
+            return Script(instance: _outputGetScript(wrapped.instance))
+        }
+
+        set {
+            if !isKnownUniquelyReferenced(&wrapped) {
+                wrapped = WrappedInstance(_outputCopy(wrapped.instance))
+            }
+            _outputSetScript(wrapped.instance, newValue.wrapped.instance)
+        }
     }
 
     public enum CodingKeys: String, CodingKey {
@@ -101,7 +118,7 @@ public struct Output: InstanceContainer, Encodable {
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
         try container.encode(value, forKey: .value)
-        try container.encode(script, forKey: .script)
+        try container.encode(scriptString, forKey: .script)
     }
 }
 

@@ -48,7 +48,7 @@ class TestMnemonic: XCTestCase {
 
     func testMnemonicToSeed() {
         func test(_ m: String, seed: String) -> Bool {
-            return try! m |> tagMnemonic |> mnemonicToSeed |> toBase16 |> rawValue == seed
+            return try! m |> tagMnemonic |> toSeed |> toBase16 |> rawValue == seed
         }
 
         XCTAssert(test("rival hurdle address inspire tenant alone", seed: "33498afc5ef71e87afd7cad1e50a9d9adb9e30d3ca4b1da5dc370d266aa7796cbc1854eebce5ab3fd3b02b6625e2a82868dbb693e988e47d74106f04c76a6263"))
@@ -56,7 +56,7 @@ class TestMnemonic: XCTestCase {
 
     func testMnemonicToSeedWithPassphrase() {
         func test(_ m: String, passphrase: String, seed: String) -> Bool {
-            return try! m |> tagMnemonic |> mnemonicToSeedWithPassphrase(passphrase) |> toBase16 |> rawValue == seed
+            return try! m |> tagMnemonic |> toSeed(passphrase: passphrase) |> toBase16 |> rawValue == seed
         }
 
         XCTAssert(test("legal winner thank year wave sausage worth useful legal winner thank yellow", passphrase: "TREZOR", seed: "2e8905819b8723fe2c1d161860e5ee1830318dbf49a83bd451cfb8440c28bd6fa457fe1296106559a3c80937a1c1069be3a3a5bd381ee6260e8d9739fce1f607"))

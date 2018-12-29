@@ -47,14 +47,14 @@ public func toECPrivateKey(_ data: Data) throws -> ECPrivateKey {
 }
 
 /// Create a new EC private key from entropy.
-public func newECPrivateKey(_ seed: Data) throws -> ECPrivateKey {
-    guard seed.count >= minimumSeedSize else {
+public func newECPrivateKey(_ entropy: Data) throws -> ECPrivateKey {
+    guard entropy.count >= minimumSeedSize else {
         throw BitcoinError.seedTooSmall
     }
     var privateKeyBytes: UnsafeMutablePointer<UInt8>!
     var privateKeyLength: Int = 0
-    try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-        if let error = BitcoinError(rawValue: _ecNewPrivateKey(seedBytes, seed.count, &privateKeyBytes, &privateKeyLength)) {
+    try entropy.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
+        if let error = BitcoinError(rawValue: _ecNewPrivateKey(seedBytes, entropy.count, &privateKeyBytes, &privateKeyLength)) {
             throw error
         }
     }

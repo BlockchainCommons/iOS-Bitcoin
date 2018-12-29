@@ -25,7 +25,7 @@ import WolfFoundation
 public enum HDKeyTag { }
 public typealias HDKey = Tagged<HDKeyTag, String>
 
-public func hdKey(_ string: String) -> HDKey { return HDKey(rawValue: string) }
+public func tagHDKey(_ string: String) -> HDKey { return HDKey(rawValue: string) }
 
 public var minimumSeedSize: Int = {
     return _minimumSeedSize()
@@ -51,8 +51,8 @@ extension Network {
     }
 }
 
-/// Generate a seed that is guaranteed to be translatable into an HDPrivateKey
-public func generateSeedForHDKey(network: Network) -> Data {
+/// Generate entropy that is guaranteed to be translatable into an HDPrivateKey
+public func generateEntropyForHDKey(network: Network) -> Data {
     var seed: Data!
     repeat {
         seed = Bitcoin.seed(bits: 256)
@@ -75,7 +75,7 @@ public func newHDPrivateKey(network: Network) -> (_ seed: Data) throws -> HDKey 
                 throw error
             }
         }
-        return receiveString(bytes: key, count: keyLength) |> hdKey
+        return receiveString(bytes: key, count: keyLength) |> tagHDKey
     }
 }
 
@@ -88,7 +88,7 @@ public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: H
             if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)) {
                 throw error
             }
-            return receiveString(bytes: childKey, count: childKeyLength) |> hdKey
+            return receiveString(bytes: childKey, count: childKeyLength) |> tagHDKey
         }
     }
 }
@@ -102,7 +102,7 @@ public func deriveHDPublicKey(isHardened: Bool, index: Int, network: Network = .
             if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, index, isHardened, network.hdKeyPublicVersion, network.hdKeyPrivateVersion, &childPublicKey, &childPublicKeyLength)) {
                 throw error
             }
-            return receiveString(bytes: childPublicKey, count: childPublicKeyLength) |> hdKey
+            return receiveString(bytes: childPublicKey, count: childPublicKeyLength) |> tagHDKey
         }
     }
 }
@@ -116,7 +116,7 @@ public func toHDPublicKey(network: Network) -> (_ privateKey: HDKey) throws -> H
             if let error = BitcoinError(rawValue: _toHDPublicKey(privateKeyString, network.hdKeyPublicVersion, &publicKey, &publicKeyLength)) {
                 throw error
             }
-            return receiveString(bytes: publicKey, count: publicKeyLength) |> hdKey
+            return receiveString(bytes: publicKey, count: publicKeyLength) |> tagHDKey
         }
     }
 }

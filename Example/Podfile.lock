@@ -5,15 +5,18 @@ PODS:
     - WolfPipe
   - CBitcoin (0.1.0)
   - ExtensibleEnumeratedName (1.0.3)
-  - WolfFoundation (1.1):
+  - WolfFoundation (2.1.0):
     - WolfNumerics
     - WolfPipe
-  - WolfNumerics (2.0.2)
-  - WolfPipe (1.0.7)
-  - WolfStrings (1.0.5):
+  - WolfNumerics (3.0.0)
+  - WolfOSBridge (1.1.0)
+  - WolfPipe (1.1.0)
+  - WolfStrings (1.2.1):
     - ExtensibleEnumeratedName
     - WolfNumerics
+    - WolfOSBridge
     - WolfPipe
+    - WolfWith
   - WolfWith (1.0.2)
 
 DEPENDENCIES:
@@ -28,6 +31,7 @@ DEPENDENCIES:
 SPEC REPOS:
   https://github.com/cocoapods/specs.git:
     - ExtensibleEnumeratedName
+    - WolfOSBridge
 
 EXTERNAL SOURCES:
   Bitcoin:
@@ -49,10 +53,11 @@ SPEC CHECKSUMS:
   Bitcoin: 877bc6f2b3c810a0d95c14179bbd2099dbd0cc8d
   CBitcoin: e7764dc7e4f33d028055c8c84375aa90b3318704
   ExtensibleEnumeratedName: c6caeb662f79105e7229a613f9043e8a7e15e642
-  WolfFoundation: b329c7dc0def384757c81c79b5600b1a36227252
-  WolfNumerics: a63222a42b4c3835e1a1cb489a71abb890f0d910
-  WolfPipe: 1a2cbb23efb14833647a2adcc034468bf82a289e
-  WolfStrings: da93adf75ddc98609744beaf5f3c2bdb1e85d1a4
+  WolfFoundation: e3738fadbd87d3867c9a3894eed514576f7c6896
+  WolfNumerics: 073642f01957a5602df21531e8b2fd31e8b92042
+  WolfOSBridge: b44c359c659d4ac704602f3f18336ffedfbb5d6a
+  WolfPipe: 5d5633fb37d8a524e326ad9cf24420f0971c8235
+  WolfStrings: cb9fa16cb9853699764ee7f1eda2bcc75fe9d4f2
   WolfWith: 46dbfeaa023972bb82387740ca38c976bc65fbac
 
 PODFILE CHECKSUM: 1987696bbfe4524f16f7b893b5afbbb3fc10055a

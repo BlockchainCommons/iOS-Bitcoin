@@ -116,6 +116,17 @@ public func addressDecode(_ address: PaymentAddress) throws -> WrappedData {
     }
 }
 
+public func getHash(_ paymentAddress: PaymentAddress) throws -> ShortHash {
+    return try paymentAddress.rawValue.withCString { addressBytes in
+        var hashBytes: UnsafeMutablePointer<UInt8>!
+        var hashLength = 0
+        if let result = BitcoinError(rawValue: _addressHash(addressBytes, &hashBytes, &hashLength)) {
+            throw result
+        }
+        return try receiveData(bytes: hashBytes, count: hashLength) |> tagShortHash
+    }
+}
+
 /// Create a payment address with an embedded record of binary data.
 ///
 /// The data is hashed as RIPEMD160 and then embedded in a script of the form:

@@ -302,6 +302,11 @@ public enum Opcode: UInt8 {
         _opcodeToString(rawValue, rules.rawValue, &string, &count)
         return receiveString(bytes: string, count: count)
     }
+
+    public static func makePushPositive(_ n: Int) -> Opcode {
+        guard (1 ... 16).contains(n) else { return .nop }
+        return Opcode(rawValue: UInt8(n + 80))!
+    }
 }
 
 extension Opcode: CustomStringConvertible {

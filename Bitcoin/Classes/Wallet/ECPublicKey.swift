@@ -121,23 +121,50 @@ public func toECPublicKey(_ privateKey: ECPrivateKey) throws -> ECPublicKey {
     return try privateKey |> toECPublicKey(isCompressed: true)
 }
 
-public enum ECPaymentAddressVersion: UInt8 {
-    case mainnetP2KH = 0x00
-    case mainnetP2SH = 0x05
-    case testnetP2KH = 0x6f
-    case testnetP2SH = 0xc4
+public enum ECPaymentAddressType {
+    case p2kh
+    case p2sh
+
+    public func version(for network: Network) -> UInt8 {
+        switch self {
+        case .p2kh:
+            return network.paymentAddressP2KHVersion
+        case .p2sh:
+            return network.paymentAddressP2SHVersion
+        }
+    }
+}
+
+extension Network {
+    public var paymentAddressP2KHVersion: UInt8 {
+        switch self {
+        case .mainnet:
+            return 0x00
+        case .testnet:
+            return 0x6f
+        }
+    }
+
+    public var paymentAddressP2SHVersion: UInt8 {
+        switch self {
+        case .mainnet:
+            return 0x05
+        case .testnet:
+            return 0xc4
+        }
+    }
 }
 
 /// Convert an EC public key to a payment address.
-public func toECPaymentAddress(version: ECPaymentAddressVersion) -> (_ publicKey: ECPublicKey) throws -> String {
+public func toECPaymentAddress(network: Network, type: ECPaymentAddressType) -> (_ publicKey: ECPublicKey) throws -> PaymentAddress {
     return { publicKey in
         return try publicKey.rawValue.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
             var addressBytes: UnsafeMutablePointer<Int8>!
             var addressLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey.rawValue.count, version.rawValue, &addressBytes, &addressLength)) {
+            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey.rawValue.count, type.version(for: network), &addressBytes, &addressLength)) {
                 throw error
             }
-            return receiveString(bytes: addressBytes, count: addressLength)
+            return receiveString(bytes: addressBytes, count: addressLength) |> tagPaymentAddress
         }
     }
 }

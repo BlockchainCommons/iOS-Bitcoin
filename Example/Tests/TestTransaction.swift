@@ -583,4 +583,114 @@ class TestTransaction: XCTestCase {
             ])
         XCTAssertTrue(tx.isInternalDoubleSpend)
     }
+
+    func test_crypto_wallet_transaction() {
+        let network = Network.testnet
+
+        var tx = Transaction()
+        tx.version = 1
+
+        let mnemonic = "priority tuition mutual grain camp mention ask aerobic either pill home harbor elephant skate follow man taste arrange again canal have dad route warm" |> tagMnemonic
+        let seed = try! mnemonic |> toSeed
+        let masterHDKey = try! seed |> newHDPrivateKey(network: network)
+        XCTAssertEqual(masterHDKey, "tprv8ZgxMBicQKsPdFdL5FzccNSkQT1kJFrP3fjiHLQzePq3pugG2NBM2rA6ZD5ywLj3ghYSEz9G13nqyW6SXkGnSLNPfaUzbGFrGgJenw47r1W" |> tagHDKey)
+
+        let sourcePublicKey = try! (masterHDKey |> toHDPublicKey(network: network) |> toECKey(network: network)) as! ECCompressedPublicKey
+        let sourceAddress =  try! sourcePublicKey |> toECPaymentAddress(network: network, type: .p2kh)
+        XCTAssertEqual(sourceAddress, "msonra6g9YqYYam28gmfcc1qMaC7qnYPh5" |> tagPaymentAddress)
+
+        let sourceTxHash = try! "af55a1bf3098c7d37d56163c0bc690ba2f6ed7c2c37d94fdc0c0ab5fd11d6b77" |> hashDecode
+        let sourceInputIndex: UInt32 = 1
+        let sourceUnspentAmount: Satoshis = 12510365
+        let outputPoint = OutputPoint(hash: sourceTxHash, index: sourceInputIndex)
+
+        let input = Input(previousOutput: outputPoint)
+        tx.inputs = [input]
+
+        let destinationAmount = try! "0.01" |> tagBase10 |> btcToSatoshi
+        let feeAmount = 17000 |> tagSatoshis
+        let changeAmount = sourceUnspentAmount - destinationAmount - feeAmount
+
+        let destinationAddress = "muR84gYDr49gjEEt942o3WJzFBnb4yMQXG" |> tagPaymentAddress
+        let destinationAddressHash = try! destinationAddress |> getHash
+        let destinationLockingOperations = Script.makePayKeyHashPattern(hash: destinationAddressHash)
+        let destinationLockingScript = Script(operations: destinationLockingOperations)
+
+        var manuallyConstructedDestLockOps: [Bitcoin.Operation] = []
+        manuallyConstructedDestLockOps.append(Operation(opcode: .dup))
+        manuallyConstructedDestLockOps.append(Operation(opcode: .hash160))
+        manuallyConstructedDestLockOps.append(try! Operation(data: destinationAddressHash.rawValue))
+        manuallyConstructedDestLockOps.append(Operation(opcode: .equalverify))
+        manuallyConstructedDestLockOps.append(Operation(opcode: .checksig))
+        XCTAssertEqual(destinationLockingOperations, manuallyConstructedDestLockOps)
+
+        let destinationOutput = Output(value: destinationAmount, script: destinationLockingScript)
+
+        let changeAddress = sourceAddress
+        let changeAddressHash = try! changeAddress |> getHash
+        let changeLockingOperations = Script.makePayKeyHashPattern(hash: changeAddressHash)
+        let changeLockingScript = Script(operations: changeLockingOperations)
+
+        let changeOutput = Output(value: changeAmount, script: changeLockingScript)
+
+        tx.outputs = [destinationOutput, changeOutput]
+
+        //print(try! tx |> serialize |> transactionDecode)
+
+
+        // signature
+        let sourcePrivateKey = try! (masterHDKey |> toECKey(network: network)) as! ECPrivateKey
+        let prevScript0 = try! Script.makePayKeyHashPattern(hash: sourceAddress |> getHash)
+        let sig0 = try! createEndorsement(privateKey: sourcePrivateKey, script: Script(operations: prevScript0), transaction: tx, inputIndex: 0, sigHashType: .all)
+
+//        // Redeem Script
+//        let redeemScriptOps = Script.makePayMultisigPattern(requiredSignatureCount: 1, publicKeys: [sourcePublicKey])
+//        let redeemScript = Script(operations: redeemScriptOps)
+//        print(redeemScript)
+//        print(redeemScript |> serialize |> toBitcoin160 |> rawValue |> toBase16)
+
+        // input script
+        var sigScript0: [Bitcoin.Operation] = []
+        sigScript0.append(try! Operation(data: sig0.rawValue))
+        sigScript0.append(try! Operation(data: sourcePublicKey.rawValue))
+//        sigScript0.append(try! Operation(data: redeemScript |> serialize))
+        let myInputScript0 = Script(operations: sigScript0)
+        //print(myInputScript0)
+        tx.inputs[0].script = myInputScript0
+        //print(try! tx |> serialize |> transactionDecode)
+        XCTAssertEqual(tx |> serialize |> toBase16, "0100000001776b1dd15fabc0c0fd947dc3c2d76e2fba90c60b3c16567dd3c79830bfa155af010000006a47304402201061a60d0a0260ea26eff4bff2fc6bd90258630d8774152d8a6afed7f311076602200c2eb64a4f91f699a4173ef126ea26133487292a4e81fbc2e0e33fb168b5426c01210337c025321af12dfc4517159d9bd98164dd2ff9fbd7971b29d0aa271d72c404caffffffff0240420f00000000001976a91498776b9b0155331a7e86e0b0f925e8fea526478888acf55faf00000000001976a91486d0b38080ded041b9585e3ffdff3f7535dd24c188ac00000000")
+    }
+
+    func testScriptPattern() {
+        let script = try! Script(string: "hash160 [86d0b38080ded041b9585e3ffdff3f7535dd24c1] equal")
+        print(script.pattern)
+        print(script.inputPattern)
+        print(script.outputPattern)
+    }
 }
+
+//    {
+//        "transaction": {
+//            "hash": "369b1ca56f1e5ef7a96af513e4c8784c412a45ac3ceec3b5e337e688e07449b8",
+//            "inputs": [{
+//                "address_hash": "86d0b38080ded041b9585e3ffdff3f7535dd24c1",
+//                "previous_output": {
+//                    "hash": "af55a1bf3098c7d37d56163c0bc690ba2f6ed7c2c37d94fdc0c0ab5fd11d6b77",
+//                    "index": "1"
+//                },
+//                "script": "[304402201061a60d0a0260ea26eff4bff2fc6bd90258630d8774152d8a6afed7f311076602200c2eb64a4f91f699a4173ef126ea26133487292a4e81fbc2e0e33fb168b5426c01] [0337c025321af12dfc4517159d9bd98164dd2ff9fbd7971b29d0aa271d72c404ca]",
+//                "sequence": "4294967295"
+//            }],
+//            "lock_time": "0",
+//            "outputs": [{
+//                "address_hash": "98776b9b0155331a7e86e0b0f925e8fea5264788",
+//                "script": "dup hash160 [98776b9b0155331a7e86e0b0f925e8fea5264788] equalverify checksig",
+//                "value": "1000000"
+//            }, {
+//                "address_hash": "86d0b38080ded041b9585e3ffdff3f7535dd24c1",
+//                "script": "dup hash160 [86d0b38080ded041b9585e3ffdff3f7535dd24c1] equalverify checksig",
+//                "value": "11493365"
+//            }],
+//            "version": "1"
+//        }
+//    }

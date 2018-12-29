@@ -45,9 +45,9 @@ public enum Language: String, CaseIterable {
     case zh_Hant
 }
 
-public func newMnemonic(language: Language) -> (_ seed: Data) throws -> Mnemonic {
-    return { seed in
-        guard seed.count % mnemonicSeedMultiple == 0 else {
+public func newMnemonic(language: Language) -> (_ entropy: Data) throws -> Mnemonic {
+    return { entropy in
+        guard entropy.count % mnemonicSeedMultiple == 0 else {
             throw BitcoinError.invalidSeedSize
         }
         guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
@@ -55,8 +55,8 @@ public func newMnemonic(language: Language) -> (_ seed: Data) throws -> Mnemonic
         }
         var mnemo: UnsafeMutablePointer<Int8>!
         var mnemoLength: Int = 0
-        try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes, seed.count, dictionary, &mnemo, &mnemoLength)) {
+        try entropy.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
+            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes, entropy.count, dictionary, &mnemo, &mnemoLength)) {
                 throw error
             }
         }
@@ -64,11 +64,11 @@ public func newMnemonic(language: Language) -> (_ seed: Data) throws -> Mnemonic
     }
 }
 
-public func newMnemonic(_ seed: Data) throws -> Mnemonic {
-    return try newMnemonic(language: .en)(seed)
+public func newMnemonic(_ entropy: Data) throws -> Mnemonic {
+    return try newMnemonic(language: .en)(entropy)
 }
 
-public func mnemonicToSeed(_ language: Language, passphrase: String? = nil) -> (_ mnemonic: Mnemonic) throws -> Data {
+public func toSeed(language: Language, passphrase: String? = nil) -> (_ mnemonic: Mnemonic) throws -> Data {
     return { mnemonic in
         let normalizedMnemonic = mnemonic.rawValue.precomposedStringWithCanonicalMapping
         let normalizedPassphrase = (passphrase ?? "").precomposedStringWithCanonicalMapping
@@ -88,12 +88,12 @@ public func mnemonicToSeed(_ language: Language, passphrase: String? = nil) -> (
     }
 }
 
-public func mnemonicToSeedWithPassphrase(_ passphrase: String?) -> (_ mnemonic: Mnemonic) throws -> Data {
+public func toSeed(passphrase: String?) -> (_ mnemonic: Mnemonic) throws -> Data {
     return { mnemonic in
         var seed: Data!
         _ = Language.allCases.first { language in
             do {
-                seed = try mnemonic |> mnemonicToSeed(language, passphrase: passphrase)
+                seed = try mnemonic |> toSeed(language: language, passphrase: passphrase)
                 return true
             } catch {
                 return false
@@ -106,6 +106,6 @@ public func mnemonicToSeedWithPassphrase(_ passphrase: String?) -> (_ mnemonic: 
     }
 }
 
-public func mnemonicToSeed(_ mnemonic: Mnemonic) throws -> Data {
-    return try mnemonic |> mnemonicToSeedWithPassphrase(nil)
+public func toSeed(_ mnemonic: Mnemonic) throws -> Data {
+    return try mnemonic |> toSeed(passphrase: nil)
 }

@@ -18,7 +18,7 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-public enum Network {
+public enum Network: String, Codable {
     case mainnet
     case testnet
 }

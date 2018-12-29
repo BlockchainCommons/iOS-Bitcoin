@@ -38,11 +38,11 @@ class TestEC: XCTestCase {
     }
 
     func testToECPaymentAddress() {
-        let f = { tagBase16 >>> toData >>> toECPublicKey >>> toECPaymentAddress(version: $0) }
-        XCTAssert(try! "0247140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36" |> f(.mainnetP2KH) == "1EKJFK8kBmasFRYY3Ay9QjpJLm4vemJtC1")
-        XCTAssert(try! "0247140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36" |> f(.testnetP2KH) == "mtqFYNDizo282Y29kjwXEf2dCkfdZZydbf")
-        XCTAssert(try! "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6" |> f(.mainnetP2KH) == "197FLrycah42jKDgfmTaok7b8kNHA7R2ih")
-        XCTAssert(try! "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6" |> f(.testnetP2KH) == "modCdv4bPiVHWRhJPLRxdfKuzjxz275cah")
+        let f = { (network: Network, type: ECPaymentAddressType) in tagBase16 >>> toData >>> toECPublicKey >>> toECPaymentAddress(network: network, type: type) }
+        XCTAssert(try! "0247140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36" |> f(.mainnet, .p2kh) == "1EKJFK8kBmasFRYY3Ay9QjpJLm4vemJtC1")
+        XCTAssert(try! "0247140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36" |> f(.testnet, .p2kh) == "mtqFYNDizo282Y29kjwXEf2dCkfdZZydbf")
+        XCTAssert(try! "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6" |> f(.mainnet, .p2kh) == "197FLrycah42jKDgfmTaok7b8kNHA7R2ih")
+        XCTAssert(try! "0447140d2811498679fe9a0467a75ac7aa581476c102d27377bc0232635af8ad36e87bb04f401be3b770a0f3e2267a6c3b14a3074f6b5ce4419f1fcdc1ca4b1cb6" |> f(.testnet, .p2kh) == "modCdv4bPiVHWRhJPLRxdfKuzjxz275cah")
     }
 
     func testToWIF() {

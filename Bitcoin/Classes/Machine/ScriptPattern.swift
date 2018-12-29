@@ -49,7 +49,7 @@ public enum ScriptPattern: Int32
     /// The redeem script may be any pay type, but only multisig makes sense.
     /// Pubkey script: OP_HASH160 <Hash160(redeemScript)> OP_EQUAL
     /// Signature script: <sig>[sig][sig...] <redeemScript>
-    case payscriptHash
+    case payScriptHash
 
     /// Sign Multisig script [BIP11]
     case signMultisig

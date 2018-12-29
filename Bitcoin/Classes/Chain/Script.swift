@@ -127,17 +127,43 @@ public struct Script: InstanceContainer {
         }
     }
 
-//    public static func makePayKeyHashPattern(hash: ShortHash) -> [Operation] {
-//    }
-//
-//    public static func makePayScriptHashPattern(hash: ShortHash) -> [Operation] {
-//    }
+    public static func makePayKeyHashPattern(hash: ShortHash) -> [Operation] {
+        return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
+            var operations: UnsafeMutablePointer<OpaquePointer>!
+            var operationsCount = 0
+            _scriptMakePayKeyHashPattern(hashBytes, &operations, &operationsCount)
+            return receiveInstances(instances: operations, count: operationsCount)
+        }
+    }
+
+    public static func makePayScriptHashPattern(hash: ShortHash) -> [Operation] {
+        return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
+            var operations: UnsafeMutablePointer<OpaquePointer>!
+            var operationsCount = 0
+            _scriptMakePayScriptHashPattern(hashBytes, &operations, &operationsCount)
+            return receiveInstances(instances: operations, count: operationsCount)
+        }
+    }
+
+    public static func makePayMultisigPattern(requiredSignatureCount: Int, publicKeys: [ECCompressedPublicKey]) -> [Operation] {
+        let m = requiredSignatureCount
+        let n = publicKeys.count
+
+        guard (1 ... 16).contains(n), (1 ... n).contains(m) else { return [] }
+
+        var ops = [Operation]()
+        ops.append(.init(opcode: .makePushPositive(m)))
+        publicKeys.forEach { key in
+            try! ops.append(.init(data: key.rawValue))
+        }
+        ops.append(.init(opcode: .makePushPositive(n)))
+        ops.append(.init(opcode: .checkmultisig))
+        return ops
+    }
 
 //    static operation::list to_pay_public_key_pattern(data_slice point);
 //    static operation::list to_pay_key_hash_pattern(const short_hash& hash);
 //    static operation::list to_pay_script_hash_pattern(const short_hash& hash);
-//    static operation::list to_pay_multisig_pattern(uint8_t signatures, const point_list& points);
-//    static operation::list to_pay_multisig_pattern(uint8_t signatures, const data_stack& points);
 
     public static func verify(transaction: Transaction, inputIndex: UInt32, rules: RuleFork, prevoutScript: Script, value: UInt64) -> LibBitcoinResult {
         let result = _scriptVerify(transaction.wrapped.instance, inputIndex, rules.rawValue, prevoutScript.wrapped.instance, value)
