@@ -1,5 +1,5 @@
 //
-//  HDPrivateKey.swift
+//  HDKey.swift
 //  Bitcoin
 //
 //  Created by Wolf McNally on 10/30/18.
@@ -121,11 +121,6 @@ public func toHDPublicKey(network: Network) -> (_ privateKey: HDKey) throws -> H
     }
 }
 
-/// Derive the HD (BIP32) public key of a HD private key.
-public func toHDPublicKey(_ privateKey: HDKey) throws -> HDKey {
-    return try privateKey |> toHDPublicKey(network: .mainnet)
-}
-
 /// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
 public func toECKey(network: Network) -> (_ hdKey: HDKey) throws -> ECKey {
     return { hdKey in
@@ -147,7 +142,25 @@ public func toECKey(network: Network) -> (_ hdKey: HDKey) throws -> ECKey {
     }
 }
 
-/// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
-public func toECKey(_ key: HDKey) throws -> ECKey {
-    return try key |> toECKey(network: .mainnet)
+/// Derives an "account private key" from the given master key, per BIP-0044:
+///
+/// Performs the the derviation in brackets below:
+///
+/// `[ m / purpose' / coin_type' / account' ]`
+public func deriveAccountKey(masterKey: HDKey, coinType: CoinType, network: Network, accountID: Int) throws -> HDKey {
+    let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: 44)
+    let coinTypeKey = try purposeKey |> deriveHDPrivateKey(isHardened: true, index: CoinType.index(for: coinType, network: network))
+    let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountID)
+    return accountKey
+}
+
+/// Derives an "address private key" from the given account key, per BIP-0044:
+///
+/// Performs the part of the derviation in brackets below:
+///
+/// `m / purpose' / coin_type' / account' [ / change / address_index ]`
+public func deriveAddressKey(accountKey: HDKey, chainType: ChainType, addressIndex: Int) throws -> HDKey {
+    let chainKey = try accountKey |> deriveHDPrivateKey(isHardened: false, index: chainType.rawValue)
+    let addressKey = try chainKey |> deriveHDPrivateKey(isHardened: false, index: addressIndex)
+    return addressKey
 }

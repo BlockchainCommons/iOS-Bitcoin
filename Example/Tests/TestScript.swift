@@ -41,11 +41,11 @@ class TestScript: XCTestCase {
 
     func testScriptToAddress() {
         let s1 = "dup hash160 [89abcdefabbaabbaabbaabbaabbaabbaabbaabba] equalverify checksig"
-        XCTAssert(try! s1 |> scriptToAddress == "3F6i6kwkevjR7AsAd4te2YB2zZyASEm1HM")
+        XCTAssert(try! s1 |> scriptToAddress(network: .mainnet) == "3F6i6kwkevjR7AsAd4te2YB2zZyASEm1HM")
         XCTAssert(try! s1 |> scriptToAddress(network: .testnet) == "2N6evAVsnGPEmJxViJCWWeVAJCvBLFehT7L")
 
         let s2 = ["2", "[048cdce248e9d30838a2b31ad7162195db0ef4c20517916fa371fd04b153c214eeb644dcda76a98d33b0180a949d521df1d75024587a28ef30f2906c266fbb360e]", "[04d34775baab521d7ba2bd43997312d5f663633484ae1a4d84246866b7088297715a049e2288ae16f168809d36e2da1162f03412bf23aa5f949f235eb2e7141783]", "[04534072a9a62226252917f3011082a429900bbc5d1e11386b16e64e1dc985259c1cbcea0bad66fa6f106ea617ddddb6de45ac9118a3dcfc29c0763c167d56290e]", "3", "checkmultisig"] |> joined(separator: " ")
-        XCTAssert(try! s2 |> scriptToAddress == "3CS58tZGJtjz4qBFyNgQRtneKaWUjeEZVM")
+        XCTAssert(try! s2 |> scriptToAddress(network: .mainnet) == "3CS58tZGJtjz4qBFyNgQRtneKaWUjeEZVM")
         XCTAssert(try! s2 |> scriptToAddress(network: .testnet) == "2N3zHCdVHvMFLGcooeWJH3qmuXvieWfEFKG")
     }
 

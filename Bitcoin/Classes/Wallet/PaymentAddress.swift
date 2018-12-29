@@ -152,17 +152,6 @@ public func addressEmbed(version: UInt8) -> (_ data: Data) -> PaymentAddress {
 ///     dup hash160 [RIPEMD160] equalverify checksig
 ///
 /// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
-public func addressEmbed(network: Network = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ data: Data) -> PaymentAddress {
+public func addressEmbed(network: Network, type: PaymentAddressType) -> (_ data: Data) -> PaymentAddress {
     return addressEmbed(version: PaymentAddressVersion(network: network, type: type).version)
-}
-
-/// Create a payment address with an embedded record of binary data.
-///
-/// The data is hashed as RIPEMD160 and then embedded in a script of the form:
-///
-///     dup hash160 [RIPEMD160] equalverify checksig
-///
-/// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
-public func addressEmbed(_ data: Data) -> PaymentAddress {
-    return data |> addressEmbed(network: .mainnet, type: .p2pkh)
 }

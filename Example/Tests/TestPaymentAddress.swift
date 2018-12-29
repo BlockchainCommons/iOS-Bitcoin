@@ -45,7 +45,7 @@ class TestPaymentAddress: XCTestCase {
     }
 
     func testAddressEmbed() {
-        XCTAssert("Satoshi Nakamoto" |> toUTF8 |> addressEmbed == "168LnUjqoJLie1PW5dTaF2vKUU9Jf6Fe4a")
-        XCTAssert("Satoshi Nakamoto" |> toUTF8 |> addressEmbed(network: .testnet) == "mkeJ5XppcKmyR7s7oCRx4x8eLTk1Xrso8t")
+        XCTAssert("Satoshi Nakamoto" |> toUTF8 |> addressEmbed(network: .mainnet, type: .p2pkh) == "168LnUjqoJLie1PW5dTaF2vKUU9Jf6Fe4a")
+        XCTAssert("Satoshi Nakamoto" |> toUTF8 |> addressEmbed(network: .testnet, type: .p2pkh) == "mkeJ5XppcKmyR7s7oCRx4x8eLTk1Xrso8t")
     }
 }

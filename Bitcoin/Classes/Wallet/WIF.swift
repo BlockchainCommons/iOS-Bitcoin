@@ -52,11 +52,6 @@ public func toWIF(network: Network, isCompressed: Bool = true) -> (_ privateKey:
     }
 }
 
-/// Convert an EC private key to a WIF private key.
-public func toWIF(_ privateKey: ECPrivateKey) throws -> WIF {
-    return try privateKey |> toWIF(network: .mainnet)
-}
-
 /// Convert a WIF private key to an EC private key.
 public func toECPrivateKey(_ wif: WIF) throws -> ECPrivateKey {
     var privateKeyBytes: UnsafeMutablePointer<UInt8>!
