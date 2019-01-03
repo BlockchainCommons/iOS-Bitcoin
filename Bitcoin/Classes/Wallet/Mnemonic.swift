@@ -50,7 +50,7 @@ public func newMnemonic(language: Language) -> (_ entropy: Data) throws -> Mnemo
         guard entropy.count % mnemonicSeedMultiple == 0 else {
             throw BitcoinError.invalidSeedSize
         }
-        guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
+        guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)!) else {
             throw BitcoinError.unsupportedLanguage
         }
         var mnemo: UnsafeMutablePointer<Int8>!
@@ -71,15 +71,21 @@ public func newMnemonic(_ entropy: Data) throws -> Mnemonic {
 public func toSeed(language: Language, passphrase: String? = nil) -> (_ mnemonic: Mnemonic) throws -> Data {
     return { mnemonic in
         let normalizedMnemonic = mnemonic.rawValue.precomposedStringWithCanonicalMapping
-        let normalizedPassphrase = (passphrase ?? "").precomposedStringWithCanonicalMapping
-        guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)) else {
+        let normalizedPassphrase = passphrase?.precomposedStringWithCanonicalMapping
+        guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)!) else {
             throw BitcoinError.unsupportedLanguage
         }
         var seed: UnsafeMutablePointer<UInt8>!
         var seedLength: Int = 0
         try normalizedMnemonic.withCString { mnemonicCStr in
-            try normalizedPassphrase.withCString { passphraseCStr in
-                if let error = BitcoinError(rawValue: _mnemonicToSeed(mnemonicCStr, dictionary, passphraseCStr, &seed, &seedLength)) {
+            if let np = normalizedPassphrase {
+                try np.withCString { passphraseCStr in
+                    if let error = BitcoinError(rawValue: _mnemonicToSeed(mnemonicCStr, dictionary, passphraseCStr, &seed, &seedLength)) {
+                        throw error
+                    }
+                }
+            } else {
+                if let error = BitcoinError(rawValue: _mnemonicToSeed(mnemonicCStr, dictionary, nil, &seed, &seedLength)) {
                     throw error
                 }
             }

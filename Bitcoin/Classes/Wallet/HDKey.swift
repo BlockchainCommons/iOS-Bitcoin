@@ -142,16 +142,24 @@ public func toECKey(network: Network) -> (_ hdKey: HDKey) throws -> ECKey {
     }
 }
 
+public enum HDKeyPurpose: Int {
+    case defaultAccount = 0 // BIP32
+    case accountTree = 44 // BIP44
+    case multisig = 45 // BIP45
+}
+
 /// Derives an "account private key" from the given master key, per BIP-0044:
 ///
 /// Performs the the derviation in brackets below:
 ///
 /// `[ m / purpose' / coin_type' / account' ]`
-public func deriveAccountKey(masterKey: HDKey, coinType: CoinType, network: Network, accountID: Int) throws -> HDKey {
-    let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: 44)
-    let coinTypeKey = try purposeKey |> deriveHDPrivateKey(isHardened: true, index: CoinType.index(for: coinType, network: network))
-    let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountID)
-    return accountKey
+public func deriveHDAccountKey(coinType: CoinType, network: Network, accountID: Int) -> (_ masterKey: HDKey) throws -> HDKey {
+    return { masterKey in
+        let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: HDKeyPurpose.accountTree.rawValue)
+        let coinTypeKey = try purposeKey |> deriveHDPrivateKey(isHardened: true, index: CoinType.index(for: coinType, network: network))
+        let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountID)
+        return accountKey
+    }
 }
 
 /// Derives an "address private key" from the given account key, per BIP-0044:
@@ -159,8 +167,42 @@ public func deriveAccountKey(masterKey: HDKey, coinType: CoinType, network: Netw
 /// Performs the part of the derviation in brackets below:
 ///
 /// `m / purpose' / coin_type' / account' [ / change / address_index ]`
-public func deriveAddressKey(accountKey: HDKey, chainType: ChainType, addressIndex: Int) throws -> HDKey {
-    let chainKey = try accountKey |> deriveHDPrivateKey(isHardened: false, index: chainType.rawValue)
-    let addressKey = try chainKey |> deriveHDPrivateKey(isHardened: false, index: addressIndex)
-    return addressKey
+public func deriveHDAddressKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
+    return { accountKey in
+        let chainKey = try accountKey |> deriveHDPrivateKey(isHardened: false, index: chainType.rawValue)
+        let addressKey = try chainKey |> deriveHDPrivateKey(isHardened: false, index: addressIndex)
+        return addressKey
+    }
+}
+
+public func prefix(_ hdKey: HDKey) -> String {
+    return String(hdKey.rawValue.prefix(4))
+}
+
+public func network(_ hdKey: HDKey) -> Network {
+    let s = (hdKey |> prefix).first!
+    switch s {
+    case "x":
+        return .mainnet
+    case "t":
+        return .testnet
+    default:
+        fatalError()
+    }
+}
+
+public func isPrivate(_ hdKey: HDKey) -> Bool {
+    let s = String((hdKey |> prefix).dropFirst())
+    switch s {
+    case "pub":
+        return false
+    case "prv":
+        return true
+    default:
+        fatalError()
+    }
+}
+
+public func isPublic(_ hdKey: HDKey) -> Bool {
+    return !(hdKey |> isPrivate)
 }
