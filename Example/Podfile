@@ -2,16 +2,20 @@ use_frameworks!
 
 platform :ios, '12.0'
 
-pod 'CBitcoin', :path => '../../CBitcoin'
-pod 'WolfNumerics', :path => '../../WolfNumerics'
-pod 'WolfPipe', :path => '../../WolfPipe'
-pod 'WolfWith', :path => '../../WolfWith'
-pod 'WolfStrings', :path => '../../WolfStrings'
-pod 'WolfFoundation', :path => '../../WolfFoundation'
+#pod 'CBitcoin', :path => '../../CBitcoin'
+#pod 'WolfNumerics', :path => '../../WolfNumerics'
+#pod 'WolfPipe', :path => '../../WolfPipe'
+#pod 'WolfWith', :path => '../../WolfWith'
+#pod 'WolfStrings', :path => '../../WolfStrings'
+#pod 'WolfFoundation', :path => '../../WolfFoundation'
 
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'
-      #pod 'WolfStrings'
+      pod 'CBitcoin'
+      pod 'WolfPipe'
+      pod 'WolfWith'
+      pod 'WolfStrings'
+      pod 'WolfFoundation'
 
       target 'Bitcoin_Tests' do
           inherit! :search_paths
