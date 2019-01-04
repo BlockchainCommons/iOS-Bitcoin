@@ -27,7 +27,6 @@ class TestOperation: XCTestCase {
     func test1() {
         let operation = Bitcoin.Operation()
         XCTAssertFalse(operation.isValid)
-        print(operation.data |> toBase16)
         XCTAssert(operation.data.isEmpty)
         XCTAssert(operation.opcode == .disabledXor)
     }

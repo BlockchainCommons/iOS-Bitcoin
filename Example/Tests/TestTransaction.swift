@@ -661,36 +661,10 @@ class TestTransaction: XCTestCase {
         XCTAssertEqual(tx |> serialize |> toBase16, "0100000001776b1dd15fabc0c0fd947dc3c2d76e2fba90c60b3c16567dd3c79830bfa155af010000006a47304402201061a60d0a0260ea26eff4bff2fc6bd90258630d8774152d8a6afed7f311076602200c2eb64a4f91f699a4173ef126ea26133487292a4e81fbc2e0e33fb168b5426c01210337c025321af12dfc4517159d9bd98164dd2ff9fbd7971b29d0aa271d72c404caffffffff0240420f00000000001976a91498776b9b0155331a7e86e0b0f925e8fea526478888acf55faf00000000001976a91486d0b38080ded041b9585e3ffdff3f7535dd24c188ac00000000")
     }
 
-    func testScriptPattern() {
-        let script = try! Script(string: "hash160 [86d0b38080ded041b9585e3ffdff3f7535dd24c1] equal")
-        print(script.pattern)
-        print(script.inputPattern)
-        print(script.outputPattern)
-    }
-}
-
-//    {
-//        "transaction": {
-//            "hash": "369b1ca56f1e5ef7a96af513e4c8784c412a45ac3ceec3b5e337e688e07449b8",
-//            "inputs": [{
-//                "address_hash": "86d0b38080ded041b9585e3ffdff3f7535dd24c1",
-//                "previous_output": {
-//                    "hash": "af55a1bf3098c7d37d56163c0bc690ba2f6ed7c2c37d94fdc0c0ab5fd11d6b77",
-//                    "index": "1"
-//                },
-//                "script": "[304402201061a60d0a0260ea26eff4bff2fc6bd90258630d8774152d8a6afed7f311076602200c2eb64a4f91f699a4173ef126ea26133487292a4e81fbc2e0e33fb168b5426c01] [0337c025321af12dfc4517159d9bd98164dd2ff9fbd7971b29d0aa271d72c404ca]",
-//                "sequence": "4294967295"
-//            }],
-//            "lock_time": "0",
-//            "outputs": [{
-//                "address_hash": "98776b9b0155331a7e86e0b0f925e8fea5264788",
-//                "script": "dup hash160 [98776b9b0155331a7e86e0b0f925e8fea5264788] equalverify checksig",
-//                "value": "1000000"
-//            }, {
-//                "address_hash": "86d0b38080ded041b9585e3ffdff3f7535dd24c1",
-//                "script": "dup hash160 [86d0b38080ded041b9585e3ffdff3f7535dd24c1] equalverify checksig",
-//                "value": "11493365"
-//            }],
-//            "version": "1"
-//        }
+//    func testScriptPattern() {
+//        let script = try! Script(string: "hash160 [86d0b38080ded041b9585e3ffdff3f7535dd24c1] equal")
+//        print(script.pattern)
+//        print(script.inputPattern)
+//        print(script.outputPattern)
 //    }
+}

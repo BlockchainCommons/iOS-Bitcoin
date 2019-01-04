@@ -145,7 +145,6 @@ class TestScript: XCTestCase {
                     "74b1d185dbf5b4db4ddb0642848868685174519c6351670068") |> dataLiteral
         var weird: Script!
         XCTAssertNoThrow(weird = try weird_raw_script |> deserializeScript)
-        print(weird)
         let roundtrip_result = weird |> serialize
         XCTAssert(roundtrip_result == weird_raw_script)
     }
