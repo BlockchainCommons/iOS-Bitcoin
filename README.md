@@ -5,18 +5,24 @@
 [![License](https://img.shields.io/cocoapods/l/Bitcoin.svg?style=flat)](https://cocoapods.org/pods/Bitcoin)
 [![Platform](https://img.shields.io/cocoapods/p/Bitcoin.svg?style=flat)](https://cocoapods.org/pods/Bitcoin)
 
-## Example
-
-To run the example project, clone the repo, and run `pod install` from the Example directory first.
-
 ## Requirements
 
-Swift 4.2
+* Swift 4.2
+
+* The `Bitcoin` framework depends on the [CBitcoin](https://github.com/BlockchainCommons/iOS-CBitcoin) framework, which includes a pre-made build of [libbitcoin](https://github.com/libbitcoin). To properly install this, you need to first install the latest version of Git and the Git Large File Storage handler:
+
+```bash
+$ brew install git
+$ brew install git-lfs
+$ which git
+/usr/local/bin/git
+$ git --version
+git version 2.20.1
+```
 
 ## Installation
 
-Bitcoin is available through [Blockchain Commons](https://github.com/blockchaincommons). To install
-it, simply add the following line to your Podfile:
+Bitcoin is available through [Cocoapods](https://github.com/cocoapods.org). To install it, add the following line to your Podfile:
 
 ```ruby
 pod 'Bitcoin'

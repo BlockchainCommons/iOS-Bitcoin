@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Bitcoin'
-    s.version          = '0.2.0'
+    s.version          = '0.2.1'
     s.summary          = 'Swift bindings for libbitcoin.'
 
     # s.description      = <<-DESC
