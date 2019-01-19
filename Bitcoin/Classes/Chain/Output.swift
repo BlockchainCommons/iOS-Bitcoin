@@ -38,7 +38,7 @@ public struct Output: InstanceContainer, Encodable {
         self.value = value
     }
 
-    public init(value: Satoshis, paymentAddress: String) throws {
+    public init(value: Satoshis, paymentAddress: PaymentAddress) throws {
         self.init(value: value)
         try setPaymentAddress(paymentAddress)
     }
@@ -48,7 +48,7 @@ public struct Output: InstanceContainer, Encodable {
         self.script = script
     }
 
-    public static func deserialize(data: Data) throws -> Output {
+    public static func deserialize(_ data: Data) throws -> Output {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _outputDeserialize(dataBytes, data.count, &instance)) {
@@ -66,11 +66,11 @@ public struct Output: InstanceContainer, Encodable {
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
-    public mutating func setPaymentAddress(_ paymentAddress: String) throws {
+    public mutating func setPaymentAddress(_ paymentAddress: PaymentAddress) throws {
         if !isKnownUniquelyReferenced(&wrapped) {
             wrapped = WrappedInstance(_outputCopy(wrapped.instance))
         }
-        try paymentAddress.withCString { paymentAddressBytes in
+        try paymentAddress®.withCString { paymentAddressBytes in
             if let error = BitcoinError(rawValue: _outputSetPaymentAddress(wrapped.instance, paymentAddressBytes)) {
                 throw error;
             }
@@ -86,14 +86,14 @@ public struct Output: InstanceContainer, Encodable {
             if !isKnownUniquelyReferenced(&wrapped) {
                 wrapped = WrappedInstance(_outputCopy(wrapped.instance))
             }
-            _outputSetValue(wrapped.instance, newValue.rawValue)
+            _outputSetValue(wrapped.instance, newValue®)
         }
     }
 
     public var scriptString: String {
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _outputGetScriptString(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
+        _outputGetScriptString(wrapped.instance, RuleFork.allRules®, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
 
@@ -124,7 +124,7 @@ public struct Output: InstanceContainer, Encodable {
 
 extension Output: CustomStringConvertible {
     public var description: String {
-        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
+        return try! self |> toJSONString(outputFormatting: .sortedKeys)
     }
 }
 
@@ -141,5 +141,5 @@ public func serialize(_ output: Output) -> Data {
 }
 
 public func deserializeOutput(_ data: Data) throws -> Output {
-    return try Output.deserialize(data: data)
+    return try Output.deserialize(data)
 }

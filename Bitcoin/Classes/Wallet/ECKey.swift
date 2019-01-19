@@ -18,6 +18,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+import WolfFoundation
+
 public class ECKey: RawRepresentable {
     public let rawValue: Data
 
@@ -34,6 +36,6 @@ extension ECKey: Hashable {
 
 extension ECKey: Equatable {
     public static func == (lhs: ECKey, rhs: ECKey) -> Bool {
-        return lhs.rawValue == rhs.rawValue
+        return lhs® == rhs®
     }
 }

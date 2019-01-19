@@ -36,7 +36,7 @@ public func tagHashDigest(_ data: Data) throws -> HashDigest {
 }
 
 public func hashEncode(_ hash: HashDigest) -> String {
-    return hash.rawValue |> reversed |> toBase16 |> rawValue
+    return hash® |> reversed |> toBase16 |> rawValue
 }
 
 public func hashDecode(_ string: String) throws -> HashDigest {

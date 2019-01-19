@@ -33,7 +33,7 @@ public struct Input: InstanceContainer, Encodable {
         self.init(instance: _inputNew())
     }
 
-    public static func deserialize(data: Data) throws -> Input {
+    public static func deserialize(_ data: Data) throws -> Input {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _inputDeserialize(dataBytes, data.count, &instance)) {
@@ -104,7 +104,7 @@ public struct Input: InstanceContainer, Encodable {
     public var scriptString: String {
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _inputGetScriptString(wrapped.instance, RuleFork.allRules.rawValue, &decoded, &decodedLength)
+        _inputGetScriptString(wrapped.instance, RuleFork.allRules®, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
 
@@ -128,7 +128,7 @@ public struct Input: InstanceContainer, Encodable {
 
 extension Input: CustomStringConvertible {
     public var description: String {
-        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
+        return try! self |> toJSONString(outputFormatting: .sortedKeys)
     }
 }
 
@@ -145,5 +145,5 @@ public func serialize(_ input: Input) -> Data {
 }
 
 public func deserializeInput(_ data: Data) throws -> Input {
-    return try Input.deserialize(data: data)
+    return try Input.deserialize(data)
 }

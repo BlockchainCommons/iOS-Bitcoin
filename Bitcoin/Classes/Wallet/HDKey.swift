@@ -51,18 +51,8 @@ extension Network {
     }
 }
 
-/// Generate entropy that is guaranteed to be translatable into an HDPrivateKey
-public func generateEntropyForHDKey(network: Network) -> Data {
-    var seed: Data!
-    repeat {
-        seed = Bitcoin.seed(bits: 256)
-        do {
-            _ = try seed |> newHDPrivateKey(network: network)
-        } catch {
-            seed = nil
-        }
-    } while seed == nil
-    return seed
+public func generateEntropyForHDKey() -> Data {
+    return Bitcoin.seed(bits: 256)
 }
 
 /// Create a new HD (BIP32) private key from entropy.
@@ -82,7 +72,7 @@ public func newHDPrivateKey(network: Network) -> (_ seed: Data) throws -> HDKey 
 /// Derive a child HD (BIP32) private key from another HD private key.
 public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: HDKey) throws -> HDKey {
     return { privateKey in
-        return try privateKey.rawValue.withCString { privateKeyString in
+        return try privateKey®.withCString { privateKeyString in
             var childKey: UnsafeMutablePointer<Int8>!
             var childKeyLength = 0
             if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)) {
@@ -94,11 +84,12 @@ public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: H
 }
 
 /// Derive a child HD (BIP32) public key from another HD public or private key.
-public func deriveHDPublicKey(isHardened: Bool, index: Int, network: Network = .mainnet) -> (_ key: HDKey) throws -> HDKey {
+public func deriveHDPublicKey(isHardened: Bool, index: Int) -> (_ parentKey: HDKey) throws -> HDKey {
     return { parentKey in
-        return try parentKey.rawValue.withCString { parentKeyString in
+        return try parentKey®.withCString { parentKeyString in
             var childPublicKey: UnsafeMutablePointer<Int8>!
             var childPublicKeyLength = 0
+            let network = parentKey |> Bitcoin.network
             if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, index, isHardened, network.hdKeyPublicVersion, network.hdKeyPrivateVersion, &childPublicKey, &childPublicKeyLength)) {
                 throw error
             }
@@ -108,36 +99,34 @@ public func deriveHDPublicKey(isHardened: Bool, index: Int, network: Network = .
 }
 
 /// Derive the HD (BIP32) public key of a HD private key.
-public func toHDPublicKey(network: Network) -> (_ privateKey: HDKey) throws -> HDKey {
-    return { privateKey in
-        return try privateKey.rawValue.withCString { privateKeyString in
-            var publicKey: UnsafeMutablePointer<Int8>!
-            var publicKeyLength = 0
-            if let error = BitcoinError(rawValue: _toHDPublicKey(privateKeyString, network.hdKeyPublicVersion, &publicKey, &publicKeyLength)) {
-                throw error
-            }
-            return receiveString(bytes: publicKey, count: publicKeyLength) |> tagHDKey
+public func toHDPublicKey(_ privateKey: HDKey) throws -> HDKey {
+    return try privateKey®.withCString { privateKeyString in
+        var publicKey: UnsafeMutablePointer<Int8>!
+        var publicKeyLength = 0
+        let network = privateKey |> Bitcoin.network
+        if let error = BitcoinError(rawValue: _toHDPublicKey(privateKeyString, network.hdKeyPublicVersion, &publicKey, &publicKeyLength)) {
+            throw error
         }
+        return receiveString(bytes: publicKey, count: publicKeyLength) |> tagHDKey
     }
 }
 
 /// Convert a HD (BIP32) public or private key to the equivalent EC public or private key.
-public func toECKey(network: Network) -> (_ hdKey: HDKey) throws -> ECKey {
-    return { hdKey in
-        try hdKey.rawValue.withCString { hdKeyString in
-            var ecKey: UnsafeMutablePointer<UInt8>!
-            var ecKeyLength = 0
-            var isPrivate = false
-            if let error = BitcoinError(rawValue: _toECKey(hdKeyString, network.hdKeyPublicVersion, network.hdKeyPrivateVersion, &isPrivate, &ecKey, &ecKeyLength)) {
-                throw error
-            }
-            let data = receiveData(bytes: ecKey, count: ecKeyLength)
-            switch isPrivate {
-            case true:
-                return try ECPrivateKey(data)
-            case false:
-                return try ECCompressedPublicKey(data)
-            }
+public func toECKey(_ hdKey: HDKey) throws -> ECKey {
+    return try hdKey®.withCString { hdKeyString in
+        var ecKey: UnsafeMutablePointer<UInt8>!
+        var ecKeyLength = 0
+        var isPrivate = false
+        let network = hdKey |> Bitcoin.network
+        if let error = BitcoinError(rawValue: _toECKey(hdKeyString, network.hdKeyPublicVersion, network.hdKeyPrivateVersion, &isPrivate, &ecKey, &ecKeyLength)) {
+            throw error
+        }
+        let data = receiveData(bytes: ecKey, count: ecKeyLength)
+        switch isPrivate {
+        case true:
+            return try ECPrivateKey(data)
+        case false:
+            return try ECCompressedPublicKey(data)
         }
     }
 }
@@ -153,11 +142,12 @@ public enum HDKeyPurpose: Int {
 /// Performs the the derviation in brackets below:
 ///
 /// `[ m / purpose' / coin_type' / account' ]`
-public func deriveHDAccountKey(coinType: CoinType, network: Network, accountID: Int) -> (_ masterKey: HDKey) throws -> HDKey {
+public func deriveHDAccountPrivateKey(coinType: CoinType, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
     return { masterKey in
-        let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: HDKeyPurpose.accountTree.rawValue)
+        let network = masterKey |> Bitcoin.network
+        let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: HDKeyPurpose.accountTree®)
         let coinTypeKey = try purposeKey |> deriveHDPrivateKey(isHardened: true, index: CoinType.index(for: coinType, network: network))
-        let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountID)
+        let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountIndex)
         return accountKey
     }
 }
@@ -167,16 +157,29 @@ public func deriveHDAccountKey(coinType: CoinType, network: Network, accountID: 
 /// Performs the part of the derviation in brackets below:
 ///
 /// `m / purpose' / coin_type' / account' [ / change / address_index ]`
-public func deriveHDAddressKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
+public func deriveHDAddressPrivateKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
     return { accountKey in
-        let chainKey = try accountKey |> deriveHDPrivateKey(isHardened: false, index: chainType.rawValue)
+        let chainKey = try accountKey |> deriveHDPrivateKey(isHardened: false, index: chainType®)
         let addressKey = try chainKey |> deriveHDPrivateKey(isHardened: false, index: addressIndex)
         return addressKey
     }
 }
 
+/// Derives an "address public key" from the given account key, per BIP-0044:
+///
+/// Performs the part of the derviation in brackets below:
+///
+/// `m / purpose' / coin_type' / account' [ / change / address_index ]`
+public func deriveHDAddressPublicKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
+    return { accountKey in
+        let chainKey = try accountKey |> deriveHDPublicKey(isHardened: false, index: chainType®)
+        let addressKey = try chainKey |> deriveHDPublicKey(isHardened: false, index: addressIndex)
+        return addressKey
+    }
+}
+
 public func prefix(_ hdKey: HDKey) -> String {
-    return String(hdKey.rawValue.prefix(4))
+    return String(hdKey®.prefix(4))
 }
 
 public func network(_ hdKey: HDKey) -> Network {

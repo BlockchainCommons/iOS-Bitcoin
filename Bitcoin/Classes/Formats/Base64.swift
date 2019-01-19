@@ -40,7 +40,7 @@ public func toBase64(_ data: Data) -> Base64 {
 ///
 /// Throws if the string is not valid base64.
 public func toData(_ base64: Base64) throws -> Data {
-    return try base64.rawValue.withCString { (stringBytes) in
+    return try base64®.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         if let error = BitcoinError(rawValue: _decodeBase64(stringBytes, &bytes, &count)) {

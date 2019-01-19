@@ -50,7 +50,7 @@ public func newMnemonic(language: Language) -> (_ entropy: Data) throws -> Mnemo
         guard entropy.count % mnemonicSeedMultiple == 0 else {
             throw BitcoinError.invalidSeedSize
         }
-        guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)!) else {
+        guard let dictionary = _dictionaryForLanguage(language®.cString(using: .utf8)!) else {
             throw BitcoinError.unsupportedLanguage
         }
         var mnemo: UnsafeMutablePointer<Int8>!
@@ -70,9 +70,9 @@ public func newMnemonic(_ entropy: Data) throws -> Mnemonic {
 
 public func toSeed(language: Language, passphrase: String? = nil) -> (_ mnemonic: Mnemonic) throws -> Data {
     return { mnemonic in
-        let normalizedMnemonic = mnemonic.rawValue.precomposedStringWithCanonicalMapping
+        let normalizedMnemonic = mnemonic®.precomposedStringWithCanonicalMapping
         let normalizedPassphrase = passphrase?.precomposedStringWithCanonicalMapping
-        guard let dictionary = _dictionaryForLanguage(language.rawValue.cString(using: .utf8)!) else {
+        guard let dictionary = _dictionaryForLanguage(language®.cString(using: .utf8)!) else {
             throw BitcoinError.unsupportedLanguage
         }
         var seed: UnsafeMutablePointer<UInt8>!

@@ -49,7 +49,7 @@ public func toBase32(prefix: String) -> (_ payload: Data) -> Base32 {
 ///
 /// Throws if the string is not valid base32.
 public func toData(_ base32: Base32) throws -> (prefix: String, payload: Data) {
-    return try base32.rawValue.withCString { (stringBytes) in
+    return try base32®.withCString { (stringBytes) in
         var prefixBytes: UnsafeMutablePointer<Int8>!
         var prefixCount: Int = 0
         var payloadBytes: UnsafeMutablePointer<UInt8>!

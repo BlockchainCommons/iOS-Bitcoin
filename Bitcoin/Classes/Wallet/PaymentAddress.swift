@@ -32,8 +32,8 @@ public enum PaymentAddressType {
 }
 
 public struct PaymentAddressVersion {
-    let network: Network
-    let type: PaymentAddressType
+    public let network: Network
+    public let type: PaymentAddressType
 
     public var version: UInt8 {
         switch network {
@@ -82,7 +82,7 @@ public struct PaymentAddressVersion {
 /// Convert a RIPEMD160 value to a payment address.
 public func addressEncode(version: UInt8) -> (_ ripemd160: ShortHash) -> PaymentAddress {
     return { ripemd160 in
-        ripemd160.rawValue.withUnsafeBytes { (ripemd160Bytes: UnsafePointer<UInt8>) in
+        ripemd160®.withUnsafeBytes { (ripemd160Bytes: UnsafePointer<UInt8>) in
             var address: UnsafeMutablePointer<Int8>!
             var addressLength = 0
             _addressEncode(ripemd160Bytes, version, &address, &addressLength)
@@ -103,7 +103,7 @@ public func addressEncode(_ ripemd160: ShortHash) -> PaymentAddress {
 
 /// Convert a payment address to its component parts.
 public func addressDecode(_ address: PaymentAddress) throws -> WrappedData {
-    return try address.rawValue.withCString { (addressString: UnsafePointer<Int8>) in
+    return try address®.withCString { (addressString: UnsafePointer<Int8>) in
         var prefix: UInt8 = 0
         var payloadBytes: UnsafeMutablePointer<UInt8>!
         var payloadLength = 0
@@ -117,7 +117,7 @@ public func addressDecode(_ address: PaymentAddress) throws -> WrappedData {
 }
 
 public func getHash(_ paymentAddress: PaymentAddress) throws -> ShortHash {
-    return try paymentAddress.rawValue.withCString { addressBytes in
+    return try paymentAddress®.withCString { addressBytes in
         var hashBytes: UnsafeMutablePointer<UInt8>!
         var hashLength = 0
         if let result = BitcoinError(rawValue: _addressHash(addressBytes, &hashBytes, &hashLength)) {
@@ -125,6 +125,14 @@ public func getHash(_ paymentAddress: PaymentAddress) throws -> ShortHash {
         }
         return try receiveData(bytes: hashBytes, count: hashLength) |> tagShortHash
     }
+}
+
+public func network(_ address: PaymentAddress) throws -> Network {
+    let wrappedData = try address |> addressDecode
+    guard let version = PaymentAddressVersion(version: wrappedData.prefix) else {
+        throw BitcoinError.invalidAddress
+    }
+    return version.network
 }
 
 /// Create a payment address with an embedded record of binary data.

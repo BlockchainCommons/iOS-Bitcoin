@@ -32,7 +32,7 @@ class TestOutputPoint: XCTestCase {
 
     func test2() {
         let hash = try! "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" |> dataLiteral |> tagHashDigest
-        let index: UInt32 = 1234
+        let index = 1234
         let outputPoint = OutputPoint(hash: hash, index: index)
         XCTAssert(outputPoint.isValid)
 
@@ -48,7 +48,7 @@ class TestOutputPoint: XCTestCase {
     }
 
     func test4() {
-        let index: UInt32 = 53213
+        let index = 53213
         let hash = try! "11121314151617180101ab1111cd1111011011ab1111cd1101111111ab1111cd" |> dataLiteral |> tagHashDigest
         let initial = OutputPoint(hash: hash, index: index)
         XCTAssert(initial.isValid)

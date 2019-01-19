@@ -20,6 +20,7 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
 public enum Opcode: UInt8 {
     case pushSize0 = 0        // is_version (pushes [] to the stack not 0)
@@ -299,7 +300,7 @@ public enum Opcode: UInt8 {
     func toStringInternal(with rules: RuleFork = .allRules) -> String {
         var string: UnsafeMutablePointer<Int8>!
         var count = 0
-        _opcodeToString(rawValue, rules.rawValue, &string, &count)
+        _opcodeToString(rawValue, rules®, &string, &count)
         return receiveString(bytes: string, count: count)
     }
 

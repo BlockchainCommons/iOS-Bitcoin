@@ -20,6 +20,7 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
 public let ecCompressedPublicKeySize: Int = { return _ecCompressedPublicKeySize() }()
 public let ecUncompressedPublicKeySize: Int = { return _ecUncompressedPublicKeySize() }()
@@ -98,10 +99,10 @@ public func toECPublicKey(_ data: Data) throws -> ECPublicKey {
 /// This is a curried function suitable for use with the pipe operator.
 public func toECPublicKey(isCompressed: Bool) -> (_ privateKey: ECPrivateKey) throws -> ECPublicKey {
     return { privateKey in
-        return try privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+        return try privateKey®.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
             var publicKeyBytes: UnsafeMutablePointer<UInt8>!
             var publicKeyLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes, privateKey.rawValue.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
+            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes, privateKey®.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
                 throw error
             }
             let data = receiveData(bytes: publicKeyBytes, count: publicKeyLength)
@@ -158,10 +159,10 @@ extension Network {
 /// Convert an EC public key to a payment address.
 public func toECPaymentAddress(network: Network, type: ECPaymentAddressType) -> (_ publicKey: ECPublicKey) throws -> PaymentAddress {
     return { publicKey in
-        return try publicKey.rawValue.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
+        return try publicKey®.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
             var addressBytes: UnsafeMutablePointer<Int8>!
             var addressLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey.rawValue.count, type.version(for: network), &addressBytes, &addressLength)) {
+            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey®.count, type.version(for: network), &addressBytes, &addressLength)) {
                 throw error
             }
             return receiveString(bytes: addressBytes, count: addressLength) |> tagPaymentAddress

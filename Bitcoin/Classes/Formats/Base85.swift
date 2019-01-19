@@ -40,7 +40,7 @@ public func toBase85(_ data: Data) -> Base85 {
 ///
 /// Throws if the string is not valid base85.
 public func toData(_ base85: Base85) throws -> Data {
-    return try base85.rawValue.withCString { (stringBytes) in
+    return try base85®.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         if let error = BitcoinError(rawValue: _decodeBase85(stringBytes, &bytes, &count)) {

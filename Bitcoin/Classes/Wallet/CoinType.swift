@@ -18,6 +18,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
+import WolfFoundation
+
 /// This is an extensible enumerated type. This means that additional members of `CoinType`
 /// can be added at compile-time by clients of this module by simply extending `CoinType`
 /// with additional `public` `static` members as seen below.
@@ -44,15 +46,15 @@ public struct CoinType: RawRepresentable, Hashable, Comparable, CustomStringConv
     }
 
     public static func < (left: CoinType, right: CoinType) -> Bool {
-        return left.rawValue < right.rawValue
+        return left® < right®
     }
 
     public static func index(for coinType: CoinType, network: Network) -> Int {
         switch network {
         case .mainnet:
-            return coinType.rawValue
+            return coinType®
         case .testnet:
-            return CoinType.testNet.rawValue
+            return CoinType.testnet®
         }
     }
 }
@@ -63,10 +65,10 @@ extension CoinType {
     // SLIP-0044 : Registered coin types for BIP-0044
     // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
     //
-    public static let bitcoin = CoinType(0)
-    public static let testNet = CoinType(1) // all coin types
-    public static let litecoin = CoinType(2)
-    public static let ether = CoinType(60)
-    public static let etherClassic = CoinType(61)
-    public static let bitcoinCash = CoinType(145)
+    public static let btc = CoinType(0)
+    public static let testnet = CoinType(1) // all coin types
+    public static let ltc = CoinType(2)
+    public static let eth = CoinType(60)
+    public static let etc = CoinType(61)
+    public static let bch = CoinType(145)
 }

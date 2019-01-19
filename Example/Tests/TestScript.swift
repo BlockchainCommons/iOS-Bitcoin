@@ -22,6 +22,7 @@ import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
+import WolfFoundation
 
 class TestScript: XCTestCase {
     func testScriptDecode() {
@@ -114,7 +115,7 @@ class TestScript: XCTestCase {
 
     func test_script__from_data__parse__success() {
         let rawScript = "3045022100ff1fc58dbd608e5e05846a8e6b45a46ad49878aef6879ad1a7cf4c5a7f853683022074a6a10f6053ab3cddc5620d169c7374cd42c1416c51b9744db2c8d9febfb84d01" |> dataLiteral
-        XCTAssertNoThrow(try Script.deserialize(data: rawScript, prefix: true))
+        XCTAssertNoThrow(try Script.deserialize(rawScript, prefix: true))
     }
 
     func test_script__from_data__to_data__roundtrips() {
@@ -156,12 +157,12 @@ class TestScript: XCTestCase {
     }
 
     func test_script__from_string__empty__success() {
-        let script = try! Script(string: "")
+        let script = try! Script("")
         XCTAssert(script.operations.isEmpty)
     }
 
     func test_script__from_string__two_of_three_multisig__success() {
-        let script = try! Script(string: script2Of3Multisig)
+        let script = try! Script(script2Of3Multisig)
         let ops = script.operations
         XCTAssert(ops.count == 6)
         XCTAssert(ops[0].opcode == Opcode.pushPositive2)
@@ -178,19 +179,19 @@ class TestScript: XCTestCase {
     }
 
     func test_script__empty__no_operations__true() {
-        let script = Script(operations: [])
+        let script = Script([])
         XCTAssert(script.isEmpty)
     }
 
     func test_script__empty__non_empty__false() {
         let data = "2a" |> dataLiteral
-        let script = Script(operations: Script.makePayNullDataPattern(data: data))
+        let script = Script(Script.makePayNullDataPattern(data: data))
         XCTAssertFalse(script.isEmpty)
     }
 
     func test_script__clear__non_empty__empty() {
         let data = "2a" |> dataLiteral
-        var script = Script(operations: Script.makePayNullDataPattern(data: data))
+        var script = Script(Script.makePayNullDataPattern(data: data))
         XCTAssertFalse(script.isEmpty)
         script.clear()
         XCTAssert(script.isEmpty)
@@ -198,7 +199,7 @@ class TestScript: XCTestCase {
 
     func test_script__pattern() {
         func f(_ scriptString: String, outputPattern: ScriptPattern, inputPattern: ScriptPattern, pattern: ScriptPattern) -> Bool {
-            let script = try! Script(string: scriptString)
+            let script = try! Script(scriptString)
             guard script.isValid else { return false }
             guard script.outputPattern == outputPattern else { return false }
             guard script.inputPattern == inputPattern else { return false }
@@ -238,8 +239,8 @@ class TestScript: XCTestCase {
     }
 
     func makeTransaction(for test: ScriptTest) -> (Transaction, Script) {
-        let inputScript = try! Script(string: test.input)
-        let outputScript = try! Script(string: test.output)
+        let inputScript = try! Script(test.input)
+        let outputScript = try! Script(test.output)
         let outputPoint = OutputPoint()
         let input = Input(previousOutput: outputPoint, script: inputScript, sequence: test.inputSequence)
         let tx = Transaction(version: test.version, lockTime: test.lockTime, inputs: [input], outputs: [])
@@ -1141,7 +1142,7 @@ class TestScript: XCTestCase {
 
         let endorsement = try! createEndorsement(privateKey: privateKey, script: script, transaction: transaction, inputIndex: 0, sigHashType: .all)
 
-        XCTAssert(endorsement.rawValue |> toBase16 == "3045022100e428d3cc67a724cb6cfe8634aa299e58f189d9c46c02641e936c40cc16c7e8ed0220083949910fe999c21734a1f33e42fca15fb463ea2e08f0a1bccd952aacaadbb801")
+        XCTAssert(endorsement® |> toBase16 == "3045022100e428d3cc67a724cb6cfe8634aa299e58f189d9c46c02641e936c40cc16c7e8ed0220083949910fe999c21734a1f33e42fca15fb463ea2e08f0a1bccd952aacaadbb801")
     }
 
     func test_script__create_endorsement__single_input_no_output__expected() {
@@ -1151,14 +1152,14 @@ class TestScript: XCTestCase {
 
         let endorsement = try! createEndorsement(privateKey: privateKey, script: script, transaction: transaction, inputIndex: 0, sigHashType: .all)
 
-        XCTAssert(endorsement.rawValue |> toBase16 == "3045022100ba57820be5f0b93a0d5b880fbf2a86f819d959ecc24dc31b6b2d4f6ed286f253022071ccd021d540868ee10ca7634f4d270dfac7aea0d5912cf2b104111ac9bc756b01")
+        XCTAssert(endorsement® |> toBase16 == "3045022100ba57820be5f0b93a0d5b880fbf2a86f819d959ecc24dc31b6b2d4f6ed286f253022071ccd021d540868ee10ca7634f4d270dfac7aea0d5912cf2b104111ac9bc756b01")
     }
 
     func test_script__generate_signature_hash__all__expected() {
         let transaction = try! "0100000001b3807042c92f449bbf79b33ca59d7dfec7f4cc71096704a9c526dddf496ee0970000000000ffffffff0000000000" |> dataLiteral |> deserializeTransaction
         let script = try! "dup hash160 [88350574280395ad2c3e2ee20e322073d94e5e40] equalverify checksig" |> toScript
         let hash = generateSignatureHash(transaction: transaction, inputIndex: 0, script: script, sigHashType: .all)
-        XCTAssert(hash.rawValue |> toBase16 == "f89572635651b2e4f89778350616989183c98d1a721c911324bf9f17a0cf5bf0")
+        XCTAssert(hash® |> toBase16 == "f89572635651b2e4f89778350616989183c98d1a721c911324bf9f17a0cf5bf0")
     }
 
     func testEndorsementSize() {

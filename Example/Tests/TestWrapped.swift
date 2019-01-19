@@ -31,7 +31,7 @@ class TestWrapped: XCTestCase {
     }
 
     func testWrapDecode() {
-        let f = tagBase16 >>> toData >>> wrapDecode >>> toJSONStringWithOutputFormatting(.sortedKeys)
+        let f = tagBase16 >>> toData >>> wrapDecode >>> toJSONString(outputFormatting: .sortedKeys)
         XCTAssert(try! "00031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd0065b09d03c" |> f == """
             {"checksum":1020266843,"payload":"031bab84e687e36514eeaf5a017c30d32c1f59dd4ea6629da7970ca374513dd006","prefix":0}
             """)

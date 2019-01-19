@@ -22,6 +22,7 @@ import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
+import WolfFoundation
 
 class TestOpcode: XCTestCase {
     func testToString1() {
@@ -76,9 +77,9 @@ class TestOpcode: XCTestCase {
     }
 
     func testToHexadecimal() {
-        XCTAssert(Opcode.pushSize0.rawValue == 0x00)
-        XCTAssert(Opcode.pushSize42.rawValue == 0x2a)
-        XCTAssert(Opcode.reserved255.rawValue == 0xff)
+        XCTAssert(Opcode.pushSize0® == 0x00)
+        XCTAssert(Opcode.pushSize42® == 0x2a)
+        XCTAssert(Opcode.reserved255® == 0xff)
     }
 
     func testHexadecimalToOpcode() {

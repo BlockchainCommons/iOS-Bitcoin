@@ -40,7 +40,7 @@ public func toBase16(_ data: Data) -> Base16 {
 ///
 /// Throws if the string is not valid base16.
 public func toData(_ base16: Base16) throws -> Data {
-    return try base16.rawValue.withCString { (stringBytes) in
+    return try base16®.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         if let error = BitcoinError(rawValue: _decodeBase16(stringBytes, &bytes, &count)) {
@@ -48,8 +48,4 @@ public func toData(_ base16: Base16) throws -> Data {
         }
         return receiveData(bytes: bytes, count: count)
     }
-}
-
-public func dataLiteral(_ string: String) -> Data {
-    return try! string |> tagBase16 |> toData
 }

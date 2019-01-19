@@ -43,8 +43,8 @@ public func toWIF(network: Network, isCompressed: Bool = true) -> (_ privateKey:
     return { privateKey in
         var wifBytes: UnsafeMutablePointer<Int8>!
         var wifLength: Int = 0
-        try privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _ecPrivateKeyToWIF(privateKeyBytes, privateKey.rawValue.count, network.wifVersion, isCompressed, &wifBytes, &wifLength)) {
+        try privateKey®.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+            if let error = BitcoinError(rawValue: _ecPrivateKeyToWIF(privateKeyBytes, privateKey®.count, network.wifVersion, isCompressed, &wifBytes, &wifLength)) {
                 throw error
             }
         }
@@ -56,7 +56,7 @@ public func toWIF(network: Network, isCompressed: Bool = true) -> (_ privateKey:
 public func toECPrivateKey(_ wif: WIF) throws -> ECPrivateKey {
     var privateKeyBytes: UnsafeMutablePointer<UInt8>!
     var privateKeyLength: Int = 0
-    try wif.rawValue.withCString { wifString in
+    try wif®.withCString { wifString in
         if let error = BitcoinError(rawValue: _wifToECPrivateKey(wifString, &privateKeyBytes, &privateKeyLength)) {
             throw error
         }

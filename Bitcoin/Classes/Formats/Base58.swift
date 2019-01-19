@@ -61,7 +61,7 @@ public func toBase58(_ data: Data) -> Base58 {
 ///
 /// Throws if the string is not valid base58.
 public func toData(_ base58: Base58) throws -> Data {
-    return try base58.rawValue.withCString { (stringBytes) in
+    return try base58®.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         if let error = BitcoinError(rawValue: _decodeBase58(stringBytes, &bytes, &count)) {
@@ -88,7 +88,7 @@ public func toBase58Check(_ data: Data) -> Base58Check {
 }
 
 public func toData(_ base58Check: Base58Check) throws -> (version: UInt8, payload: Data) {
-    return try base58Check.rawValue.withCString { (stringBytes) in
+    return try base58Check®.withCString { (stringBytes) in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
         var version: UInt8 = 0

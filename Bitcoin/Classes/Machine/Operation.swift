@@ -20,6 +20,7 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
 public struct Operation: InstanceContainer {
     var wrapped: WrappedInstance
@@ -32,11 +33,11 @@ public struct Operation: InstanceContainer {
         self.init(instance: _operationNew())
     }
 
-    public init(opcode: Opcode) {
-        self.init(instance: _operationFromOpcode(opcode.rawValue))
+    public init(_ opcode: Opcode) {
+        self.init(instance: _operationFromOpcode(opcode®))
     }
 
-    public init(data: Data, isMinimal: Bool = true) throws {
+    public init(_ data: Data, isMinimal: Bool = true) throws {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _operationFromData(dataBytes, data.count, isMinimal, &instance)) {
@@ -47,7 +48,7 @@ public struct Operation: InstanceContainer {
         self.init(instance: instance)
     }
 
-    public init(string: String) throws {
+    public init(_ string: String) throws {
         let instance = try string.withCString { (stringBytes: UnsafePointer<Int8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _operationFromString(stringBytes, &instance)) {
@@ -58,7 +59,7 @@ public struct Operation: InstanceContainer {
         self.init(instance: instance)
     }
 
-    public static func deserialize(data: Data) throws -> Operation {
+    public static func deserialize(_ data: Data) throws -> Operation {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _operationDeserialize(dataBytes, data.count, &instance)) {
@@ -83,7 +84,7 @@ public struct Operation: InstanceContainer {
     public func string(with rules: RuleFork) -> String {
         var string: UnsafeMutablePointer<Int8>!
         var stringLength = 0
-        _operationToString(wrapped.instance, rules.rawValue, &string, &stringLength)
+        _operationToString(wrapped.instance, rules®, &string, &stringLength)
         return receiveString(bytes: string, count: stringLength)
     }
 
@@ -114,12 +115,12 @@ extension Operation: CustomStringConvertible {
 // MARK: - Free Functions
 
 public func toOperation(_ opcode: Opcode) -> Operation {
-    return Operation(opcode: opcode)
+    return Operation(opcode)
 }
 
 public func toOperation(isMinimal: Bool) -> (_ data: Data) throws -> Operation {
     return { data in
-        return try Operation(data: data, isMinimal: isMinimal)
+        return try Operation(data, isMinimal: isMinimal)
     }
 }
 
@@ -128,7 +129,7 @@ public func toOperation(_ data: Data) throws -> Operation {
 }
 
 public func toOperation(_ string: String) throws -> Operation {
-    return try Operation(string: string)
+    return try Operation(string)
 }
 
 public func serialize(_ operation: Operation) -> Data {
@@ -136,7 +137,7 @@ public func serialize(_ operation: Operation) -> Data {
 }
 
 public func deserializeOperation(_ data: Data) throws -> Operation {
-    return try Operation.deserialize(data: data)
+    return try Operation.deserialize(data)
 }
 
 public func toString(rules: RuleFork) -> (_ operation: Operation) -> String {

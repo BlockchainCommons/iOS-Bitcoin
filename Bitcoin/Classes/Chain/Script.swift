@@ -20,6 +20,7 @@
 
 import CBitcoin
 import WolfPipe
+import WolfFoundation
 
 public struct Script: InstanceContainer {
     var wrapped: WrappedInstance
@@ -32,7 +33,7 @@ public struct Script: InstanceContainer {
         self.init(instance: _scriptNew())
     }
 
-    public init(string: String) throws {
+    public init(_ string: String) throws {
         let instance = try string.withCString { (stringBytes: UnsafePointer<Int8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _scriptFromString(stringBytes, &instance)) {
@@ -43,7 +44,7 @@ public struct Script: InstanceContainer {
         self.init(instance: instance)
     }
 
-    public static func deserialize(data: Data, prefix: Bool = false) throws -> Script {
+    public static func deserialize(_ data: Data, prefix: Bool = false) throws -> Script {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _scriptDeserialize(dataBytes, data.count, prefix, &instance)) {
@@ -65,7 +66,7 @@ public struct Script: InstanceContainer {
         return serialized(prefix: false)
     }
 
-    public init(operations: [Operation]) {
+    public init(_ operations: [Operation]) {
         let operationInstances = operations.map { $0.wrapped.instance }
         let newInstance = operationInstances.withUnsafeBufferPointer { instancesBuffer in
             _scriptFromOperations(instancesBuffer.baseAddress, operationInstances.count)
@@ -128,7 +129,7 @@ public struct Script: InstanceContainer {
     }
 
     public static func makePayKeyHashPattern(hash: ShortHash) -> [Operation] {
-        return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
+        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
             _scriptMakePayKeyHashPattern(hashBytes, &operations, &operationsCount)
@@ -137,7 +138,7 @@ public struct Script: InstanceContainer {
     }
 
     public static func makePayScriptHashPattern(hash: ShortHash) -> [Operation] {
-        return hash.rawValue.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
+        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
             _scriptMakePayScriptHashPattern(hashBytes, &operations, &operationsCount)
@@ -152,12 +153,12 @@ public struct Script: InstanceContainer {
         guard (1 ... 16).contains(n), (1 ... n).contains(m) else { return [] }
 
         var ops = [Operation]()
-        ops.append(.init(opcode: .makePushPositive(m)))
+        ops.append(Operation(.makePushPositive(m)))
         publicKeys.forEach { key in
-            try! ops.append(.init(data: key.rawValue))
+            try! ops.append(Operation(key®))
         }
-        ops.append(.init(opcode: .makePushPositive(n)))
-        ops.append(.init(opcode: .checkmultisig))
+        ops.append(Operation(.makePushPositive(n)))
+        ops.append(Operation(.checkmultisig))
         return ops
     }
 
@@ -165,8 +166,8 @@ public struct Script: InstanceContainer {
 //    static operation::list to_pay_key_hash_pattern(const short_hash& hash);
 //    static operation::list to_pay_script_hash_pattern(const short_hash& hash);
 
-    public static func verify(transaction: Transaction, inputIndex: UInt32, rules: RuleFork, prevoutScript: Script, value: UInt64) -> LibBitcoinResult {
-        let result = _scriptVerify(transaction.wrapped.instance, inputIndex, rules.rawValue, prevoutScript.wrapped.instance, value)
+    public static func verify(transaction: Transaction, inputIndex: Int, rules: RuleFork, prevoutScript: Script, value: UInt64) -> LibBitcoinResult {
+        let result = _scriptVerify(transaction.wrapped.instance, UInt32(inputIndex), rules®, prevoutScript.wrapped.instance, value)
         return LibBitcoinResult(code: result)
     }
 
@@ -187,26 +188,26 @@ extension Script: Equatable {
     }
 }
 
-public func generateSignatureHash(transaction: Transaction, inputIndex: UInt32, script: Script, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> HashDigest {
+public func generateSignatureHash(transaction: Transaction, inputIndex: Int, script: Script, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> HashDigest {
     var hash: UnsafeMutablePointer<UInt8>!
     var hashLength = 0
-    _generateSignatureHash(transaction.wrapped.instance, inputIndex, script.wrapped.instance, sigHashType.rawValue, scriptVersion.rawValue, value, &hash, &hashLength)
+    _generateSignatureHash(transaction.wrapped.instance, UInt32(inputIndex), script.wrapped.instance, sigHashType®, scriptVersion®, value, &hash, &hashLength)
     return try! receiveData(bytes: hash, count: hashLength) |> tagHashDigest
 }
 
-public func checkSignature(_ signature: ECSignature, sigHashType: SigHashAlgorithm, publicKey: ECPublicKey, script: Script, transaction: Transaction, inputIndex: UInt32, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> Bool {
-    return signature.rawValue.withUnsafeBytes { signatureBytes in
-        publicKey.rawValue.withUnsafeBytes { publicKeyBytes in
-            _checkSignature(signatureBytes, sigHashType.rawValue, publicKeyBytes, publicKey.rawValue.count, script.wrapped.instance, transaction.wrapped.instance, inputIndex, scriptVersion.rawValue, value)
+public func checkSignature(_ signature: ECSignature, sigHashType: SigHashAlgorithm, publicKey: ECPublicKey, script: Script, transaction: Transaction, inputIndex: Int, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> Bool {
+    return signature®.withUnsafeBytes { signatureBytes in
+        publicKey®.withUnsafeBytes { publicKeyBytes in
+            _checkSignature(signatureBytes, sigHashType®, publicKeyBytes, publicKey®.count, script.wrapped.instance, transaction.wrapped.instance, UInt32(inputIndex), scriptVersion®, value)
         }
     }
 }
 
-public func createEndorsement(privateKey: ECPrivateKey, script: Script, transaction: Transaction, inputIndex: UInt32, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) throws -> Endorsement {
-    return try privateKey.rawValue.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+public func createEndorsement(privateKey: ECPrivateKey, script: Script, transaction: Transaction, inputIndex: Int, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) throws -> Endorsement {
+    return try privateKey®.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
         var _endorsement: UnsafeMutablePointer<UInt8>!
         var endorsementLength = 0
-        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, inputIndex, sigHashType.rawValue, scriptVersion.rawValue, value, &_endorsement, &endorsementLength)) {
+        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, UInt32(inputIndex), sigHashType®, scriptVersion®, value, &_endorsement, &endorsementLength)) {
             throw error
         }
         return try! receiveData(bytes: _endorsement, count: endorsementLength) |> tagEndorsement
@@ -263,9 +264,9 @@ public func serialize(_ script: Script) -> Data {
 }
 
 public func deserializeScript(_ data: Data) throws -> Script {
-    return try Script.deserialize(data: data)
+    return try Script.deserialize(data)
 }
 
 public func toScript(_ script: String) throws -> Script {
-    return try Script(string: script)
+    return try Script(script)
 }

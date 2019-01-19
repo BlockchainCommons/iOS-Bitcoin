@@ -22,6 +22,7 @@ import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
+import WolfFoundation
 
 class TestOperation: XCTestCase {
     func test1() {
@@ -33,7 +34,7 @@ class TestOperation: XCTestCase {
 
     func test2() {
         let data = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" |> dataLiteral
-        let operation = try! Operation(data: data)
+        let operation = try! Operation(data)
         XCTAssert(operation.isValid)
         XCTAssert(operation.opcode == .pushSize32)
         XCTAssert(operation.data == data)
@@ -41,7 +42,7 @@ class TestOperation: XCTestCase {
 
     func test3() {
         let data = "23156214" |> dataLiteral
-        let operation = try! Operation(data: data)
+        let operation = try! Operation(data)
         XCTAssert(operation.isValid)
         let operation2 = operation
         XCTAssert(operation == operation2)
@@ -49,16 +50,16 @@ class TestOperation: XCTestCase {
 
     func test4() {
         let data = Data()
-        XCTAssertThrowsError(try Operation.deserialize(data: data))
+        XCTAssertThrowsError(try Operation.deserialize(data))
     }
 
     func test5() {
         let rawOperation = "00" |> dataLiteral
-        let operation = try! Operation.deserialize(data: rawOperation)
+        let operation = try! Operation.deserialize(rawOperation)
         XCTAssert(operation.isValid)
         XCTAssert(operation.serialized == rawOperation)
 
-        let duplicate = try! Operation.deserialize(data: operation.serialized)
+        let duplicate = try! Operation.deserialize(operation.serialized)
         XCTAssert(operation == duplicate)
 
         XCTAssert(operation.opcode == .pushSize0)
@@ -68,11 +69,11 @@ class TestOperation: XCTestCase {
     func test6() {
         let data75 = Data(repeating: ".".asciiByte, count: 75)
         let rawOperation = ("4b" |> dataLiteral) + data75
-        let operation = try! Operation.deserialize(data: rawOperation)
+        let operation = try! Operation.deserialize(rawOperation)
         XCTAssert(operation.isValid)
         XCTAssert(operation.serialized == rawOperation)
 
-        let duplicate = try! Operation.deserialize(data: operation.serialized)
+        let duplicate = try! Operation.deserialize(operation.serialized)
         XCTAssert(operation == duplicate)
 
         XCTAssert(operation.opcode == .pushSize75)

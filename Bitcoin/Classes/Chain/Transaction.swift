@@ -33,7 +33,7 @@ public struct Transaction: InstanceContainer, Encodable {
         self.init(instance: _transactionNew())
     }
 
-    public static func deserialize(data: Data) throws -> Transaction {
+    public static func deserialize(_ data: Data) throws -> Transaction {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _transactionDeserialize(dataBytes, data.count, &instance)) {
@@ -220,7 +220,7 @@ public struct Transaction: InstanceContainer, Encodable {
 
 extension Transaction: CustomStringConvertible {
     public var description: String {
-        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
+        return try! self |> toJSONString(outputFormatting: .sortedKeys)
     }
 }
 
@@ -231,7 +231,7 @@ public func serialize(_ transaction: Transaction) -> Data {
 }
 
 public func deserializeTransaction(_ data: Data) throws -> Transaction {
-    return try Transaction.deserialize(data: data)
+    return try Transaction.deserialize(data)
 }
 
 /// Decode a binary transaction to JSON format.

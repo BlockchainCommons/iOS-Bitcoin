@@ -35,7 +35,7 @@ public struct OutputPoint: InstanceContainer, Encodable {
         self.init(instance: _outputPointNew())
     }
 
-    public static func deserialize(data: Data) throws -> OutputPoint {
+    public static func deserialize(_ data: Data) throws -> OutputPoint {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _outputPointDeserialize(dataBytes, data.count, &instance)) {
@@ -58,25 +58,25 @@ public struct OutputPoint: InstanceContainer, Encodable {
         return receiveData(bytes: dataBytes, count: dataLength)
     }
 
-    public init(hash: HashDigest, index: UInt32) {
+    public init(hash: HashDigest, index: Int) {
         self.init()
         self.hash = hash
         self.index = index
     }
 
     /// This is a sentinel used in `index` to indicate no output, e.g. coinbase.
-    public static let nullIndex = UInt32.max
+    public static let nullIndex = Int(UInt32.max)
 
-    public var index: UInt32 {
+    public var index: Int {
         get {
-            return _outputPointGetIndex(wrapped.instance)
+            return Int(_outputPointGetIndex(wrapped.instance))
         }
 
         set {
             if !isKnownUniquelyReferenced(&wrapped) {
                 wrapped = WrappedInstance(_outputPointCopy(wrapped.instance))
             }
-            _outputPointSetIndex(wrapped.instance, newValue)
+            _outputPointSetIndex(wrapped.instance, UInt32(newValue))
         }
     }
 
@@ -92,7 +92,7 @@ public struct OutputPoint: InstanceContainer, Encodable {
             if !isKnownUniquelyReferenced(&wrapped) {
                 wrapped = WrappedInstance(_outputPointCopy(wrapped.instance))
             }
-            newValue.rawValue.withUnsafeBytes { hashBytes in
+            newValue®.withUnsafeBytes { hashBytes in
                 _outputPointSetHash(wrapped.instance, hashBytes)
             }
         }
@@ -113,14 +113,14 @@ public struct OutputPoint: InstanceContainer, Encodable {
 
     public func encode(to encoder: Encoder) throws {
         var container = encoder.container(keyedBy: CodingKeys.self)
-        try container.encode(hash.rawValue |> toBase16, forKey: .hash)
+        try container.encode(hash® |> toBase16, forKey: .hash)
         try container.encode(index, forKey: .index)
     }
 }
 
 extension OutputPoint: CustomStringConvertible {
     public var description: String {
-        return try! self |> toJSONStringWithOutputFormatting(.sortedKeys)
+        return try! self |> toJSONString(outputFormatting: .sortedKeys)
     }
 }
 
@@ -137,5 +137,5 @@ public func serialize(_ outputPoint: OutputPoint) -> Data {
 }
 
 public func deserializeOutputPoint(_ data: Data) throws -> OutputPoint {
-    return try OutputPoint.deserialize(data: data)
+    return try OutputPoint.deserialize(data)
 }

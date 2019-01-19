@@ -35,7 +35,7 @@ class TestPaymentAddress: XCTestCase {
         let mainnetAddress: PaymentAddress = "1HT7xU2Ngenf7D4yocz2SAcnNLW7rK8d4E"
         let testnetAddress: PaymentAddress = "mwy5FX7MVgDutKYbXBxQG5q7EL6pmhHT58"
 
-        let f = addressDecode >>> toJSONStringWithOutputFormatting(.sortedKeys)
+        let f = addressDecode >>> toJSONString(outputFormatting: .sortedKeys)
         XCTAssert(try! mainnetAddress |> f == """
             {"checksum":2743498322,"payload":"b472a266d0bd89c13706a4132ccfb16f7c3b9fcb","prefix":0}
             """)

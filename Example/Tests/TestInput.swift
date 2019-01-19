@@ -22,6 +22,7 @@ import XCTest
 import Bitcoin
 import WolfPipe
 import WolfStrings
+import WolfFoundation
 
 class TestInput: XCTestCase {
 

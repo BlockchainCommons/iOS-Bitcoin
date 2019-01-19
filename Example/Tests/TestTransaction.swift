@@ -111,16 +111,16 @@ class TestTransaction: XCTestCase {
         """)
     }
 
-    private func makeInput(hash: String, index: UInt32, sequence: UInt32? = nil) -> Input {
+    private func makeInput(hash: String, index: Int, sequence: UInt32? = nil) -> Input {
         let outputPoint = try! OutputPoint(hash: hash |> dataLiteral |> tagHashDigest, index: index)
         return Input(previousOutput: outputPoint, sequence: sequence)
     }
 
-    private func makeOutput(satoshis: Satoshis, paymentAddress: String) -> Output {
+    private func makeOutput(satoshis: Satoshis, paymentAddress: PaymentAddress) -> Output {
         return try! Output(value: satoshis, paymentAddress: paymentAddress)
     }
 
-    private func makeOutput(btc: String, paymentAddress: String) -> Output {
+    private func makeOutput(btc: String, paymentAddress: PaymentAddress) -> Output {
         return try! makeOutput(satoshis: btc |> Base10.init(rawValue:) |> btcToSatoshi, paymentAddress: paymentAddress)
     }
 
@@ -595,12 +595,12 @@ class TestTransaction: XCTestCase {
         let masterHDKey = try! seed |> newHDPrivateKey(network: network)
         XCTAssertEqual(masterHDKey, "tprv8ZgxMBicQKsPdFdL5FzccNSkQT1kJFrP3fjiHLQzePq3pugG2NBM2rA6ZD5ywLj3ghYSEz9G13nqyW6SXkGnSLNPfaUzbGFrGgJenw47r1W" |> tagHDKey)
 
-        let sourcePublicKey = try! (masterHDKey |> toHDPublicKey(network: network) |> toECKey(network: network)) as! ECCompressedPublicKey
+        let sourcePublicKey = try! (masterHDKey |> toHDPublicKey |> toECKey) as! ECCompressedPublicKey
         let sourceAddress =  try! sourcePublicKey |> toECPaymentAddress(network: network, type: .p2kh)
         XCTAssertEqual(sourceAddress, "msonra6g9YqYYam28gmfcc1qMaC7qnYPh5" |> tagPaymentAddress)
 
         let sourceTxHash = try! "af55a1bf3098c7d37d56163c0bc690ba2f6ed7c2c37d94fdc0c0ab5fd11d6b77" |> hashDecode
-        let sourceInputIndex: UInt32 = 1
+        let sourceInputIndex = 1
         let sourceUnspentAmount: Satoshis = 12510365
         let outputPoint = OutputPoint(hash: sourceTxHash, index: sourceInputIndex)
 
@@ -614,14 +614,14 @@ class TestTransaction: XCTestCase {
         let destinationAddress = "muR84gYDr49gjEEt942o3WJzFBnb4yMQXG" |> tagPaymentAddress
         let destinationAddressHash = try! destinationAddress |> getHash
         let destinationLockingOperations = Script.makePayKeyHashPattern(hash: destinationAddressHash)
-        let destinationLockingScript = Script(operations: destinationLockingOperations)
+        let destinationLockingScript = Script(destinationLockingOperations)
 
         var manuallyConstructedDestLockOps: [Bitcoin.Operation] = []
-        manuallyConstructedDestLockOps.append(Operation(opcode: .dup))
-        manuallyConstructedDestLockOps.append(Operation(opcode: .hash160))
-        manuallyConstructedDestLockOps.append(try! Operation(data: destinationAddressHash.rawValue))
-        manuallyConstructedDestLockOps.append(Operation(opcode: .equalverify))
-        manuallyConstructedDestLockOps.append(Operation(opcode: .checksig))
+        manuallyConstructedDestLockOps.append(Operation(.dup))
+        manuallyConstructedDestLockOps.append(Operation(.hash160))
+        manuallyConstructedDestLockOps.append(try! Operation(destinationAddressHash®))
+        manuallyConstructedDestLockOps.append(Operation(.equalverify))
+        manuallyConstructedDestLockOps.append(Operation(.checksig))
         XCTAssertEqual(destinationLockingOperations, manuallyConstructedDestLockOps)
 
         let destinationOutput = Output(value: destinationAmount, script: destinationLockingScript)
@@ -629,7 +629,7 @@ class TestTransaction: XCTestCase {
         let changeAddress = sourceAddress
         let changeAddressHash = try! changeAddress |> getHash
         let changeLockingOperations = Script.makePayKeyHashPattern(hash: changeAddressHash)
-        let changeLockingScript = Script(operations: changeLockingOperations)
+        let changeLockingScript = Script(changeLockingOperations)
 
         let changeOutput = Output(value: changeAmount, script: changeLockingScript)
 
@@ -639,32 +639,25 @@ class TestTransaction: XCTestCase {
 
 
         // signature
-        let sourcePrivateKey = try! (masterHDKey |> toECKey(network: network)) as! ECPrivateKey
+        let sourcePrivateKey = try! (masterHDKey |> toECKey) as! ECPrivateKey
         let prevScript0 = try! Script.makePayKeyHashPattern(hash: sourceAddress |> getHash)
-        let sig0 = try! createEndorsement(privateKey: sourcePrivateKey, script: Script(operations: prevScript0), transaction: tx, inputIndex: 0, sigHashType: .all)
+        let sig0 = try! createEndorsement(privateKey: sourcePrivateKey, script: Script(prevScript0), transaction: tx, inputIndex: 0, sigHashType: .all)
 
 //        // Redeem Script
 //        let redeemScriptOps = Script.makePayMultisigPattern(requiredSignatureCount: 1, publicKeys: [sourcePublicKey])
-//        let redeemScript = Script(operations: redeemScriptOps)
+//        let redeemScript = Script(redeemScriptOps)
 //        print(redeemScript)
 //        print(redeemScript |> serialize |> toBitcoin160 |> rawValue |> toBase16)
 
         // input script
         var sigScript0: [Bitcoin.Operation] = []
-        sigScript0.append(try! Operation(data: sig0.rawValue))
-        sigScript0.append(try! Operation(data: sourcePublicKey.rawValue))
+        sigScript0.append(try! Operation(sig0®))
+        sigScript0.append(try! Operation(sourcePublicKey®))
 //        sigScript0.append(try! Operation(data: redeemScript |> serialize))
-        let myInputScript0 = Script(operations: sigScript0)
+        let myInputScript0 = Script(sigScript0)
         //print(myInputScript0)
         tx.inputs[0].script = myInputScript0
         //print(try! tx |> serialize |> transactionDecode)
         XCTAssertEqual(tx |> serialize |> toBase16, "0100000001776b1dd15fabc0c0fd947dc3c2d76e2fba90c60b3c16567dd3c79830bfa155af010000006a47304402201061a60d0a0260ea26eff4bff2fc6bd90258630d8774152d8a6afed7f311076602200c2eb64a4f91f699a4173ef126ea26133487292a4e81fbc2e0e33fb168b5426c01210337c025321af12dfc4517159d9bd98164dd2ff9fbd7971b29d0aa271d72c404caffffffff0240420f00000000001976a91498776b9b0155331a7e86e0b0f925e8fea526478888acf55faf00000000001976a91486d0b38080ded041b9585e3ffdff3f7535dd24c188ac00000000")
     }
-
-//    func testScriptPattern() {
-//        let script = try! Script(string: "hash160 [86d0b38080ded041b9585e3ffdff3f7535dd24c1] equal")
-//        print(script.pattern)
-//        print(script.inputPattern)
-//        print(script.outputPattern)
-//    }
 }

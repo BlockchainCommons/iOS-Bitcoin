@@ -37,15 +37,15 @@ class TestFormats: XCTestCase {
         XCTAssert(mbtcDecimalPlaces == 5)
         XCTAssert(ubtcDecimalPlaces == 2)
 
-        let satoshis: UInt64 = 1012345678
+        let satoshis: Fragments = 1012345678
         let satoshisString: Base10 = "1012345678"
         let btcString: Base10 = "10.12345678"
         XCTAssert(satoshis |> toBase10 == satoshisString)
         XCTAssert(satoshis |> toBase10(decimalPlaces: btcDecimalPlaces) == btcString)
-        XCTAssert(try! satoshisString |> base10Decode == satoshis)
-        XCTAssert(try! btcString |> base10Decode(decimalPlaces: btcDecimalPlaces) == satoshis)
-        XCTAssertThrowsError(try "Foobar" |> base10Decode == satoshis) // Invalid format
-        XCTAssertThrowsError(try btcString |> base10Decode(decimalPlaces: 1) == satoshis) // incorrect decimal place
+        XCTAssert(try! satoshisString |> toFragments == satoshis)
+        XCTAssert(try! btcString |> toFragments(decimalPlaces: btcDecimalPlaces) == satoshis)
+        XCTAssertThrowsError(try "Foobar" |> toFragments == satoshis) // Invalid format
+        XCTAssertThrowsError(try btcString |> toFragments(decimalPlaces: 1) == satoshis) // incorrect decimal place
     }
 
     func testBase16() {
@@ -66,7 +66,7 @@ class TestFormats: XCTestCase {
         XCTAssertThrowsError(try Data(bytes: [0x01, 0x02]) |> toBitcoinHash == hash) // Wrong length
         XCTAssertThrowsError(try "" |> tagBitcoinHash |> toData == hashData) // Empty string
         XCTAssertThrowsError(try "010203" |> tagBitcoinHash |> toData == hashData) // Wrong length
-        XCTAssertThrowsError(try (hash.rawValue + "x") |> BitcoinHash.init(rawValue:) |> toData == hashData) // Invalid character
+        XCTAssertThrowsError(try (hash® + "x") |> BitcoinHash.init(rawValue:) |> toData == hashData) // Invalid character
     }
 
     func testBase32() {
@@ -89,7 +89,7 @@ class TestFormats: XCTestCase {
 
         let testData = "007680adec8eabcabac676be9e83854ade0bd22cdb0bb960de" |> dataLiteral
         let base58Encoded: Base58 = "1BoatSLRHtKNngkdXEeobR76b53LETtpyT"
-        XCTAssert(base58Encoded.rawValue.isBase58)
+        XCTAssert(base58Encoded®.isBase58)
         XCTAssertFalse("F00bar".isBase58) // Invalid format
         XCTAssert(testData |> toBase58 == base58Encoded)
         XCTAssert(try! base58Encoded |> toData == testData)
