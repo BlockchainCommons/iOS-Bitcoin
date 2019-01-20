@@ -192,7 +192,7 @@ class TestHD: XCTestCase {
         let seed = try! mnemonic |> toSeed
         let masterPrivateKey = try! seed |> newHDPrivateKey(network: network)
 
-        let accountPrivateKey = try! masterPrivateKey |> deriveHDAccountPrivateKey(coinType: .bitcoin, accountIndex: 0)
+        let accountPrivateKey = try! masterPrivateKey |> deriveHDAccountPrivateKey(coinType: .btc, accountIndex: 0)
         let accountPublicKey = try! accountPrivateKey |> toHDPublicKey
 
         // Hot wallet receives only accountPublicKey from cold wallet,
