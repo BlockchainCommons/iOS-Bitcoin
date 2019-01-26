@@ -5,6 +5,10 @@
 [![License](https://img.shields.io/cocoapods/l/Bitcoin.svg?style=flat)](https://cocoapods.org/pods/Bitcoin)
 [![Platform](https://img.shields.io/cocoapods/p/Bitcoin.svg?style=flat)](https://cocoapods.org/pods/Bitcoin)
 
+## Blog Post
+
+On January 25, 2019 I published an announcement for this framework on my blog [here](https://wolfmcnally.com/125/announcing-open-source-bitcoin-framework-for-ios/).
+
 ## Requirements
 
 * Swift 4.2
