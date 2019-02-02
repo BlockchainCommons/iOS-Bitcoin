@@ -57,6 +57,7 @@ public enum BitcoinError: Int, Error, CustomStringConvertible, CaseIterable {
     case invalidOpcode = 16
     case invalidSignature = 17
     case signingFailed = 18
+    case invalidDerivation = 19
 
     private static let descriptions: [BitcoinError: String] = [
         .errorCode: "Error code",
@@ -76,7 +77,8 @@ public enum BitcoinError: Int, Error, CustomStringConvertible, CaseIterable {
         .invalidData: "Invalid data",
         .invalidOpcode: "Invalid opcode",
         .invalidSignature: "Invalid signature",
-        .signingFailed: "Signing failed"
+        .signingFailed: "Signing failed",
+        .invalidDerivation: "Invalid derivation"
     ]
 
     public var description: String {

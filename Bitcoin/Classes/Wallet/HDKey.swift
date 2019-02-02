@@ -135,6 +135,7 @@ public enum HDKeyPurpose: Int {
     case defaultAccount = 0 // BIP32
     case accountTree = 44 // BIP44
     case multisig = 45 // BIP45
+    case P2WPKHinP2SH = 49 // BIP49
 }
 
 /// Derives an "account private key" from the given master key, per BIP-0044:
@@ -142,10 +143,10 @@ public enum HDKeyPurpose: Int {
 /// Performs the the derviation in brackets below:
 ///
 /// `[ m / purpose' / coin_type' / account' ]`
-public func deriveHDAccountPrivateKey(coinType: CoinType, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
+public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose = .accountTree, coinType: CoinType, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
     return { masterKey in
         let network = masterKey |> Bitcoin.network
-        let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: HDKeyPurpose.accountTree®)
+        let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: purpose®)
         let coinTypeKey = try purposeKey |> deriveHDPrivateKey(isHardened: true, index: CoinType.index(for: coinType, network: network))
         let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountIndex)
         return accountKey

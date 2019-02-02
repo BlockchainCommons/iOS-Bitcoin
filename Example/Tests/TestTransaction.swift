@@ -639,7 +639,7 @@ class TestTransaction: XCTestCase {
 
 
         // signature
-        let sourcePrivateKey = try! (masterHDKey |> toECKey) as! ECPrivateKey
+        let sourcePrivateKey = try! masterHDKey |> toECPrivateKey
         let prevScript0 = try! Script.makePayKeyHashPattern(hash: sourceAddress |> getHash)
         let sig0 = try! createEndorsement(privateKey: sourcePrivateKey, script: Script(prevScript0), transaction: tx, inputIndex: 0, sigHashType: .all)
 

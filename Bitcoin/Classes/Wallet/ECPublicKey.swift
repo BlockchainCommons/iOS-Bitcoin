@@ -122,6 +122,10 @@ public func toECPublicKey(_ privateKey: ECPrivateKey) throws -> ECPublicKey {
     return try privateKey |> toECPublicKey(isCompressed: true)
 }
 
+public func toECPublicKey(_ hdKey: HDKey) throws -> ECPublicKey {
+    return try hdKey |> toECPrivateKey |> toECPublicKey
+}
+
 public enum ECPaymentAddressType {
     case p2kh
     case p2sh

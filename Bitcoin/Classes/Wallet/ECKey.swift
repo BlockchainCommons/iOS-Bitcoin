@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfFoundation
+import WolfPipe
 
 public class ECKey: RawRepresentable {
     public let rawValue: Data
@@ -37,5 +38,11 @@ extension ECKey: Hashable {
 extension ECKey: Equatable {
     public static func == (lhs: ECKey, rhs: ECKey) -> Bool {
         return lhs® == rhs®
+    }
+}
+
+extension ECKey: CustomStringConvertible {
+    public var description: String {
+        return rawValue |> toBase16 |> WolfPipe.rawValue
     }
 }

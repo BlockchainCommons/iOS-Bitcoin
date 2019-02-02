@@ -204,4 +204,34 @@ class TestHD: XCTestCase {
             print(paymentAddress)
         }
     }
+
+    func testBIP49Derivation() {
+        // Test vectors from https://github.com/bitcoin/bips/blob/master/bip-0049.mediawiki
+        let masterSeedWords: Mnemonic = "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+        let masterSeed = try! masterSeedWords |> toSeed |> newHDPrivateKey(network: .testnet)
+        XCTAssertEqual(masterSeed, "tprv8ZgxMBicQKsPe5YMU9gHen4Ez3ApihUfykaqUorj9t6FDqy3nP6eoXiAo2ssvpAjoLroQxHqr3R5nE3a5dU3DHTjTgJDd7zrbniJr6nrCzd" |> tagHDKey)
+
+        // Account 0, root = m/49'/1'/0'
+        let account0Xpriv = try! masterSeed |> deriveHDAccountPrivateKey(purpose: .P2WPKHinP2SH, coinType: .testnet, accountIndex: 0)
+        XCTAssertEqual(account0Xpriv, "tprv8gRrNu65W2Msef2BdBSUgFdRTGzC8EwVXnV7UGS3faeXtuMVtGfEdidVeGbThs4ELEoayCAzZQ4uUji9DUiAs7erdVskqju7hrBcDvDsdbY" |> tagHDKey)
+
+        // Account 0, first receiving private key = m/49'/1'/0'/0/0
+        let account0recvPrivateHDKey = try! account0Xpriv |> deriveHDAddressPrivateKey(chainType: .external, addressIndex: 0)
+        let account0recvPrivateECKey = try! account0recvPrivateHDKey |> toECPrivateKey
+        XCTAssertEqual(account0recvPrivateECKey®, "c9bdb49cfbaedca21c4b1f3a7803c34636b1d7dc55a717132443fc3f4c5867e8" |> dataLiteral)
+        let account0recvPublicECKey = try! account0recvPrivateHDKey |> toECPublicKey
+        XCTAssertEqual(account0recvPublicECKey®, "03a1af804ac108a8a51782198c2d034b28bf90c8803f5a53f76276fa69a4eae77f" |> dataLiteral)
+
+        // Address derivation
+        let keyhash = account0recvPublicECKey® |> toBitcoin160
+        XCTAssertEqual(keyhash®, "38971f73930f6c141d977ac4fd4a727c854935b3" |> dataLiteral)
+        let scriptSigOps = [Operation(.pushSize0), try! Operation(keyhash®)]
+        let scriptSig = Script(scriptSigOps)
+        let scriptSigData = scriptSig |> serialize
+        XCTAssertEqual(scriptSigData, "001438971f73930f6c141d977ac4fd4a727c854935b3" |> dataLiteral)
+        let scriptSigHash = scriptSigData |> toBitcoin160
+        XCTAssertEqual(scriptSigHash®, "336caa13e08b96080a32b5d818d59b4ab3b36742" |> dataLiteral)
+        let paymentAddress = scriptSigHash |> addressEncode(network: .testnet, type: .p2sh)
+        XCTAssertEqual(paymentAddress, "2Mww8dCYPUpKHofjgcXcBCEGmniw9CoaiD2" |> tagPaymentAddress)
+    }
 }

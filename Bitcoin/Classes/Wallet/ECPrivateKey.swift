@@ -60,3 +60,11 @@ public func newECPrivateKey(_ entropy: Data) throws -> ECPrivateKey {
     }
     return try ECPrivateKey(receiveData(bytes: privateKeyBytes, count: privateKeyLength))
 }
+
+public func toECPrivateKey(_ hdPrivateKey: HDKey) throws -> ECPrivateKey {
+    let ecKey = try hdPrivateKey |> toECKey
+    guard let ecPrivateKey = ecKey as? ECPrivateKey else {
+        throw BitcoinError.invalidDerivation
+    }
+    return ecPrivateKey
+}

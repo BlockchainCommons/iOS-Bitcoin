@@ -14,6 +14,20 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
+               BlueprintIdentifier = "7BD632D520F5BE325CABE517E284F677"
+               BuildableName = "Bitcoin.framework"
+               BlueprintName = "Bitcoin"
+               ReferencedContainer = "container:Pods/Pods.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
                BlueprintIdentifier = "607FACCF1AFB9204008FA782"
                BuildableName = "Bitcoin_Example.app"
                BlueprintName = "Bitcoin_Example"
@@ -46,7 +60,7 @@
       <CodeCoverageTargets>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "F495A2C3488212E8742570B31CB6AAFB"
+            BlueprintIdentifier = "7BD632D520F5BE325CABE517E284F677"
             BuildableName = "Bitcoin.framework"
             BlueprintName = "Bitcoin"
             ReferencedContainer = "container:Pods/Pods.xcodeproj">
