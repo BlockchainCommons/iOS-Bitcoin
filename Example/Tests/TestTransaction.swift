@@ -592,7 +592,8 @@ class TestTransaction: XCTestCase {
 
         let mnemonic = "priority tuition mutual grain camp mention ask aerobic either pill home harbor elephant skate follow man taste arrange again canal have dad route warm" |> tagMnemonic
         let seed = try! mnemonic |> toSeed
-        let masterHDKey = try! seed |> newHDPrivateKey(network: network)
+        let version = HDKeyVersion.findVersion(coinType: .btc, network: network, encoding: .p2pkh)!
+        let masterHDKey = try! seed |> newHDPrivateKey(hdKeyVersion: version)
         XCTAssertEqual(masterHDKey, "tprv8ZgxMBicQKsPdFdL5FzccNSkQT1kJFrP3fjiHLQzePq3pugG2NBM2rA6ZD5ywLj3ghYSEz9G13nqyW6SXkGnSLNPfaUzbGFrGgJenw47r1W" |> tagHDKey)
 
         let sourcePublicKey = try! (masterHDKey |> toHDPublicKey |> toECKey) as! ECCompressedPublicKey
@@ -616,12 +617,13 @@ class TestTransaction: XCTestCase {
         let destinationLockingOperations = Script.makePayKeyHashPattern(hash: destinationAddressHash)
         let destinationLockingScript = Script(destinationLockingOperations)
 
-        var manuallyConstructedDestLockOps: [Bitcoin.Operation] = []
-        manuallyConstructedDestLockOps.append(Operation(.dup))
-        manuallyConstructedDestLockOps.append(Operation(.hash160))
-        manuallyConstructedDestLockOps.append(try! Operation(destinationAddressHash®))
-        manuallyConstructedDestLockOps.append(Operation(.equalverify))
-        manuallyConstructedDestLockOps.append(Operation(.checksig))
+        let manuallyConstructedDestLockOps: [ScriptOperation] = try! [
+            .init(.dup),
+            .init(.hash160),
+            .init(destinationAddressHash®),
+            .init(.equalverify),
+            .init(.checksig)
+        ]
         XCTAssertEqual(destinationLockingOperations, manuallyConstructedDestLockOps)
 
         let destinationOutput = Output(value: destinationAmount, script: destinationLockingScript)
@@ -650,9 +652,9 @@ class TestTransaction: XCTestCase {
 //        print(redeemScript |> serialize |> toBitcoin160 |> rawValue |> toBase16)
 
         // input script
-        var sigScript0: [Bitcoin.Operation] = []
-        sigScript0.append(try! Operation(sig0®))
-        sigScript0.append(try! Operation(sourcePublicKey®))
+        var sigScript0: [ScriptOperation] = []
+        sigScript0.append(try! ScriptOperation(sig0®))
+        sigScript0.append(try! ScriptOperation(sourcePublicKey®))
 //        sigScript0.append(try! Operation(data: redeemScript |> serialize))
         let myInputScript0 = Script(sigScript0)
         //print(myInputScript0)

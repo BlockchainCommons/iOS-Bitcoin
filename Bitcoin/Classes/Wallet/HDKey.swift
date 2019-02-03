@@ -31,37 +31,17 @@ public var minimumSeedSize: Int = {
     return _minimumSeedSize()
 }()
 
-extension Network {
-    public var hdKeyPublicVersion: UInt32 {
-        switch self {
-        case .mainnet:
-            return 0x0488B21E
-        case .testnet:
-            return 0x043587CF
-        }
-    }
-
-    public var hdKeyPrivateVersion: UInt32 {
-        switch self {
-        case .mainnet:
-            return 0x0488ADE4
-        case .testnet:
-            return 0x04358394
-        }
-    }
-}
-
 public func generateEntropyForHDKey() -> Data {
     return Bitcoin.seed(bits: 256)
 }
 
 /// Create a new HD (BIP32) private key from entropy.
-public func newHDPrivateKey(network: Network) -> (_ seed: Data) throws -> HDKey {
+public func newHDPrivateKey(hdKeyVersion: HDKeyVersion) -> (_ seed: Data) throws -> HDKey {
     return { seed in
         var key: UnsafeMutablePointer<Int8>!
         var keyLength = 0
         try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _newHDPrivateKey(seedBytes, seed.count, network.hdKeyPrivateVersion, &key, &keyLength)) {
+            if let error = BitcoinError(rawValue: _newHDPrivateKey(seedBytes, seed.count, hdKeyVersion.privateVersion, &key, &keyLength)) {
                 throw error
             }
         }
@@ -69,13 +49,46 @@ public func newHDPrivateKey(network: Network) -> (_ seed: Data) throws -> HDKey 
     }
 }
 
+public func prefix(_ hdKey: HDKey) -> Base58 {
+    return String(hdKey®.prefix(4)) |> tagBase58
+}
+
+public func version(_ hdKey: HDKey) throws -> HDKeyVersion {
+    let pfx = hdKey |> prefix
+    guard let vers = hdKeyVersions.first(where: { $0.publicPrefix == pfx || $0.privatePrefix == pfx }) else {
+        throw BitcoinError.invalidFormat
+    }
+    return vers
+}
+
+public func network(_ hdKey: HDKey) throws -> Network {
+    return try hdKey |> version |> network
+}
+
+public func isPrivate(_ hdKey: HDKey) -> Bool {
+    let pfx = hdKey |> prefix
+    let vers = hdKeyVersions.first { $0.privatePrefix == pfx}
+    return vers != nil
+}
+
+public func isPublic(_ hdKey: HDKey) -> Bool {
+    let pfx = hdKey |> prefix
+    let vers = hdKeyVersions.first { $0.publicPrefix == pfx}
+    return vers != nil
+}
+
+public func coinType(_ hdKey: HDKey) throws -> CoinType {
+    let vers = try hdKey |> version
+    return vers.coinType
+}
+
 /// Derive a child HD (BIP32) private key from another HD private key.
-public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: HDKey) throws -> HDKey {
+public func deriveHDPrivateKey(_ component: BIP32Path.PathComponent) -> (_ privateKey: HDKey) throws -> HDKey {
     return { privateKey in
         return try privateKey®.withCString { privateKeyString in
             var childKey: UnsafeMutablePointer<Int8>!
             var childKeyLength = 0
-            if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, index, isHardened, &childKey, &childKeyLength)) {
+            if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, component.index, component.isHardened, &childKey, &childKeyLength)) {
                 throw error
             }
             return receiveString(bytes: childKey, count: childKeyLength) |> tagHDKey
@@ -84,13 +97,13 @@ public func deriveHDPrivateKey(isHardened: Bool, index: Int) -> (_ privateKey: H
 }
 
 /// Derive a child HD (BIP32) public key from another HD public or private key.
-public func deriveHDPublicKey(isHardened: Bool, index: Int) -> (_ parentKey: HDKey) throws -> HDKey {
+public func deriveHDPublicKey(_ component: BIP32Path.PathComponent) -> (_ parentKey: HDKey) throws -> HDKey {
     return { parentKey in
         return try parentKey®.withCString { parentKeyString in
             var childPublicKey: UnsafeMutablePointer<Int8>!
             var childPublicKeyLength = 0
-            let network = parentKey |> Bitcoin.network
-            if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, index, isHardened, network.hdKeyPublicVersion, network.hdKeyPrivateVersion, &childPublicKey, &childPublicKeyLength)) {
+            let vers = try parentKey |> version
+            if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, component.index, component.isHardened, vers.publicVersion, vers.privateVersion, &childPublicKey, &childPublicKeyLength)) {
                 throw error
             }
             return receiveString(bytes: childPublicKey, count: childPublicKeyLength) |> tagHDKey
@@ -103,8 +116,8 @@ public func toHDPublicKey(_ privateKey: HDKey) throws -> HDKey {
     return try privateKey®.withCString { privateKeyString in
         var publicKey: UnsafeMutablePointer<Int8>!
         var publicKeyLength = 0
-        let network = privateKey |> Bitcoin.network
-        if let error = BitcoinError(rawValue: _toHDPublicKey(privateKeyString, network.hdKeyPublicVersion, &publicKey, &publicKeyLength)) {
+        let vers = try privateKey |> version
+        if let error = BitcoinError(rawValue: _toHDPublicKey(privateKeyString, vers.publicVersion, &publicKey, &publicKeyLength)) {
             throw error
         }
         return receiveString(bytes: publicKey, count: publicKeyLength) |> tagHDKey
@@ -117,8 +130,8 @@ public func toECKey(_ hdKey: HDKey) throws -> ECKey {
         var ecKey: UnsafeMutablePointer<UInt8>!
         var ecKeyLength = 0
         var isPrivate = false
-        let network = hdKey |> Bitcoin.network
-        if let error = BitcoinError(rawValue: _toECKey(hdKeyString, network.hdKeyPublicVersion, network.hdKeyPrivateVersion, &isPrivate, &ecKey, &ecKeyLength)) {
+        let vers = try hdKey |> version
+        if let error = BitcoinError(rawValue: _toECKey(hdKeyString, vers.publicVersion, vers.privateVersion, &isPrivate, &ecKey, &ecKeyLength)) {
             throw error
         }
         let data = receiveData(bytes: ecKey, count: ecKeyLength)
@@ -131,25 +144,40 @@ public func toECKey(_ hdKey: HDKey) throws -> ECKey {
     }
 }
 
-public enum HDKeyPurpose: Int {
-    case defaultAccount = 0 // BIP32
-    case accountTree = 44 // BIP44
-    case multisig = 45 // BIP45
-    case P2WPKHinP2SH = 49 // BIP49
+/// Derives a private key according to a BIP32 derivation path.
+public func deriveHDPrivateKey(path: BIP32Path) -> (_ key: HDKey) throws -> HDKey {
+    return { key in
+        try path.components.reduce(key) { (key, component) in
+            try key |> deriveHDPrivateKey(component)
+        }
+    }
 }
 
-/// Derives an "account private key" from the given master key, per BIP-0044:
+/// Derives a public key according to a BIP32 derivation path.
+public func deriveHDPublicKey(path: BIP32Path) -> (_ key: HDKey) throws -> HDKey {
+    return { key in
+        try path.components.reduce(key) { (key, component) in
+            try key |> deriveHDPublicKey(component)
+        }
+    }
+}
+
+/// Derives an "account private key" from the given master key, per BIP44:
 ///
 /// Performs the the derviation in brackets below:
 ///
 /// `[ m / purpose' / coin_type' / account' ]`
-public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose = .accountTree, coinType: CoinType, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
+public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose? = nil, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
     return { masterKey in
-        let network = masterKey |> Bitcoin.network
-        let purposeKey = try masterKey |> deriveHDPrivateKey(isHardened: true, index: purpose®)
-        let coinTypeKey = try purposeKey |> deriveHDPrivateKey(isHardened: true, index: CoinType.index(for: coinType, network: network))
-        let accountKey = try coinTypeKey |> deriveHDPrivateKey(isHardened: true, index: accountIndex)
-        return accountKey
+        let vers = try masterKey |> version
+        let effectivePurpose = purpose ?? vers.purpose!
+        let path: BIP32Path = [
+            .init(index: effectivePurpose®, isHardened: true),
+            .init(index: CoinType.index(for: vers.coinType, network: vers.network), isHardened: true),
+            .init(index: accountIndex, isHardened: true)
+        ]
+        print(path)
+        return try masterKey |> deriveHDPrivateKey(path: path)
     }
 }
 
@@ -160,9 +188,10 @@ public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose = .accountTree, coin
 /// `m / purpose' / coin_type' / account' [ / change / address_index ]`
 public func deriveHDAddressPrivateKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
     return { accountKey in
-        let chainKey = try accountKey |> deriveHDPrivateKey(isHardened: false, index: chainType®)
-        let addressKey = try chainKey |> deriveHDPrivateKey(isHardened: false, index: addressIndex)
-        return addressKey
+        return try accountKey |> deriveHDPrivateKey(path: [
+            .init(index: chainType®, isHardened: false),
+            .init(index: addressIndex, isHardened: false)
+            ])
     }
 }
 
@@ -173,40 +202,9 @@ public func deriveHDAddressPrivateKey(chainType: ChainType, addressIndex: Int) -
 /// `m / purpose' / coin_type' / account' [ / change / address_index ]`
 public func deriveHDAddressPublicKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
     return { accountKey in
-        let chainKey = try accountKey |> deriveHDPublicKey(isHardened: false, index: chainType®)
-        let addressKey = try chainKey |> deriveHDPublicKey(isHardened: false, index: addressIndex)
-        return addressKey
+        return try accountKey |> deriveHDPublicKey(path: [
+            .init(index: chainType®, isHardened: false),
+            .init(index: addressIndex, isHardened: false)
+            ])
     }
-}
-
-public func prefix(_ hdKey: HDKey) -> String {
-    return String(hdKey®.prefix(4))
-}
-
-public func network(_ hdKey: HDKey) -> Network {
-    let s = (hdKey |> prefix).first!
-    switch s {
-    case "x":
-        return .mainnet
-    case "t":
-        return .testnet
-    default:
-        fatalError()
-    }
-}
-
-public func isPrivate(_ hdKey: HDKey) -> Bool {
-    let s = String((hdKey |> prefix).dropFirst())
-    switch s {
-    case "pub":
-        return false
-    case "prv":
-        return true
-    default:
-        fatalError()
-    }
-}
-
-public func isPublic(_ hdKey: HDKey) -> Bool {
-    return !(hdKey |> isPrivate)
 }

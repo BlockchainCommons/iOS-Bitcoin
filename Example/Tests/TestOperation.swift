@@ -26,7 +26,7 @@ import WolfFoundation
 
 class TestOperation: XCTestCase {
     func test1() {
-        let operation = Bitcoin.Operation()
+        let operation = ScriptOperation()
         XCTAssertFalse(operation.isValid)
         XCTAssert(operation.data.isEmpty)
         XCTAssert(operation.opcode == .disabledXor)
@@ -34,7 +34,7 @@ class TestOperation: XCTestCase {
 
     func test2() {
         let data = "000000000019d6689c085ae165831e934ff763ae46a2a6c172b3f1b60a8ce26f" |> dataLiteral
-        let operation = try! Operation(data)
+        let operation = try! ScriptOperation(data)
         XCTAssert(operation.isValid)
         XCTAssert(operation.opcode == .pushSize32)
         XCTAssert(operation.data == data)
@@ -42,7 +42,7 @@ class TestOperation: XCTestCase {
 
     func test3() {
         let data = "23156214" |> dataLiteral
-        let operation = try! Operation(data)
+        let operation = try! ScriptOperation(data)
         XCTAssert(operation.isValid)
         let operation2 = operation
         XCTAssert(operation == operation2)
@@ -50,16 +50,16 @@ class TestOperation: XCTestCase {
 
     func test4() {
         let data = Data()
-        XCTAssertThrowsError(try Operation.deserialize(data))
+        XCTAssertThrowsError(try ScriptOperation.deserialize(data))
     }
 
     func test5() {
         let rawOperation = "00" |> dataLiteral
-        let operation = try! Operation.deserialize(rawOperation)
+        let operation = try! ScriptOperation.deserialize(rawOperation)
         XCTAssert(operation.isValid)
         XCTAssert(operation.serialized == rawOperation)
 
-        let duplicate = try! Operation.deserialize(operation.serialized)
+        let duplicate = try! ScriptOperation.deserialize(operation.serialized)
         XCTAssert(operation == duplicate)
 
         XCTAssert(operation.opcode == .pushSize0)
@@ -69,11 +69,11 @@ class TestOperation: XCTestCase {
     func test6() {
         let data75 = Data(repeating: ".".asciiByte, count: 75)
         let rawOperation = ("4b" |> dataLiteral) + data75
-        let operation = try! Operation.deserialize(rawOperation)
+        let operation = try! ScriptOperation.deserialize(rawOperation)
         XCTAssert(operation.isValid)
         XCTAssert(operation.serialized == rawOperation)
 
-        let duplicate = try! Operation.deserialize(operation.serialized)
+        let duplicate = try! ScriptOperation.deserialize(operation.serialized)
         XCTAssert(operation == duplicate)
 
         XCTAssert(operation.opcode == .pushSize75)
@@ -81,7 +81,7 @@ class TestOperation: XCTestCase {
     }
 
     func test7() {
-        func f(_ opcode: Opcode, _ s: String) -> Bool {
+        func f(_ opcode: ScriptOpcode, _ s: String) -> Bool {
             return opcode |> toOperation |> toString == s
         }
         XCTAssert(f(.pushSize0, "zero"))
@@ -104,14 +104,14 @@ class TestOperation: XCTestCase {
     }
 
     func test10() {
-        XCTAssert(Opcode.nop2 |> toString(rules: .noRules) == "nop2")
-        XCTAssert(Opcode.nop2 |> toString(rules: .bip65Rule) == "checklocktimeverify")
-        XCTAssert(Opcode.nop3 |> toString(rules: .noRules) == "nop3")
-        XCTAssert(Opcode.nop3 |> toString(rules: .bip112Rule) == "checksequenceverify")
+        XCTAssert(ScriptOpcode.nop2 |> toString(rules: .noRules) == "nop2")
+        XCTAssert(ScriptOpcode.nop2 |> toString(rules: .bip65Rule) == "checklocktimeverify")
+        XCTAssert(ScriptOpcode.nop3 |> toString(rules: .noRules) == "nop3")
+        XCTAssert(ScriptOpcode.nop3 |> toString(rules: .bip112Rule) == "checksequenceverify")
     }
 
     func test11() {
-        func f(_ operationString: String, _ opcode: Opcode, _ dataString: String = "") -> Bool {
+        func f(_ operationString: String, _ opcode: ScriptOpcode, _ dataString: String = "") -> Bool {
             let op = try! operationString |> toOperation
             let data = try! Base16(rawValue: dataString) |> toData
             guard op.opcode == opcode else { return false }

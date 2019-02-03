@@ -1,5 +1,5 @@
 //
-//  Operation.swift
+//  ScriptOperation.swift
 //  Bitcoin
 //
 //  Created by Wolf McNally on 11/14/18.
@@ -22,7 +22,7 @@ import CBitcoin
 import WolfPipe
 import WolfFoundation
 
-public struct Operation: InstanceContainer {
+public struct ScriptOperation: InstanceContainer {
     var wrapped: WrappedInstance
 
     init(instance: OpaquePointer) {
@@ -33,7 +33,7 @@ public struct Operation: InstanceContainer {
         self.init(instance: _operationNew())
     }
 
-    public init(_ opcode: Opcode) {
+    public init(_ opcode: ScriptOpcode) {
         self.init(instance: _operationFromOpcode(opcode®))
     }
 
@@ -59,7 +59,7 @@ public struct Operation: InstanceContainer {
         self.init(instance: instance)
     }
 
-    public static func deserialize(_ data: Data) throws -> Operation {
+    public static func deserialize(_ data: Data) throws -> ScriptOperation {
         let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
             var instance: OpaquePointer!
             if let error = BitcoinError(rawValue: _operationDeserialize(dataBytes, data.count, &instance)) {
@@ -67,7 +67,7 @@ public struct Operation: InstanceContainer {
             }
             return instance
         }
-        return Operation(instance: instance)
+        return ScriptOperation(instance: instance)
     }
 
     public var serialized: Data {
@@ -88,8 +88,8 @@ public struct Operation: InstanceContainer {
         return receiveString(bytes: string, count: stringLength)
     }
 
-    public var opcode: Opcode {
-        return Opcode(rawValue: _operationGetOpcode(wrapped.instance))!
+    public var opcode: ScriptOpcode {
+        return ScriptOpcode(rawValue: _operationGetOpcode(wrapped.instance))!
     }
 
     public var data: Data {
@@ -100,13 +100,13 @@ public struct Operation: InstanceContainer {
     }
 }
 
-extension Operation: Equatable {
-    public static func == (lhs: Operation, rhs: Operation) -> Bool {
+extension ScriptOperation: Equatable {
+    public static func == (lhs: ScriptOperation, rhs: ScriptOperation) -> Bool {
         return _operationEqual(lhs.wrapped.instance, rhs.wrapped.instance)
     }
 }
 
-extension Operation: CustomStringConvertible {
+extension ScriptOperation: CustomStringConvertible {
     public var description: String {
         return self |> toString
     }
@@ -114,38 +114,38 @@ extension Operation: CustomStringConvertible {
 
 // MARK: - Free Functions
 
-public func toOperation(_ opcode: Opcode) -> Operation {
-    return Operation(opcode)
+public func toOperation(_ opcode: ScriptOpcode) -> ScriptOperation {
+    return ScriptOperation(opcode)
 }
 
-public func toOperation(isMinimal: Bool) -> (_ data: Data) throws -> Operation {
+public func toOperation(isMinimal: Bool) -> (_ data: Data) throws -> ScriptOperation {
     return { data in
-        return try Operation(data, isMinimal: isMinimal)
+        return try ScriptOperation(data, isMinimal: isMinimal)
     }
 }
 
-public func toOperation(_ data: Data) throws -> Operation {
+public func toOperation(_ data: Data) throws -> ScriptOperation {
     return try data |> toOperation(isMinimal: true)
 }
 
-public func toOperation(_ string: String) throws -> Operation {
-    return try Operation(string)
+public func toOperation(_ string: String) throws -> ScriptOperation {
+    return try ScriptOperation(string)
 }
 
-public func serialize(_ operation: Operation) -> Data {
+public func serialize(_ operation: ScriptOperation) -> Data {
     return operation.serialized
 }
 
-public func deserializeOperation(_ data: Data) throws -> Operation {
-    return try Operation.deserialize(data)
+public func deserializeOperation(_ data: Data) throws -> ScriptOperation {
+    return try ScriptOperation.deserialize(data)
 }
 
-public func toString(rules: RuleFork) -> (_ operation: Operation) -> String {
+public func toString(rules: RuleFork) -> (_ operation: ScriptOperation) -> String {
     return { operation in
         return operation.string(with: rules)
     }
 }
 
-public func toString(_ operation: Operation) -> String {
+public func toString(_ operation: ScriptOperation) -> String {
     return operation |> toString(rules: .allRules)
 }

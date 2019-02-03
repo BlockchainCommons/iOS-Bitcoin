@@ -165,12 +165,12 @@ class TestScript: XCTestCase {
         let script = try! Script(script2Of3Multisig)
         let ops = script.operations
         XCTAssert(ops.count == 6)
-        XCTAssert(ops[0].opcode == Opcode.pushPositive2)
+        XCTAssert(ops[0].opcode == .pushPositive2)
         XCTAssert(ops[1] |> toString(rules: .noRules) == "[03dcfd9e580de35d8c2060d76dbf9e5561fe20febd2e64380e860a4d59f15ac864]")
         XCTAssert(ops[2] |> toString(rules: .noRules) == "[02440e0304bf8d32b2012994393c6a477acf238dd6adb4c3cef5bfa72f30c9861c]")
         XCTAssert(ops[3] |> toString(rules: .noRules) == "[03624505c6cc3967352cce480d8550490dd68519cd019066a4c302fdfb7d1c9934]")
-        XCTAssert(ops[4].opcode == Opcode.pushPositive3)
-        XCTAssert(ops[5].opcode == Opcode.checkmultisig)
+        XCTAssert(ops[4].opcode == .pushPositive3)
+        XCTAssert(ops[5].opcode == .checkmultisig)
     }
 
     func test_script__empty__default__true() {

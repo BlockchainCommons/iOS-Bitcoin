@@ -1,5 +1,5 @@
 //
-//  Opcode.swift
+//  ScriptOpcode.swift
 //  Pods
 //
 //  Created by Wolf McNally on 11/12/18.
@@ -22,7 +22,7 @@ import CBitcoin
 import WolfPipe
 import WolfFoundation
 
-public enum Opcode: UInt8 {
+public enum ScriptOpcode: UInt8 {
     case pushSize0 = 0        // is_version (pushes [] to the stack not 0)
     case pushSize1 = 1
     case pushSize2 = 2
@@ -205,9 +205,9 @@ public enum Opcode: UInt8 {
     case checkmultisigverify = 175
     case nop1 = 176
     case checklocktimeverify = 177
-    public static let nop2 = Opcode(rawValue: 177)!
+    public static let nop2 = ScriptOpcode(rawValue: 177)!
     case checksequenceverify = 178
-    public static let nop3 = Opcode(rawValue: 178)!
+    public static let nop3 = ScriptOpcode(rawValue: 178)!
     case nop4 = 179
     case nop5 = 180
     case nop6 = 181
@@ -286,7 +286,7 @@ public enum Opcode: UInt8 {
     case reserved254 = 254
     case reserved255 = 255
 
-    public static func makeFrom(mnemonic: String) throws -> Opcode {
+    public static func makeFrom(mnemonic: String) throws -> ScriptOpcode {
         let opcode = try mnemonic.withCString { (mnemonicBytes: UnsafePointer<Int8>) -> UInt8 in
             var opcode: UInt8 = 0
             if let error = BitcoinError(rawValue: _opcodeFromString(mnemonicBytes, &opcode)) {
@@ -294,7 +294,7 @@ public enum Opcode: UInt8 {
             }
             return opcode
         }
-        return Opcode(rawValue: opcode)!
+        return ScriptOpcode(rawValue: opcode)!
     }
 
     func toStringInternal(with rules: RuleFork = .allRules) -> String {
@@ -304,13 +304,13 @@ public enum Opcode: UInt8 {
         return receiveString(bytes: string, count: count)
     }
 
-    public static func makePushPositive(_ n: Int) -> Opcode {
+    public static func makePushPositive(_ n: Int) -> ScriptOpcode {
         guard (1 ... 16).contains(n) else { return .nop }
-        return Opcode(rawValue: UInt8(n + 80))!
+        return ScriptOpcode(rawValue: UInt8(n + 80))!
     }
 }
 
-extension Opcode: CustomStringConvertible {
+extension ScriptOpcode: CustomStringConvertible {
     public var description: String {
         return self |> toString
     }
@@ -318,25 +318,25 @@ extension Opcode: CustomStringConvertible {
 
 // MARK: - Free functions
 
-public func toOpcode(_ string: String) throws -> Opcode {
-    return try Opcode.makeFrom(mnemonic: string)
+public func toOpcode(_ string: String) throws -> ScriptOpcode {
+    return try ScriptOpcode.makeFrom(mnemonic: string)
 }
 
-public func toString(rules: RuleFork) -> (_ opcode: Opcode) -> String {
+public func toString(rules: RuleFork) -> (_ opcode: ScriptOpcode) -> String {
     return { opcode in
         opcode.toStringInternal(with: rules)
     }
 }
 
-public func toString(_ opcode: Opcode) -> String {
+public func toString(_ opcode: ScriptOpcode) -> String {
     return opcode |> toString(rules: .allRules)
 }
 
-public func toOpcode(_ i: UInt8) -> Opcode {
-    return Opcode(rawValue: i)!
+public func toOpcode(_ i: UInt8) -> ScriptOpcode {
+    return ScriptOpcode(rawValue: i)!
 }
 
-public func toOpcode(_ data: Data) throws -> Opcode {
+public func toOpcode(_ data: Data) throws -> ScriptOpcode {
     guard data.count == 1 else { throw BitcoinError.invalidDataSize }
     return data[0] |> toOpcode
 }

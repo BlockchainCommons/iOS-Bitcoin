@@ -66,7 +66,7 @@ public struct Script: InstanceContainer {
         return serialized(prefix: false)
     }
 
-    public init(_ operations: [Operation]) {
+    public init(_ operations: [ScriptOperation]) {
         let operationInstances = operations.map { $0.wrapped.instance }
         let newInstance = operationInstances.withUnsafeBufferPointer { instancesBuffer in
             _scriptFromOperations(instancesBuffer.baseAddress, operationInstances.count)
@@ -78,7 +78,7 @@ public struct Script: InstanceContainer {
         return _scriptIsValid(wrapped.instance)
     }
 
-    public var operations: [Operation] {
+    public var operations: [ScriptOperation] {
         var operations: UnsafeMutablePointer<OpaquePointer>!
         var operationsCount = 0
         _scriptGetOperations(wrapped.instance, &operations, &operationsCount)
@@ -119,8 +119,8 @@ public struct Script: InstanceContainer {
         return ScriptPattern(rawValue: _scriptGetOutputPattern(wrapped.instance))!
     }
 
-    public static func makePayNullDataPattern(data: Data) -> [Operation] {
-        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> [Operation] in
+    public static func makePayNullDataPattern(data: Data) -> [ScriptOperation] {
+        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> [ScriptOperation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
             _scriptMakePayNullDataPattern(dataBytes, data.count, &operations, &operationsCount)
@@ -128,8 +128,8 @@ public struct Script: InstanceContainer {
         }
     }
 
-    public static func makePayKeyHashPattern(hash: ShortHash) -> [Operation] {
-        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
+    public static func makePayKeyHashPattern(hash: ShortHash) -> [ScriptOperation] {
+        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [ScriptOperation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
             _scriptMakePayKeyHashPattern(hashBytes, &operations, &operationsCount)
@@ -137,8 +137,8 @@ public struct Script: InstanceContainer {
         }
     }
 
-    public static func makePayScriptHashPattern(hash: ShortHash) -> [Operation] {
-        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [Operation] in
+    public static func makePayScriptHashPattern(hash: ShortHash) -> [ScriptOperation] {
+        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [ScriptOperation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
             _scriptMakePayScriptHashPattern(hashBytes, &operations, &operationsCount)
@@ -146,19 +146,19 @@ public struct Script: InstanceContainer {
         }
     }
 
-    public static func makePayMultisigPattern(requiredSignatureCount: Int, publicKeys: [ECCompressedPublicKey]) -> [Operation] {
+    public static func makePayMultisigPattern(requiredSignatureCount: Int, publicKeys: [ECCompressedPublicKey]) -> [ScriptOperation] {
         let m = requiredSignatureCount
         let n = publicKeys.count
 
         guard (1 ... 16).contains(n), (1 ... n).contains(m) else { return [] }
 
-        var ops = [Operation]()
-        ops.append(Operation(.makePushPositive(m)))
+        var ops = [ScriptOperation]()
+        ops.append(ScriptOperation(.makePushPositive(m)))
         publicKeys.forEach { key in
-            try! ops.append(Operation(key®))
+            try! ops.append(ScriptOperation(key®))
         }
-        ops.append(Operation(.makePushPositive(n)))
-        ops.append(Operation(.checkmultisig))
+        ops.append(ScriptOperation(.makePushPositive(n)))
+        ops.append(ScriptOperation(.checkmultisig))
         return ops
     }
 
@@ -269,4 +269,11 @@ public func deserializeScript(_ data: Data) throws -> Script {
 
 public func toScript(_ script: String) throws -> Script {
     return try Script(script)
+}
+
+
+extension Script: ExpressibleByArrayLiteral {
+    public init(arrayLiteral: ScriptOperation...) {
+        self.init(arrayLiteral)
+    }
 }

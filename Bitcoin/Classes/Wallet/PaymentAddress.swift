@@ -26,14 +26,18 @@ public enum PaymentAddressTag { }
 public typealias PaymentAddress = Tagged<PaymentAddressTag, String>
 public func tagPaymentAddress(_ string: String) -> PaymentAddress { return PaymentAddress(rawValue: string) }
 
-public enum PaymentAddressType {
+public enum PaymentAddressEncoding {
     case p2pkh
     case p2sh
+    case p2wpkh
+    case p2wsh
+    case p2wpkhInP2sh
+    case p2wshInP2sh
 }
 
 public struct PaymentAddressVersion {
     public let network: Network
-    public let type: PaymentAddressType
+    public let type: PaymentAddressEncoding
 
     public var version: UInt8 {
         switch network {
@@ -43,6 +47,8 @@ public struct PaymentAddressVersion {
                 return 0
             case .p2sh:
                 return 5
+            default:
+                fatalError("Unsupported")
             }
         case .testnet:
             switch type {
@@ -50,11 +56,13 @@ public struct PaymentAddressVersion {
                 return 111
             case .p2sh:
                 return 196
+            default:
+                fatalError("Unsupported")
             }
         }
     }
 
-    public init(network: Network, type: PaymentAddressType) {
+    public init(network: Network, type: PaymentAddressEncoding) {
         self.network = network
         self.type = type
     }
@@ -92,7 +100,7 @@ public func addressEncode(version: UInt8) -> (_ ripemd160: ShortHash) -> Payment
 }
 
 /// Convert a RIPEMD160 value to a payment address.
-public func addressEncode(network: Network = .mainnet, type: PaymentAddressType = .p2pkh) -> (_ ripemd160: ShortHash) -> PaymentAddress {
+public func addressEncode(network: Network = .mainnet, type: PaymentAddressEncoding = .p2pkh) -> (_ ripemd160: ShortHash) -> PaymentAddress {
     return addressEncode(version: PaymentAddressVersion(network: network, type: type).version)
 }
 
@@ -160,6 +168,6 @@ public func addressEmbed(version: UInt8) -> (_ data: Data) -> PaymentAddress {
 ///     dup hash160 [RIPEMD160] equalverify checksig
 ///
 /// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
-public func addressEmbed(network: Network, type: PaymentAddressType) -> (_ data: Data) -> PaymentAddress {
+public func addressEmbed(network: Network, type: PaymentAddressEncoding) -> (_ data: Data) -> PaymentAddress {
     return addressEmbed(version: PaymentAddressVersion(network: network, type: type).version)
 }

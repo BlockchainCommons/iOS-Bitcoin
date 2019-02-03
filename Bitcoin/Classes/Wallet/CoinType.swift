@@ -59,12 +59,10 @@ public struct CoinType: RawRepresentable, Hashable, Comparable, CustomStringConv
     }
 }
 
+/// Please see:
+/// SLIP-0044 : Registered coin types for BIP-0044
+/// https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 extension CoinType {
-    //
-    // Please see:
-    // SLIP-0044 : Registered coin types for BIP-0044
-    // https://github.com/satoshilabs/slips/blob/master/slip-0044.md
-    //
     public static let btc = CoinType(0)
     public static let testnet = CoinType(1) // all coin types
     public static let ltc = CoinType(2)

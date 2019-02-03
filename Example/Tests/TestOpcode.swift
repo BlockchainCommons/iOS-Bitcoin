@@ -26,7 +26,7 @@ import WolfFoundation
 
 class TestOpcode: XCTestCase {
     func testToString1() {
-        func f(_ op: Opcode, _ expected: String) -> Bool {
+        func f(_ op: ScriptOpcode, _ expected: String) -> Bool {
             return op |> toString(rules: .allRules) == expected
                 && op |> toString(rules: .noRules) == expected
         }
@@ -44,15 +44,15 @@ class TestOpcode: XCTestCase {
     }
 
     func testToString2() {
-        XCTAssert(Opcode.checklocktimeverify |> toString(rules: .noRules) == "nop2")
-        XCTAssert(Opcode.checklocktimeverify |> toString(rules: .bip65Rule) == "checklocktimeverify")
+        XCTAssert(ScriptOpcode.checklocktimeverify |> toString(rules: .noRules) == "nop2")
+        XCTAssert(ScriptOpcode.checklocktimeverify |> toString(rules: .bip65Rule) == "checklocktimeverify")
 
-        XCTAssert(Opcode.checksequenceverify |> toString(rules: .noRules) == "nop3")
-        XCTAssert(Opcode.checksequenceverify |> toString(rules: .bip112Rule) == "checksequenceverify")
+        XCTAssert(ScriptOpcode.checksequenceverify |> toString(rules: .noRules) == "nop3")
+        XCTAssert(ScriptOpcode.checksequenceverify |> toString(rules: .bip112Rule) == "checksequenceverify")
     }
 
     func testToOpcode() {
-        func f(_ s: String, _ op: Opcode) -> Bool {
+        func f(_ s: String, _ op: ScriptOpcode) -> Bool {
             return try! s |> toOpcode == op
         }
 
@@ -77,9 +77,9 @@ class TestOpcode: XCTestCase {
     }
 
     func testToHexadecimal() {
-        XCTAssert(Opcode.pushSize0® == 0x00)
-        XCTAssert(Opcode.pushSize42® == 0x2a)
-        XCTAssert(Opcode.reserved255® == 0xff)
+        XCTAssert(ScriptOpcode.pushSize0® == 0x00)
+        XCTAssert(ScriptOpcode.pushSize42® == 0x2a)
+        XCTAssert(ScriptOpcode.reserved255® == 0xff)
     }
 
     func testHexadecimalToOpcode() {
