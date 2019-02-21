@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		0309A6842182879F007E974E /* TestHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0309A6822182876C007E974E /* TestHash.swift */; };
+		0310E307221E24D7004BC9C3 /* TestSSS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0310E305221E24B1004BC9C3 /* TestSSS.swift */; };
 		032FC9282190F6B4003A55D7 /* TestPaymentAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */; };
 		0331067121922387000509BB /* TestWrapped.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331067021922387000509BB /* TestWrapped.swift */; };
 		0331068321937FDC000509BB /* TestScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331068221937FDC000509BB /* TestScript.swift */; };
@@ -43,6 +44,7 @@
 
 /* Begin PBXFileReference section */
 		0309A6822182876C007E974E /* TestHash.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHash.swift; sourceTree = "<group>"; };
+		0310E305221E24B1004BC9C3 /* TestSSS.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestSSS.swift; sourceTree = "<group>"; };
 		032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestPaymentAddress.swift; sourceTree = "<group>"; };
 		0331067021922387000509BB /* TestWrapped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWrapped.swift; sourceTree = "<group>"; };
 		0331068221937FDC000509BB /* TestScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScript.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				03DD3E2A219A0B1300E7D982 /* TestInput.swift */,
 				0331068A2193F052000509BB /* TestTransaction.swift */,
 				0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */,
+				0310E305221E24B1004BC9C3 /* TestSSS.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			path = Tests;
@@ -404,6 +407,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				03DD3E30219A655F00E7D982 /* TestOpcode.swift in Sources */,
+				0310E307221E24D7004BC9C3 /* TestSSS.swift in Sources */,
 				03DD3E3C219D0E3300E7D982 /* TestOperation.swift in Sources */,
 				0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */,
 				03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */,
