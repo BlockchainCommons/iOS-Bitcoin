@@ -22,46 +22,46 @@ import WolfFoundation
 import WolfPipe
 import CBitcoin
 
-public struct SSSShare: RawRepresentable {
+public struct SSSShare {
     private typealias `Self` = SSSShare
 
     public static let length = _sss_share_length()
 
-    public let rawValue: Data
+    public let data: Data
 
-    public init?(rawValue: Data) {
-        guard rawValue.count == Self.length else {
-            return nil
+    public init(data: Data) throws {
+        guard data.count == Self.length else {
+            throw BitcoinError.invalidDataSize
         }
-        self.rawValue = rawValue
+        self.data = data
     }
 
     public init(base64: Base64) throws {
-        rawValue = try base64 |> toData
-        guard rawValue.count == Self.length else {
+        data = try base64 |> toData
+        guard data.count == Self.length else {
             throw BitcoinError.invalidDataSize
         }
     }
 
     public var base64: Base64 {
-        return rawValue |> toBase64
+        return data |> toBase64
     }
 }
 
 extension SSSShare: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(rawValue)
+        hasher.combine(data)
     }
 }
 
 extension SSSShare: Equatable {
     public static func == (lhs: SSSShare, rhs: SSSShare) -> Bool {
-        return lhs® == rhs®
+        return lhs.data == rhs.data
     }
 }
 
 extension SSSShare: CustomStringConvertible {
     public var description: String {
-        return rawValue |> toBase16 |> WolfPipe.rawValue
+        return data |> toBase16 |> rawValue
     }
 }

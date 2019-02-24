@@ -36,14 +36,14 @@ public struct SSS {
         let outBufferSize = SSSShare.length * shareCount + 1000
         var outBuffer = Data(count: outBufferSize)
         return outBuffer.withUnsafeMutableBytes { (outBytes: UnsafeMutablePointer<UInt8>) in
-            message.rawValue.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
+            message.data.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
                 _sss_create_shares(UnsafeMutableRawPointer(outBytes), messageBytes, UInt8(shareCount), UInt8(quorum))
 
                 var shares = [SSSShare]()
                 let p = UnsafeRawPointer(outBytes)
                 for i in 0 ..< shareCount {
                     let data = Data(bytes: p + i * SSSShare.length, count: SSSShare.length)
-                    shares.append(SSSShare(rawValue: data)!)
+                    try! shares.append(SSSShare(data: data))
                 }
                 return shares
             }
@@ -51,7 +51,7 @@ public struct SSS {
     }
 
     public static func combineShares(_ shares: [SSSShare]) -> SSSMessage? {
-        let inBuffer = shares.reduce(into: Data()) { (buf, share) in buf.append(share.rawValue) }
+        let inBuffer = shares.reduce(into: Data()) { (buf, share) in buf.append(share.data) }
         return inBuffer.withUnsafeBytes { (sharesBytes: UnsafePointer<UInt8>) -> SSSMessage? in
             var data = Data(count: SSSMessage.length)
             let result = data.withUnsafeMutableBytes { (messageBytes: UnsafeMutablePointer<UInt8>) in
@@ -60,7 +60,42 @@ public struct SSS {
             guard result == 0 else {
                 return nil
             }
-            return SSSMessage(rawValue: data)
+            return try! SSSMessage(data: data)
         }
     }
+
+    // The message to be split is possibly longer than the SSS message length (64 bytes).
+    // So, we instead symmetrically encrypt the message with a new secret key, which then becomes
+    // the thing we split. We then distribute the encrypted message with each share of the split key.
+    public static func createShares(from data: Data, shareCount: Int, quorum: Int) -> [SSSKeyShare] {
+        let key = Crypto.generateKey()
+        let ciphertext = try! Crypto.encrypt(plaintext: data, key: key)
+        let paddingLength = SSSMessage.length - key.count
+        assert(paddingLength >= 0)
+        let keyMessage = try! SSSMessage(data: key + Data(count: paddingLength))
+        let keyShares = SSS.createShares(from: keyMessage, shareCount: shareCount, quorum: quorum)
+        return keyShares.map { keyShare in
+            return SSSKeyShare(message: ciphertext.message, nonce: ciphertext.nonce, key: keyShare.data)
+        }
+    }
+
+    public static func combineShares(_ shares: [SSSKeyShare]) throws -> Data? {
+        guard !shares.isEmpty else { return nil }
+
+        let ciphertext = Crypto.Ciphertext(message: shares.first!.message, nonce: shares.first!.nonce)
+
+        let keyShares = try shares.map { try SSSShare(data: $0.key) }
+
+        guard let paddedKey = SSS.combineShares(keyShares)?.data else { return nil }
+        guard paddedKey.count >= Crypto.keyLength else { throw BitcoinError.invalidDataSize }
+        let recoveredKey = paddedKey[0 ..< Crypto.keyLength]
+
+        return try Crypto.decrypt(ciphertext: ciphertext, key: recoveredKey)
+    }
+}
+
+public struct SSSKeyShare: Codable {
+    public let message: Data
+    public let nonce: Data
+    public let key: Data
 }

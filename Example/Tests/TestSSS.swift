@@ -32,7 +32,7 @@ class TestSSS: XCTestCase {
     }
 
     func testSSS() throws {
-        let message = try SSSMessage(rawValue: SSS.randomBytes(count: SSSMessage.length))!
+        let message = try SSSMessage(data: SSS.randomBytes(count: SSSMessage.length))
 
         func test(shareCount: Int, quorum: Int, retrievedCount: Int) throws -> Bool {
             let shares = SSS.createShares(from: message, shareCount: shareCount, quorum: quorum)
@@ -55,5 +55,43 @@ class TestSSS: XCTestCase {
         XCTAssertFalse(try test(shareCount: 7, quorum: 5, retrievedCount: 2))
         XCTAssertFalse(try test(shareCount: 7, quorum: 5, retrievedCount: 1))
         XCTAssertFalse(try test(shareCount: 7, quorum: 5, retrievedCount: 0))
+    }
+
+    func testCrypto() throws {
+        let plaintext = "The quick brown 🐺 jumps over the lazy 🐶." |> toUTF8
+        let key = Crypto.generateKey()
+        let ciphertext = try Crypto.encrypt(plaintext: plaintext, key: key)
+        let encodedCiphertext = try JSONEncoder().encode(ciphertext)
+        //print(try encodedCiphertext |> fromUTF8)
+
+        // ===
+
+        let decodedCiphertext = try JSONDecoder().decode(Crypto.Ciphertext.self, from: encodedCiphertext)
+        let recoveredPlaintext = try Crypto.decrypt(ciphertext: decodedCiphertext, key: key)
+        XCTAssertEqual(plaintext, recoveredPlaintext)
+    }
+
+    func testSSSWithCrypto() throws {
+        let plaintext = """
+        Inner North London, top floor flat
+        All white walls, white carpet, white cat,
+        Rice Paper partitions, modern art and ambition
+        The host's a physician,
+        Bright bloke, has his own practice
+        His girlfriend's an actress, an old mate of ours from home
+        And they're always great fun, so to dinner we've come.
+        """ |> toUTF8
+
+        let keyShares = SSS.createShares(from: plaintext, shareCount: 3, quorum: 2)
+        let encodedShares = try JSONEncoder().encode(keyShares)
+        //print(try encodedShares |> fromUTF8)
+
+        // ===
+
+        let decodedShares = try JSONDecoder().decode([SSSKeyShare].self, from: encodedShares)
+        let truncatedShares = Array(decodedShares.shuffled().dropLast())
+        let recoveredPlaintext = try SSS.combineShares(truncatedShares)
+
+        XCTAssertEqual(plaintext, recoveredPlaintext)
     }
 }

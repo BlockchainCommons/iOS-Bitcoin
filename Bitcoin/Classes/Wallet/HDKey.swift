@@ -31,10 +31,6 @@ public var minimumSeedSize: Int = {
     return _minimumSeedSize()
 }()
 
-public func generateEntropyForHDKey() -> Data {
-    return Bitcoin.seed(bits: 256)
-}
-
 /// Create a new HD (BIP32) private key from entropy.
 public func newHDPrivateKey(hdKeyVersion: HDKeyVersion) -> (_ seed: Data) throws -> HDKey {
     return { seed in

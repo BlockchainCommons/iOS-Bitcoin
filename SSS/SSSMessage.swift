@@ -22,35 +22,35 @@ import WolfFoundation
 import WolfPipe
 import CBitcoin
 
-public struct SSSMessage: RawRepresentable {
+public struct SSSMessage {
     private typealias `Self` = SSSMessage
 
     public static let length = _sss_message_length()
 
-    public var rawValue: Data
+    public var data: Data
 
-    public init?(rawValue: Data) {
-        guard rawValue.count == Self.length else {
-            return nil
+    public init(data: Data) throws {
+        guard data.count == Self.length else {
+            throw BitcoinError.invalidDataSize
         }
-        self.rawValue = rawValue
+        self.data = data
     }
 }
 
 extension SSSMessage: Hashable {
     public func hash(into hasher: inout Hasher) {
-        hasher.combine(rawValue)
+        hasher.combine(data)
     }
 }
 
 extension SSSMessage: Equatable {
     public static func == (lhs: SSSMessage, rhs: SSSMessage) -> Bool {
-        return lhs® == rhs®
+        return lhs.data == rhs.data
     }
 }
 
 extension SSSMessage: CustomStringConvertible {
     public var description: String {
-        return rawValue |> toBase16 |> WolfPipe.rawValue
+        return data |> toBase16 |> rawValue
     }
 }

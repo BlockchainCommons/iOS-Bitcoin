@@ -187,7 +187,7 @@ class TestHD: XCTestCase {
     func testKeyDerivation() {
         // Cold wallet generates these
         let network = Network.mainnet
-        let entropy = generateEntropyForHDKey()
+        let entropy = Bitcoin.seed(bits: 256)
         let mnemonic = try! entropy |> newMnemonic
         let seed = try! mnemonic |> toSeed
         let version = HDKeyVersion.findVersion(coinType: .btc, network: network, encoding: .p2pkh)!
