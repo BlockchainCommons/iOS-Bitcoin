@@ -93,9 +93,3 @@ public struct SSS {
         return try Crypto.decrypt(ciphertext: ciphertext, key: recoveredKey)
     }
 }
-
-public struct SSSKeyShare: Codable {
-    public let message: Data
-    public let nonce: Data
-    public let key: Data
-}
