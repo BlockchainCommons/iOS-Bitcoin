@@ -1,7 +1,7 @@
 Pod::Spec.new do |s|
     s.name             = 'Bitcoin'
-    s.version          = '0.3.0'
-    s.summary          = 'Swift bindings for libbitcoin.'
+    s.version          = '0.4.0'
+    s.summary          = 'Swift bindings for libbitcoin, including Shamir Secret Sharing.'
 
     # s.description      = <<-DESC
     # TODO: Add long description of the pod here.
