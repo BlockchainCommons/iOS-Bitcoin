@@ -43,8 +43,14 @@ public func seed(count: Int) -> Data {
 }
 
 public func seed<T>(bits: Int, using generator: inout T) -> Data where T: RandomNumberGenerator {
-    let count = (bits / 8) + ((bits % 8) > 0 ? 1 : 0)
-    return seed(count: count, using: &generator)
+    let extraBits = bits % 8
+    let count = (bits / 8) + (extraBits > 0 ? 1 : 0)
+    var s = seed(count: count, using: &generator)
+    if extraBits > 0 {
+        let mask = UInt8(0xFF) << (8 - extraBits)
+        s[count - 1] = s.last! & mask
+    }
+    return s
 }
 
 public func seed(bits: Int) -> Data {

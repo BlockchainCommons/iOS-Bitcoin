@@ -19,9 +19,9 @@
 //  limitations under the License.
 
 import Foundation
+import WolfFoundation
 
 public struct SSSKeyShare: Codable {
     public let message: Data
-    public let nonce: Data
-    public let key: Data
+    public let id: Data
 }

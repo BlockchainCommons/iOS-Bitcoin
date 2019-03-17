@@ -19,7 +19,7 @@
 //  limitations under the License.
 
 import XCTest
-import Bitcoin
+@testable import Bitcoin
 import WolfPipe
 import WolfFoundation
 
@@ -82,7 +82,7 @@ class TestSSS: XCTestCase {
         And they're always great fun, so to dinner we've come.
         """ |> toUTF8
 
-        let keyShares = SSS.createShares(from: plaintext, shareCount: 3, quorum: 2)
+        let keyShares = try SSS.createShares(from: plaintext, shareCount: 3, quorum: 2)
         let encodedShares = try JSONEncoder().encode(keyShares)
         //print(try encodedShares |> fromUTF8)
 
@@ -93,5 +93,31 @@ class TestSSS: XCTestCase {
         let recoveredPlaintext = try SSS.combineShares(truncatedShares)
 
         XCTAssertEqual(plaintext, recoveredPlaintext)
+    }
+
+    func testChecksum() {
+        let message = [1, 2, 3, 4]
+        let expectedChecksum = [120, 542, 324]
+        let checksum = SplitRecoveryPhrase.createChecksum(message)
+        XCTAssertEqual(checksum, expectedChecksum)
+        XCTAssertTrue(SplitRecoveryPhrase.verifyChecksum(message + checksum))
+    }
+
+    func testRecoveryPhrase() throws {
+        let wordCount = 13
+        let entropy = SplitRecoveryPhrase.generateEntropy(wordCount: wordCount)
+        let recoveryPhrase = SplitRecoveryPhrase.makeRecoveryPhrase(from: entropy, wordCount: wordCount)
+        //print(recoveryPhrase)
+        let data = try SplitRecoveryPhrase.makeData(from: recoveryPhrase)
+        XCTAssertEqual(entropy, data)
+    }
+
+    func testSplitRecoveryPhrase() throws {
+        let wordCount = 13
+        let entropy = SplitRecoveryPhrase.generateEntropy(wordCount: wordCount)
+        let recoveryPhrase = SplitRecoveryPhrase.makeRecoveryPhrase(from: entropy, wordCount: wordCount)
+        print(recoveryPhrase)
+        let keyShares = try SSS.createShares(from: entropy, shareCount: 3, quorum: 2)
+        print(keyShares)
     }
 }

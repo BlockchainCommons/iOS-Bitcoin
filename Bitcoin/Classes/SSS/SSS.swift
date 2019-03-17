@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfPipe
 
 public struct SSS {
     public static func randomBytes(count: Int) throws -> Data {
@@ -64,32 +65,61 @@ public struct SSS {
         }
     }
 
-    // The message to be split is possibly longer than the SSS message length (64 bytes).
-    // So, we instead symmetrically encrypt the message with a new secret key, which then becomes
-    // the thing we split. We then distribute the encrypted message with each share of the split key.
-    public static func createShares(from data: Data, shareCount: Int, quorum: Int) -> [SSSKeyShare] {
-        let key = Crypto.generateKey()
-        let ciphertext = try! Crypto.encrypt(plaintext: data, key: key)
-        let paddingLength = SSSMessage.length - key.count
-        assert(paddingLength >= 0)
-        let keyMessage = try! SSSMessage(data: key + Data(count: paddingLength))
-        let keyShares = SSS.createShares(from: keyMessage, shareCount: shareCount, quorum: quorum)
-        return keyShares.map { keyShare in
-            return SSSKeyShare(message: ciphertext.message, nonce: ciphertext.nonce, key: keyShare.data)
+    static let maxMessageSize = 4096
+    static let shareMetadataSize = 49
+
+    public static func createShares(from message: Data, shareCount: Int, quorum: Int) throws -> [SSSKeyShare] {
+        let messageSize = message.count
+        guard messageSize <= maxMessageSize else {
+            throw BitcoinError.invalidDataSize
+        }
+        let shareLength = messageSize + shareMetadataSize
+        let outBufferLen = shareLength * shareCount
+        var outData = Data(count: outBufferLen)
+        return try outData.withUnsafeMutableBytes { (outBytes: UnsafeMutablePointer<UInt8>) -> [SSSKeyShare] in
+            return try message.withUnsafeBytes { (inBytes: UnsafePointer<UInt8>) -> [SSSKeyShare] in
+                let result = _sss_create_shares_varlen(outBytes, inBytes, messageSize, UInt8(shareCount), UInt8(quorum))
+                guard result == 0 else {
+                    throw BitcoinError.invalidDataSize
+                }
+
+                var shares = [SSSKeyShare]()
+                let p = UnsafeRawPointer(outBytes)
+                let id = seed(count: 16)
+                for i in 0 ..< shareCount {
+                    let message = Data(bytes: p + i * shareLength, count: shareLength)
+                    shares.append(SSSKeyShare(message: message, id: id))
+                }
+                return shares
+            }
         }
     }
 
     public static func combineShares(_ shares: [SSSKeyShare]) throws -> Data? {
         guard !shares.isEmpty else { return nil }
 
-        let ciphertext = Crypto.Ciphertext(message: shares.first!.message, nonce: shares.first!.nonce)
-
-        let keyShares = try shares.map { try SSSShare(data: $0.key) }
-
-        guard let paddedKey = SSS.combineShares(keyShares)?.data else { return nil }
-        guard paddedKey.count >= Crypto.keyLength else { throw BitcoinError.invalidDataSize }
-        let recoveredKey = paddedKey[0 ..< Crypto.keyLength]
-
-        return try Crypto.decrypt(ciphertext: ciphertext, key: recoveredKey)
+        let shareSize = shares.first!.message.count
+        guard (shareMetadataSize...(maxMessageSize + shareMetadataSize)).contains(shareSize) else {
+            throw BitcoinError.invalidDataSize
+        }
+        var sharesData = Data()
+        for share in shares {
+            let shareData = share.message
+            guard shareData.count == shareSize else {
+                throw BitcoinError.invalidDataSize
+            }
+            sharesData += shareData
+        }
+        let messageSize = shareSize - 49
+        var message = Data(count: messageSize)
+        let result: Int32 = message.withUnsafeMutableBytes { (messageBytes: UnsafeMutablePointer<UInt8>) -> Int32 in
+            sharesData.withUnsafeBytes { (sharesBytes: UnsafePointer<UInt8>) -> Int32 in
+                _sss_combine_shares_varlen(messageBytes, sharesBytes, shareSize, UInt8(shares.count))
+            }
+        }
+        guard result == 0 else {
+            return nil
+        }
+        return message
     }
 }
