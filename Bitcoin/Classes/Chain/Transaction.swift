@@ -34,9 +34,9 @@ public struct Transaction: InstanceContainer, Encodable {
     }
 
     public static func deserialize(_ data: Data) throws -> Transaction {
-        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+        let instance = try data.withUnsafeBytes { dataBytes -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _transactionDeserialize(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _transactionDeserialize(dataBytes®, data.count, &instance)) {
                 throw error
             }
             return instance
@@ -115,7 +115,7 @@ public struct Transaction: InstanceContainer, Encodable {
             }
             let instances = newValue.map { $0.wrapped.instance }
             instances.withUnsafeBufferPointer { instancesBuffer in
-                _transactionSetInputs(wrapped.instance, instancesBuffer.baseAddress, instances.count)
+                _transactionSetInputs(wrapped.instance, instancesBuffer.baseAddress!, instances.count)
             }
         }
     }
@@ -134,7 +134,7 @@ public struct Transaction: InstanceContainer, Encodable {
             }
             let instances = newValue.map { $0.wrapped.instance }
             instances.withUnsafeBufferPointer { instancesBuffer in
-                _transactionSetOutputs(wrapped.instance, instancesBuffer.baseAddress, instances.count)
+                _transactionSetOutputs(wrapped.instance, instancesBuffer.baseAddress!, instances.count)
             }
         }
     }
@@ -237,10 +237,10 @@ public func deserializeTransaction(_ data: Data) throws -> Transaction {
 /// Decode a binary transaction to JSON format.
 public func transactionDecode(isPretty: Bool) -> (_ data: Data) throws -> String {
     return { data in
-        return try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+        return try data.withUnsafeBytes { dataBytes in
             var decoded: UnsafeMutablePointer<Int8>!
             var decodedLength = 0
-            if let error = BitcoinError(rawValue: _transactionDecode(dataBytes, data.count, isPretty, &decoded, &decodedLength)) {
+            if let error = BitcoinError(rawValue: _transactionDecode(dataBytes®, data.count, isPretty, &decoded, &decodedLength)) {
                 throw error
             }
             return receiveString(bytes: decoded, count: decodedLength) |> trim

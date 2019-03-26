@@ -23,66 +23,66 @@ import WolfFoundation
 import WolfPipe
 
 public func toRIPEMD160(_ data: Data) -> ShortHash {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _ripemd160(dataBytes, data.count, &bytes, &count)
+        _ripemd160(dataBytes®, data.count, &bytes, &count)
         return try! receiveData(bytes: bytes, count: count) |> tagShortHash
     }
 }
 
 public func toSHA160(_ data: Data) -> ShortHash {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _sha160(dataBytes, data.count, &bytes, &count)
+        _sha160(dataBytes®, data.count, &bytes, &count)
         return try! receiveData(bytes: bytes, count: count) |> tagShortHash
     }
 }
 
 public func toSHA256(_ data: Data) -> HashDigest {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _sha256(dataBytes, data.count, &bytes, &count)
+        _sha256(dataBytes®, data.count, &bytes, &count)
         return try! receiveData(bytes: bytes, count: count) |> tagHashDigest
     }
 }
 
 public func toSHA512(_ data: Data) -> LongHash {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _sha512(dataBytes, data.count, &bytes, &count)
+        _sha512(dataBytes®, data.count, &bytes, &count)
         return try! receiveData(bytes: bytes, count: count) |> tagLongHash
     }
 }
 
 public func toBitcoin256(_ data: Data) -> HashDigest {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _bitcoin256(dataBytes, data.count, &bytes, &count)
+        _bitcoin256(dataBytes®, data.count, &bytes, &count)
         return try! receiveData(bytes: bytes, count: count) |> tagHashDigest
     }
 }
 
 public func toBitcoin160(_ data: Data) -> ShortHash {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var bytes: UnsafeMutablePointer<UInt8>!
         var count: Int = 0
-        _bitcoin160(dataBytes, data.count, &bytes, &count)
+        _bitcoin160(dataBytes®, data.count, &bytes, &count)
         return try! receiveData(bytes: bytes, count: count) |> tagShortHash
     }
 }
 
 public func toSHA256HMAC(key: Data) -> (_ data: Data) -> HashDigest {
     return { data in
-        data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
-            key.withUnsafeBytes { (keyBytes: UnsafePointer<UInt8>) in
+        data.withUnsafeBytes { dataBytes in
+            key.withUnsafeBytes { keyBytes in
                 var bytes: UnsafeMutablePointer<UInt8>!
                 var count: Int = 0
-                _sha256HMAC(dataBytes, data.count, keyBytes, key.count, &bytes, &count)
+                _sha256HMAC(dataBytes®, data.count, keyBytes®, key.count, &bytes, &count)
                 return try! receiveData(bytes: bytes, count: count) |> tagHashDigest
             }
         }
@@ -91,11 +91,11 @@ public func toSHA256HMAC(key: Data) -> (_ data: Data) -> HashDigest {
 
 public func toSHA512HMAC(key: Data) -> (_ data: Data) -> LongHash {
     return { data in
-        data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
-            key.withUnsafeBytes { (keyBytes: UnsafePointer<UInt8>) in
+        data.withUnsafeBytes { dataBytes in
+            key.withUnsafeBytes { keyBytes in
                 var bytes: UnsafeMutablePointer<UInt8>!
                 var count: Int = 0
-                _sha512HMAC(dataBytes, data.count, keyBytes, key.count, &bytes, &count)
+                _sha512HMAC(dataBytes®, data.count, keyBytes®, key.count, &bytes, &count)
                 return try! receiveData(bytes: bytes, count: count) |> tagLongHash
             }
         }
@@ -104,11 +104,11 @@ public func toSHA512HMAC(key: Data) -> (_ data: Data) -> LongHash {
 
 public func toPKCS5PBKDF2HMACSHA512(salt: Data, iterations: Int) -> (_ passphrase: Data) -> LongHash {
     return { passphrase in
-        passphrase.withUnsafeBytes { (passphraseBytes: UnsafePointer<UInt8>) in
-            salt.withUnsafeBytes { (saltBytes: UnsafePointer<UInt8>) in
+        passphrase.withUnsafeBytes { passphraseBytes in
+            salt.withUnsafeBytes { saltBytes in
                 var bytes: UnsafeMutablePointer<UInt8>!
                 var count: Int = 0
-                _pkcs5PBKDF2HMACSHA512(passphraseBytes, passphrase.count, saltBytes, salt.count, iterations, &bytes, &count)
+                _pkcs5PBKDF2HMACSHA512(passphraseBytes®, passphrase.count, saltBytes®, salt.count, iterations, &bytes, &count)
                 return try! receiveData(bytes: bytes, count: count) |> tagLongHash
             }
         }

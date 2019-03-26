@@ -28,10 +28,10 @@ public func tagBase64(_ string: String) -> Base64 { return Base64(rawValue: stri
 
 /// Encodes the data as a base64 string.
 public func toBase64(_ data: Data) -> Base64 {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base64 in
+    return data.withUnsafeBytes { dataBytes -> Base64 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeBase64(dataBytes, data.count, &bytes, &count)
+        _encodeBase64(dataBytes®, data.count, &bytes, &count)
         return receiveString(bytes: bytes, count: count) |> tagBase64
     }
 }

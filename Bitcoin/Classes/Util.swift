@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
+import WolfFoundation
 
 final class WrappedInstance {
     let instance: OpaquePointer
@@ -55,4 +56,12 @@ func receiveInstances<T: InstanceContainer>(instances: UnsafeMutablePointer<Opaq
 
 func trim(_ string: String) -> String {
     return string.trimmingCharacters(in: .whitespacesAndNewlines)
+}
+
+public postfix func ® (lhs: UnsafeRawBufferPointer) -> UnsafePointer<UInt8> {
+    return lhs.bindMemory(to: UInt8.self).baseAddress!
+}
+
+public postfix func ® (lhs: UnsafeMutableRawBufferPointer) -> UnsafeMutablePointer<UInt8> {
+    return lhs.bindMemory(to: UInt8.self).baseAddress!
 }

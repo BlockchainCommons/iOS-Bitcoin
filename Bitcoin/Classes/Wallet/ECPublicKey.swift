@@ -48,10 +48,10 @@ public final class ECCompressedPublicKey: ECPublicKey {
     }
 
     public override func decompress() throws -> ECPublicKey {
-        return try! rawValue.withUnsafeBytes { (compressedBytes: UnsafePointer<UInt8>) in
+        return try! rawValue.withUnsafeBytes { compressedBytes in
             var uncompressed: UnsafeMutablePointer<UInt8>!
             var uncompressedLength = 0
-            if let error = BitcoinError(rawValue: _decompress(compressedBytes, &uncompressed, &uncompressedLength)) {
+            if let error = BitcoinError(rawValue: _decompress(compressedBytes®, &uncompressed, &uncompressedLength)) {
                 throw error
             }
             return try ECUncompressedPublicKey(receiveData(bytes: uncompressed, count: uncompressedLength))
@@ -72,10 +72,10 @@ public final class ECUncompressedPublicKey: ECPublicKey {
     }
 
     public override func compress() throws -> ECPublicKey {
-        return try! rawValue.withUnsafeBytes { (uncompressedBytes: UnsafePointer<UInt8>) in
+        return try! rawValue.withUnsafeBytes { uncompressedBytes in
             var compressed: UnsafeMutablePointer<UInt8>!
             var compressedLength = 0
-            if let error = BitcoinError(rawValue: _compress(uncompressedBytes, &compressed, &compressedLength)) {
+            if let error = BitcoinError(rawValue: _compress(uncompressedBytes®, &compressed, &compressedLength)) {
                 throw error
             }
             return try ECCompressedPublicKey(receiveData(bytes: compressed, count: compressedLength))
@@ -99,10 +99,10 @@ public func toECPublicKey(_ data: Data) throws -> ECPublicKey {
 /// This is a curried function suitable for use with the pipe operator.
 public func toECPublicKey(isCompressed: Bool) -> (_ privateKey: ECPrivateKey) throws -> ECPublicKey {
     return { privateKey in
-        return try privateKey®.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+        return try privateKey®.withUnsafeBytes { privateKeyBytes in
             var publicKeyBytes: UnsafeMutablePointer<UInt8>!
             var publicKeyLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes, privateKey®.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
+            if let error = BitcoinError(rawValue: _toECPublicKey(privateKeyBytes®, privateKey®.count, isCompressed, &publicKeyBytes, &publicKeyLength)) {
                 throw error
             }
             let data = receiveData(bytes: publicKeyBytes, count: publicKeyLength)
@@ -163,10 +163,10 @@ extension Network {
 /// Convert an EC public key to a payment address.
 public func toECPaymentAddress(network: Network, type: ECPaymentAddressType) -> (_ publicKey: ECPublicKey) throws -> PaymentAddress {
     return { publicKey in
-        return try publicKey®.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
+        return try publicKey®.withUnsafeBytes { publicKeyBytes in
             var addressBytes: UnsafeMutablePointer<Int8>!
             var addressLength: Int = 0
-            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes, publicKey®.count, type.version(for: network), &addressBytes, &addressLength)) {
+            if let error = BitcoinError(rawValue: _toECPaymentAddress(publicKeyBytes®, publicKey®.count, type.version(for: network), &addressBytes, &addressLength)) {
                 throw error
             }
             return receiveString(bytes: addressBytes, count: addressLength) |> tagPaymentAddress

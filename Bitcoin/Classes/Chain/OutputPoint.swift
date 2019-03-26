@@ -36,9 +36,9 @@ public struct OutputPoint: InstanceContainer, Encodable {
     }
 
     public static func deserialize(_ data: Data) throws -> OutputPoint {
-        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+        let instance = try data.withUnsafeBytes { dataBytes -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _outputPointDeserialize(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _outputPointDeserialize(dataBytes®, data.count, &instance)) {
                 throw error
             }
             return instance
@@ -93,7 +93,7 @@ public struct OutputPoint: InstanceContainer, Encodable {
                 wrapped = WrappedInstance(_outputPointCopy(wrapped.instance))
             }
             newValue®.withUnsafeBytes { hashBytes in
-                _outputPointSetHash(wrapped.instance, hashBytes)
+                _outputPointSetHash(wrapped.instance, hashBytes®)
             }
         }
     }

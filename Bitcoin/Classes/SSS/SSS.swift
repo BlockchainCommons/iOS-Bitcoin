@@ -25,7 +25,7 @@ public struct SSS {
     public static func randomBytes(count: Int) throws -> Data {
         var data = Data(count: count)
         let result = data.withUnsafeMutableBytes {
-            _randombytes($0, count)
+            _randombytes($0®, count)
         }
         guard result == 0 else {
             throw BitcoinError.noRandomNumberSource
@@ -36,12 +36,12 @@ public struct SSS {
     public static func createShares(from message: SSSMessage, shareCount: Int, quorum: Int) -> [SSSShare] {
         let outBufferSize = SSSShare.length * shareCount + 1000
         var outBuffer = Data(count: outBufferSize)
-        return outBuffer.withUnsafeMutableBytes { (outBytes: UnsafeMutablePointer<UInt8>) in
-            message.data.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
-                _sss_create_shares(UnsafeMutableRawPointer(outBytes), messageBytes, UInt8(shareCount), UInt8(quorum))
+        return outBuffer.withUnsafeMutableBytes { outBytes in
+            message.data.withUnsafeBytes { messageBytes in
+                _sss_create_shares(outBytes®, messageBytes®, UInt8(shareCount), UInt8(quorum))
 
                 var shares = [SSSShare]()
-                let p = UnsafeRawPointer(outBytes)
+                let p = outBytes®
                 for i in 0 ..< shareCount {
                     let data = Data(bytes: p + i * SSSShare.length, count: SSSShare.length)
                     try! shares.append(SSSShare(data: data))
@@ -53,10 +53,10 @@ public struct SSS {
 
     public static func combineShares(_ shares: [SSSShare]) -> SSSMessage? {
         let inBuffer = shares.reduce(into: Data()) { (buf, share) in buf.append(share.data) }
-        return inBuffer.withUnsafeBytes { (sharesBytes: UnsafePointer<UInt8>) -> SSSMessage? in
+        return inBuffer.withUnsafeBytes { sharesBytes -> SSSMessage? in
             var data = Data(count: SSSMessage.length)
-            let result = data.withUnsafeMutableBytes { (messageBytes: UnsafeMutablePointer<UInt8>) in
-                return _sss_combine_shares(messageBytes, UnsafeRawPointer(sharesBytes), UInt8(shares.count))
+            let result = data.withUnsafeMutableBytes { messageBytes in
+                return _sss_combine_shares(messageBytes®, sharesBytes®, UInt8(shares.count))
             }
             guard result == 0 else {
                 return nil
@@ -76,15 +76,15 @@ public struct SSS {
         let shareLength = messageSize + shareMetadataSize
         let outBufferLen = shareLength * shareCount
         var outData = Data(count: outBufferLen)
-        return try outData.withUnsafeMutableBytes { (outBytes: UnsafeMutablePointer<UInt8>) -> [SSSKeyShare] in
-            return try message.withUnsafeBytes { (inBytes: UnsafePointer<UInt8>) -> [SSSKeyShare] in
-                let result = _sss_create_shares_varlen(outBytes, inBytes, messageSize, UInt8(shareCount), UInt8(quorum))
+        return try outData.withUnsafeMutableBytes { outBytes -> [SSSKeyShare] in
+            return try message.withUnsafeBytes { inBytes -> [SSSKeyShare] in
+                let result = _sss_create_shares_varlen(outBytes®, inBytes®, messageSize, UInt8(shareCount), UInt8(quorum))
                 guard result == 0 else {
                     throw BitcoinError.invalidDataSize
                 }
 
                 var shares = [SSSKeyShare]()
-                let p = UnsafeRawPointer(outBytes)
+                let p = outBytes®
                 let id = seed(count: 16)
                 for i in 0 ..< shareCount {
                     let message = Data(bytes: p + i * shareLength, count: shareLength)
@@ -112,9 +112,9 @@ public struct SSS {
         }
         let messageSize = shareSize - 49
         var message = Data(count: messageSize)
-        let result: Int32 = message.withUnsafeMutableBytes { (messageBytes: UnsafeMutablePointer<UInt8>) -> Int32 in
-            sharesData.withUnsafeBytes { (sharesBytes: UnsafePointer<UInt8>) -> Int32 in
-                _sss_combine_shares_varlen(messageBytes, sharesBytes, shareSize, UInt8(shares.count))
+        let result: Int32 = message.withUnsafeMutableBytes { messageBytes -> Int32 in
+            sharesData.withUnsafeBytes { sharesBytes -> Int32 in
+                _sss_combine_shares_varlen(messageBytes®, sharesBytes®, shareSize, UInt8(shares.count))
             }
         }
         guard result == 0 else {

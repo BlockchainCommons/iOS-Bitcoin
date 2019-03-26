@@ -28,10 +28,10 @@ public func tagBase16(_ string: String) -> Base16 { return Base16(rawValue: stri
 
 /// Encodes the data as a base16 (hex) string.
 public func toBase16(_ data: Data) -> Base16 {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base16 in
+    return data.withUnsafeBytes { dataBytes -> Base16 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeBase16(dataBytes, data.count, &bytes, &count)
+        _encodeBase16(dataBytes®, data.count, &bytes, &count)
         return receiveString(bytes: bytes, count: count) |> tagBase16
     }
 }

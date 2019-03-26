@@ -38,9 +38,9 @@ public struct ScriptOperation: InstanceContainer {
     }
 
     public init(_ data: Data, isMinimal: Bool = true) throws {
-        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+        let instance = try data.withUnsafeBytes { dataBytes -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _operationFromData(dataBytes, data.count, isMinimal, &instance)) {
+            if let error = BitcoinError(rawValue: _operationFromData(dataBytes®, data.count, isMinimal, &instance)) {
                 throw error
             }
             return instance
@@ -60,9 +60,9 @@ public struct ScriptOperation: InstanceContainer {
     }
 
     public static func deserialize(_ data: Data) throws -> ScriptOperation {
-        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+        let instance = try data.withUnsafeBytes { dataBytes -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _operationDeserialize(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _operationDeserialize(dataBytes®, data.count, &instance)) {
                 throw error
             }
             return instance

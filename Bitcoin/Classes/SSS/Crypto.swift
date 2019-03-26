@@ -43,7 +43,7 @@ public struct Crypto {
             plaintext.withUnsafeBytes { inputBytes in
                 nonce.withUnsafeBytes { nonceBytes in
                     key.withUnsafeBytes { keyBytes in
-                        _crypto_stream_xor(outputBytes, inputBytes, messageLength, nonceBytes, keyBytes)
+                        _crypto_stream_xor(outputBytes®, inputBytes®, messageLength, nonceBytes®, keyBytes®)
                     }
                 }
             }
@@ -61,7 +61,7 @@ public struct Crypto {
             ciphertext.message.withUnsafeBytes { inputBytes in
                 ciphertext.nonce.withUnsafeBytes { nonceBytes in
                     key.withUnsafeBytes { keyBytes in
-                        _crypto_stream_xor(outputBytes, inputBytes, messageLength, nonceBytes, keyBytes)
+                        _crypto_stream_xor(outputBytes®, inputBytes®, messageLength, nonceBytes®, keyBytes®)
                     }
                 }
             }

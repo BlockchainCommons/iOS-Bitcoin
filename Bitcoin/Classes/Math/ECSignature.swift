@@ -35,10 +35,10 @@ public func tagECSignature(_ data: Data) throws -> ECSignature {
 
 public func toECSignature(isStrict: Bool) -> (_ derSignature: DERSignature) throws -> ECSignature {
     return { derSignature in
-        try derSignature®.withUnsafeBytes { (derSignatureBytes: UnsafePointer<UInt8>) in
+        try derSignature®.withUnsafeBytes { (derSignatureBytes: UnsafeRawBufferPointer) in
             var ecSignatureBytes: UnsafeMutablePointer<UInt8>!
             var ecSignatureLength = 0
-            if let error = BitcoinError(rawValue: _parseSignature(derSignatureBytes, derSignature®.count, isStrict, &ecSignatureBytes, &ecSignatureLength)) {
+            if let error = BitcoinError(rawValue: _parseSignature(derSignatureBytes®, derSignature®.count, isStrict, &ecSignatureBytes, &ecSignatureLength)) {
                 throw error
             }
             return try receiveData(bytes: ecSignatureBytes, count: ecSignatureLength) |> tagECSignature

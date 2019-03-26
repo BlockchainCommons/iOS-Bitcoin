@@ -34,9 +34,9 @@ public struct Input: InstanceContainer, Encodable {
     }
 
     public static func deserialize(_ data: Data) throws -> Input {
-        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+        let instance = try data.withUnsafeBytes { dataBytes -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _inputDeserialize(dataBytes, data.count, &instance)) {
+            if let error = BitcoinError(rawValue: _inputDeserialize(dataBytes®, data.count, &instance)) {
                 throw error
             }
             return instance

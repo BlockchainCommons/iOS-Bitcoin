@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Bitcoin'
-    s.version          = '0.4.0'
+    s.version          = '0.5.0'
     s.summary          = 'Swift bindings for libbitcoin, including Shamir Secret Sharing.'
 
     # s.description      = <<-DESC
@@ -12,13 +12,13 @@ Pod::Spec.new do |s|
     s.author           = { 'Wolf McNally' => 'wolf@wolfmcnally.com' }
     s.source           = { :git => 'https://github.com/blockchaincommons/iOS-Bitcoin.git', :tag => s.version.to_s }
 
-    s.swift_version = '4.2'
+    s.swift_version = '5.0'
 
     s.source_files = 'Bitcoin/Classes/**/*'
 
     s.ios.deployment_target = '11.0'
-    s.macos.deployment_target = '10.13'
-    s.tvos.deployment_target = '11.0'
+    #s.macos.deployment_target = '10.13'
+    #s.tvos.deployment_target = '11.0'
 
     s.module_name = 'Bitcoin'
 

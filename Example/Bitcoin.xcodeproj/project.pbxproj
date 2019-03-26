@@ -357,8 +357,6 @@
 			buildActionMask = 2147483647;
 			files = (
 			);
-			inputFileListPaths = (
-			);
 			inputPaths = (
 				"${PODS_ROOT}/Target Support Files/Pods-Bitcoin_Example/Pods-Bitcoin_Example-frameworks.sh",
 				"${BUILT_PRODUCTS_DIR}/Bitcoin/Bitcoin.framework",
@@ -372,8 +370,6 @@
 				"${BUILT_PRODUCTS_DIR}/WolfWith/WolfWith.framework",
 			);
 			name = "[CP] Embed Pods Frameworks";
-			outputFileListPaths = (
-			);
 			outputPaths = (
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/Bitcoin.framework",
 				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/CBitcoin.framework",

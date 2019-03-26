@@ -49,10 +49,10 @@ extension String {
 
 /// Encodes the data as a base58 string.
 public func toBase58(_ data: Data) -> Base58 {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base58 in
+    return data.withUnsafeBytes { (dataBytes: UnsafeRawBufferPointer) -> Base58 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeBase58(dataBytes, data.count, &bytes, &count)
+        _encodeBase58(dataBytes®, data.count, &bytes, &count)
         return receiveString(bytes: bytes, count: count) |> tagBase58
     }
 }
@@ -74,10 +74,10 @@ public func toData(_ base58: Base58) throws -> Data {
 /// Encodes the data as a base58check string.
 public func toBase58Check(version: UInt8) -> (_ data: Data) -> Base58Check {
     return { data in
-        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base58Check in
+        return data.withUnsafeBytes { (dataBytes: UnsafeRawBufferPointer) -> Base58Check in
             var bytes: UnsafeMutablePointer<Int8>!
             var count: Int = 0
-            _encodeBase58Check(dataBytes, data.count, version, &bytes, &count)
+            _encodeBase58Check(dataBytes®, data.count, version, &bytes, &count)
             return receiveString(bytes: bytes, count: count) |> tagBase58Check
         }
     }

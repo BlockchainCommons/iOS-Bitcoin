@@ -28,11 +28,11 @@ public func tagBase32(_ string: String) -> Base32 { return Base32(rawValue: stri
 
 /// Convert the data to Base32 with the provided prefix.
 public func toBase32(prefix: String, payload: Data) -> Base32 {
-    return payload.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base32 in
+    return payload.withUnsafeBytes { dataBytes -> Base32 in
         prefix.withCString { prefixBytes in
             var bytes: UnsafeMutablePointer<Int8>!
             var count: Int = 0
-            _encodeBase32(prefixBytes, dataBytes, payload.count, &bytes, &count)
+            _encodeBase32(prefixBytes, dataBytes®, payload.count, &bytes, &count)
             return receiveString(bytes: bytes, count: count) |> tagBase32
         }
     }

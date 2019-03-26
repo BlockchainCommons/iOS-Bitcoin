@@ -90,10 +90,10 @@ public struct PaymentAddressVersion {
 /// Convert a RIPEMD160 value to a payment address.
 public func addressEncode(version: UInt8) -> (_ ripemd160: ShortHash) -> PaymentAddress {
     return { ripemd160 in
-        ripemd160®.withUnsafeBytes { (ripemd160Bytes: UnsafePointer<UInt8>) in
+        ripemd160®.withUnsafeBytes { ripemd160Bytes in
             var address: UnsafeMutablePointer<Int8>!
             var addressLength = 0
-            _addressEncode(ripemd160Bytes, version, &address, &addressLength)
+            _addressEncode(ripemd160Bytes®, version, &address, &addressLength)
             return receiveString(bytes: address, count: addressLength) |> tagPaymentAddress
         }
     }
@@ -152,10 +152,10 @@ public func network(_ address: PaymentAddress) throws -> Network {
 /// The script is then serialized, hashed as RIPEMD160, and used with the specified version to create a Bitcoin payment address.
 public func addressEmbed(version: UInt8) -> (_ data: Data) -> PaymentAddress {
     return { data in
-        data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+        data.withUnsafeBytes { dataBytes in
             var address: UnsafeMutablePointer<Int8>!
             var addressLength = 0
-            _addressEmbed(dataBytes, data.count, version, &address, &addressLength)
+            _addressEmbed(dataBytes®, data.count, version, &address, &addressLength)
             return receiveString(bytes: address, count: addressLength) |> tagPaymentAddress
         }
     }

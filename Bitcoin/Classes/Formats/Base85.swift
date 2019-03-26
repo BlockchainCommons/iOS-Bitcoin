@@ -28,10 +28,10 @@ public func tagBase85(_ string: String) -> Base85 { return Base85(rawValue: stri
 
 /// Encodes the data as a base85 string.
 public func toBase85(_ data: Data) -> Base85 {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> Base85 in
+    return data.withUnsafeBytes { dataBytes -> Base85 in
         var bytes: UnsafeMutablePointer<Int8>!
         var count: Int = 0
-        _encodeBase85(dataBytes, data.count, &bytes, &count)
+        _encodeBase85(dataBytes®, data.count, &bytes, &count)
         return receiveString(bytes: bytes, count: count) |> tagBase85
     }
 }

@@ -45,9 +45,9 @@ public struct Script: InstanceContainer {
     }
 
     public static func deserialize(_ data: Data, prefix: Bool = false) throws -> Script {
-        let instance = try data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> OpaquePointer in
+        let instance = try data.withUnsafeBytes { dataBytes -> OpaquePointer in
             var instance: OpaquePointer!
-            if let error = BitcoinError(rawValue: _scriptDeserialize(dataBytes, data.count, prefix, &instance)) {
+            if let error = BitcoinError(rawValue: _scriptDeserialize(dataBytes®, data.count, prefix, &instance)) {
                 throw error
             }
             return instance
@@ -69,7 +69,7 @@ public struct Script: InstanceContainer {
     public init(_ operations: [ScriptOperation]) {
         let operationInstances = operations.map { $0.wrapped.instance }
         let newInstance = operationInstances.withUnsafeBufferPointer { instancesBuffer in
-            _scriptFromOperations(instancesBuffer.baseAddress, operationInstances.count)
+            _scriptFromOperations(instancesBuffer.baseAddress!, operationInstances.count)
         }
         self.init(instance: newInstance)
     }
@@ -120,28 +120,28 @@ public struct Script: InstanceContainer {
     }
 
     public static func makePayNullDataPattern(data: Data) -> [ScriptOperation] {
-        return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) -> [ScriptOperation] in
+        return data.withUnsafeBytes { dataBytes -> [ScriptOperation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
-            _scriptMakePayNullDataPattern(dataBytes, data.count, &operations, &operationsCount)
+            _scriptMakePayNullDataPattern(dataBytes®, data.count, &operations, &operationsCount)
             return receiveInstances(instances: operations, count: operationsCount)
         }
     }
 
     public static func makePayKeyHashPattern(hash: ShortHash) -> [ScriptOperation] {
-        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [ScriptOperation] in
+        return hash®.withUnsafeBytes { hashBytes -> [ScriptOperation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
-            _scriptMakePayKeyHashPattern(hashBytes, &operations, &operationsCount)
+            _scriptMakePayKeyHashPattern(hashBytes®, &operations, &operationsCount)
             return receiveInstances(instances: operations, count: operationsCount)
         }
     }
 
     public static func makePayScriptHashPattern(hash: ShortHash) -> [ScriptOperation] {
-        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> [ScriptOperation] in
+        return hash®.withUnsafeBytes { hashBytes -> [ScriptOperation] in
             var operations: UnsafeMutablePointer<OpaquePointer>!
             var operationsCount = 0
-            _scriptMakePayScriptHashPattern(hashBytes, &operations, &operationsCount)
+            _scriptMakePayScriptHashPattern(hashBytes®, &operations, &operationsCount)
             return receiveInstances(instances: operations, count: operationsCount)
         }
     }
@@ -198,16 +198,16 @@ public func generateSignatureHash(transaction: Transaction, inputIndex: Int, scr
 public func checkSignature(_ signature: ECSignature, sigHashType: SigHashAlgorithm, publicKey: ECPublicKey, script: Script, transaction: Transaction, inputIndex: Int, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) -> Bool {
     return signature®.withUnsafeBytes { signatureBytes in
         publicKey®.withUnsafeBytes { publicKeyBytes in
-            _checkSignature(signatureBytes, sigHashType®, publicKeyBytes, publicKey®.count, script.wrapped.instance, transaction.wrapped.instance, UInt32(inputIndex), scriptVersion®, value)
+            _checkSignature(signatureBytes®, sigHashType®, publicKeyBytes®, publicKey®.count, script.wrapped.instance, transaction.wrapped.instance, UInt32(inputIndex), scriptVersion®, value)
         }
     }
 }
 
 public func createEndorsement(privateKey: ECPrivateKey, script: Script, transaction: Transaction, inputIndex: Int, sigHashType: SigHashAlgorithm, scriptVersion: ScriptVersion = .unversioned, value: UInt64 = UInt64.max) throws -> Endorsement {
-    return try privateKey®.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) in
+    return try privateKey®.withUnsafeBytes { privateKeyBytes in
         var _endorsement: UnsafeMutablePointer<UInt8>!
         var endorsementLength = 0
-        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes, script.wrapped.instance, transaction.wrapped.instance, UInt32(inputIndex), sigHashType®, scriptVersion®, value, &_endorsement, &endorsementLength)) {
+        if let error = BitcoinError(rawValue: _createEndorsement(privateKeyBytes®, script.wrapped.instance, transaction.wrapped.instance, UInt32(inputIndex), sigHashType®, scriptVersion®, value, &_endorsement, &endorsementLength)) {
             throw error
         }
         return try! receiveData(bytes: _endorsement, count: endorsementLength) |> tagEndorsement
@@ -220,10 +220,10 @@ public func createEndorsement(privateKey: ECPrivateKey, script: Script, transact
 
 /// Decode a script to plain text tokens.
 public func scriptDecode(_ data: Data) -> String {
-    return data.withUnsafeBytes { (dataBytes: UnsafePointer<UInt8>) in
+    return data.withUnsafeBytes { dataBytes in
         var decoded: UnsafeMutablePointer<Int8>!
         var decodedLength = 0
-        _scriptDecode(dataBytes, data.count, &decoded, &decodedLength)
+        _scriptDecode(dataBytes®, data.count, &decoded, &decodedLength)
         return receiveString(bytes: decoded, count: decodedLength)
     }
 }

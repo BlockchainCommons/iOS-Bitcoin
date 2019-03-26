@@ -55,8 +55,8 @@ public func newMnemonic(language: Language) -> (_ entropy: Data) throws -> Mnemo
         }
         var mnemo: UnsafeMutablePointer<Int8>!
         var mnemoLength: Int = 0
-        try entropy.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes, entropy.count, dictionary, &mnemo, &mnemoLength)) {
+        try entropy.withUnsafeBytes { seedBytes in
+            if let error = BitcoinError(rawValue: _mnemonicNew(seedBytes®, entropy.count, dictionary, &mnemo, &mnemoLength)) {
                 throw error
             }
         }

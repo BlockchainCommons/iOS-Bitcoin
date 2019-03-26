@@ -53,8 +53,8 @@ public func newECPrivateKey(_ entropy: Data) throws -> ECPrivateKey {
     }
     var privateKeyBytes: UnsafeMutablePointer<UInt8>!
     var privateKeyLength: Int = 0
-    try entropy.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-        if let error = BitcoinError(rawValue: _ecNewPrivateKey(seedBytes, entropy.count, &privateKeyBytes, &privateKeyLength)) {
+    try entropy.withUnsafeBytes { seedBytes in
+        if let error = BitcoinError(rawValue: _ecNewPrivateKey(seedBytes®, entropy.count, &privateKeyBytes, &privateKeyLength)) {
             throw error
         }
     }

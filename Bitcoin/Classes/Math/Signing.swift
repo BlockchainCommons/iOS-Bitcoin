@@ -36,11 +36,11 @@ public func verifySignature(publicKey: ECPublicKey, signature: ECSignature) -> (
 
 public func sign(with privateKey: ECPrivateKey) -> (_ hash: HashDigest) -> ECSignature {
     return { hash in
-        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) -> ECSignature in
-            privateKey®.withUnsafeBytes { (privateKeyBytes: UnsafePointer<UInt8>) -> ECSignature in
+        return hash®.withUnsafeBytes { hashBytes -> ECSignature in
+            privateKey®.withUnsafeBytes { privateKeyBytes -> ECSignature in
                 var signature: UnsafeMutablePointer<UInt8>!
                 var signatureLength = 0
-                _sign(hashBytes, privateKeyBytes, &signature, &signatureLength)
+                _sign(hashBytes®, privateKeyBytes®, &signature, &signatureLength)
                 return try! receiveData(bytes: signature, count: signatureLength) |> tagECSignature
             }
         }
@@ -49,10 +49,10 @@ public func sign(with privateKey: ECPrivateKey) -> (_ hash: HashDigest) -> ECSig
 
 public func verifySignature(publicKey: ECPublicKey, signature: ECSignature) -> (_ hash: HashDigest) -> Bool {
     return { hash in
-        return hash®.withUnsafeBytes { (hashBytes: UnsafePointer<UInt8>) in
-            publicKey®.withUnsafeBytes { (publicKeyBytes: UnsafePointer<UInt8>) in
-                signature®.withUnsafeBytes { (signatureBytes: UnsafePointer<UInt8>) in
-                    _verifySignature(publicKeyBytes, publicKey®.count, hashBytes, signatureBytes)
+        return hash®.withUnsafeBytes { hashBytes in
+            publicKey®.withUnsafeBytes { publicKeyBytes in
+                signature®.withUnsafeBytes { signatureBytes in
+                    _verifySignature(publicKeyBytes®, publicKey®.count, hashBytes®, signatureBytes®)
                 }
             }
         }
@@ -63,10 +63,10 @@ public func verifySignature(publicKey: ECPublicKey, signature: ECSignature) -> (
 public func signMessage(with wif: WIF) -> (_ message: Data) -> String {
     return { message in
         wif®.withCString { (wifString: UnsafePointer<Int8>) in
-            message.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
+            message.withUnsafeBytes { messageBytes in
                 var signatureBytes: UnsafeMutablePointer<Int8>!
                 var signatureLength = 0
-                _messageSign(messageBytes, message.count, wifString, &signatureBytes, &signatureLength)
+                _messageSign(messageBytes®, message.count, wifString, &signatureBytes, &signatureLength)
                 return receiveString(bytes: signatureBytes, count: signatureLength)
             }
         }
@@ -78,8 +78,8 @@ public func validateMessage(paymentAddress: PaymentAddress, signature: String) -
     return { message in
         paymentAddress®.withCString { (paymentAddressString: UnsafePointer<Int8>) in
             signature.withCString { (signatureString: UnsafePointer<Int8>) in
-                message.withUnsafeBytes { (messageBytes: UnsafePointer<UInt8>) in
-                    _messageValidate(paymentAddressString, signatureString, messageBytes, message.count)
+                message.withUnsafeBytes { messageBytes in
+                    _messageValidate(paymentAddressString, signatureString, messageBytes®, message.count)
                 }
             }
         }

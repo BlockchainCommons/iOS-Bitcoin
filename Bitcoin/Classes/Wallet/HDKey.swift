@@ -36,8 +36,8 @@ public func newHDPrivateKey(hdKeyVersion: HDKeyVersion) -> (_ seed: Data) throws
     return { seed in
         var key: UnsafeMutablePointer<Int8>!
         var keyLength = 0
-        try seed.withUnsafeBytes { (seedBytes: UnsafePointer<UInt8>) in
-            if let error = BitcoinError(rawValue: _newHDPrivateKey(seedBytes, seed.count, hdKeyVersion.privateVersion, &key, &keyLength)) {
+        try seed.withUnsafeBytes { seedBytes in
+            if let error = BitcoinError(rawValue: _newHDPrivateKey(seedBytes®, seed.count, hdKeyVersion.privateVersion, &key, &keyLength)) {
                 throw error
             }
         }
