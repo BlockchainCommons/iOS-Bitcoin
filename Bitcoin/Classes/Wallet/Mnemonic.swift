@@ -45,6 +45,16 @@ public enum Language: String, CaseIterable {
     case zh_Hant
 }
 
+public func wordList(for language: Language) -> [String] {
+    var wordsBytes: UnsafeMutablePointer<Int8>!
+    var wordsBytesLength: Int = 0
+    if let error = BitcoinError(rawValue: _wordlistForLanguage(language®.cString(using: .utf8)!, &wordsBytes, &wordsBytesLength)) {
+        fatalError()
+    }
+    let words = receiveString(bytes: wordsBytes, count: wordsBytesLength)
+    return words.split(separator: " ").map { String($0) }
+}
+
 public func newMnemonic(language: Language) -> (_ entropy: Data) throws -> Mnemonic {
     return { entropy in
         guard entropy.count % mnemonicSeedMultiple == 0 else {
