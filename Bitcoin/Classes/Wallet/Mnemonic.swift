@@ -49,7 +49,7 @@ public func wordList(for language: Language) -> [String] {
     var wordsBytes: UnsafeMutablePointer<Int8>!
     var wordsBytesLength: Int = 0
     if let error = BitcoinError(rawValue: _wordlistForLanguage(language®.cString(using: .utf8)!, &wordsBytes, &wordsBytesLength)) {
-        fatalError()
+        fatalError(String(describing: error))
     }
     let words = receiveString(bytes: wordsBytes, count: wordsBytesLength)
     return words.split(separator: " ").map { String($0) }
