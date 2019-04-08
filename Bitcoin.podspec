@@ -1,6 +1,6 @@
 Pod::Spec.new do |s|
     s.name             = 'Bitcoin'
-    s.version          = '0.5.0'
+    s.version          = '0.5.1'
     s.summary          = 'Swift bindings for libbitcoin, including Shamir Secret Sharing.'
 
     # s.description      = <<-DESC
@@ -14,7 +14,7 @@ Pod::Spec.new do |s|
 
     s.swift_version = '5.0'
 
-    s.source_files = 'Bitcoin/Classes/**/*'
+    s.source_files = 'Sources/Bitcoin/**/*'
 
     s.ios.deployment_target = '11.0'
     #s.macos.deployment_target = '10.13'
@@ -23,6 +23,5 @@ Pod::Spec.new do |s|
     s.module_name = 'Bitcoin'
 
     s.dependency 'CBitcoin'
-    s.dependency 'WolfPipe'
-    s.dependency 'WolfFoundation'
+    s.dependency 'WolfCore'
 end

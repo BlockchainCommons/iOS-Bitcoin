@@ -20,9 +20,7 @@
 
 import XCTest
 import Bitcoin
-import WolfPipe
-import WolfStrings
-import WolfFoundation
+import WolfCore
 
 class TestOutputPoint: XCTestCase {
     func test1() {
@@ -77,4 +75,3 @@ class TestOutputPoint: XCTestCase {
         XCTAssertEqual(point |> serialize, data)
     }
 }
-

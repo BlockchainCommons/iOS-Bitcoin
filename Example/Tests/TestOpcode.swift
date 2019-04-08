@@ -20,9 +20,7 @@
 
 import XCTest
 import Bitcoin
-import WolfPipe
-import WolfStrings
-import WolfFoundation
+import WolfCore
 
 class TestOpcode: XCTestCase {
     func testToString1() {

@@ -5,11 +5,7 @@ platform :ios, '12.0'
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'
       pod 'CBitcoin', :path => '../../CBitcoin'
-      pod 'WolfPipe'
-      pod 'WolfWith'
-      pod 'WolfStrings'
-      pod 'WolfFoundation'
-      pod 'WolfNumerics'
+      pod 'WolfCore'
 
       target 'Bitcoin_Tests' do
           inherit! :search_paths

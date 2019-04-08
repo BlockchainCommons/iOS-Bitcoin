@@ -20,8 +20,7 @@
 
 import XCTest
 import Bitcoin
-import WolfPipe
-import WolfFoundation
+import WolfCore
 
 class TestWrapped: XCTestCase {
     func testWrapEncode() {

@@ -20,9 +20,7 @@
 
 import XCTest
 import Bitcoin
-import WolfPipe
-import WolfStrings
-import WolfFoundation
+import WolfCore
 
 class TestTransaction: XCTestCase {
     func testTransactionDecode() {
@@ -91,7 +89,7 @@ class TestTransaction: XCTestCase {
         XCTAssertEqual(Output().description, """
         {"script":"","value":18446744073709551615}
         """)
-        
+
         let value = try! "1.0" |> btcToSatoshi
         let value2 = try! "0.5" |> btcToSatoshi
 

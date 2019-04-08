@@ -11,8 +11,6 @@ On January 25, 2019 I published an announcement for this framework on my blog [h
 
 ## Requirements
 
-* Swift 4.2
-
 * The `Bitcoin` framework depends on the [CBitcoin](https://github.com/BlockchainCommons/iOS-CBitcoin) framework, which includes a pre-made build of [libbitcoin](https://github.com/libbitcoin). To properly install this, you need to first install the latest version of Git and the Git Large File Storage handler:
 
 ```bash
