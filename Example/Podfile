@@ -4,7 +4,7 @@ platform :ios, '12.0'
 
 target 'Bitcoin_Example' do
       pod 'Bitcoin', :path => '../'
-      pod 'CBitcoin', :path => '../../CBitcoin'
+      pod 'CBitcoin' #, :path => '../../CBitcoin'
       pod 'WolfCore'
 
       target 'Bitcoin_Tests' do
