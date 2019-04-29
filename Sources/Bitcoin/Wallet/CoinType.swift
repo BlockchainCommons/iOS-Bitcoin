@@ -64,6 +64,7 @@ public struct CoinType: RawRepresentable, Hashable, Comparable, CustomStringConv
 /// https://github.com/satoshilabs/slips/blob/master/slip-0044.md
 extension CoinType {
     public static let btc = CoinType(0)
+    public static let btct = CoinType(1)
     public static let testnet = CoinType(1) // all coin types
     public static let ltc = CoinType(2)
     public static let eth = CoinType(60)
