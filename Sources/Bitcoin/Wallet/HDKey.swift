@@ -171,7 +171,6 @@ public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose? = nil, accountIndex
             .init(index: CoinType.index(for: vers.coinType, network: vers.network), isHardened: true),
             .init(index: accountIndex, isHardened: true)
         ]
-        print(path)
         return try masterKey |> deriveHDPrivateKey(path: path)
     }
 }
