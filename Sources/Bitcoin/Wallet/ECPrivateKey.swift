@@ -36,7 +36,11 @@ public class ECPrivateKey: ECKey {
     }
 
     public required init(rawValue: Data) {
-        fatalError("init(rawValue:) has not been implemented")
+        super.init(rawValue: rawValue)
+    }
+
+    required public init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
     }
 }
 

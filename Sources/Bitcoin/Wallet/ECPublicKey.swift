@@ -43,7 +43,11 @@ public final class ECCompressedPublicKey: ECPublicKey {
     }
 
     required init(rawValue: Data) {
-        fatalError("init(rawValue:) has not been implemented")
+        super.init(rawValue: rawValue)
+    }
+
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
     }
 
     public override func decompress() throws -> ECPublicKey {
@@ -67,7 +71,11 @@ public final class ECUncompressedPublicKey: ECPublicKey {
     }
 
     required init(rawValue: Data) {
-        fatalError("init(rawValue:) has not been implemented")
+        super.init(rawValue: rawValue)
+    }
+
+    required init(from decoder: Decoder) throws {
+        try super.init(from: decoder)
     }
 
     public override func compress() throws -> ECPublicKey {

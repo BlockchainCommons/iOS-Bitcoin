@@ -20,11 +20,21 @@
 
 import WolfCore
 
-public class ECKey: RawRepresentable {
+public class ECKey: RawRepresentable, Codable {
     public let rawValue: Data
 
     public required init(rawValue: Data) {
         self.rawValue = rawValue
+    }
+
+    required public init(from decoder: Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        rawValue = try container.decode(Data.self)
+    }
+
+    public func encode(to encoder: Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
     }
 }
 
