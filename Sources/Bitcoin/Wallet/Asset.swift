@@ -99,7 +99,7 @@ public let ethDecimalPlaces = 18
 public extension Asset {
     static let bch = Asset(name: "Bitcoin Cash", symbol: "BCH", network: .mainnet, decimalPlaces: btcDecimalPlaces, coinType: .bch)
     static let btc = Asset(name: "Bitcoin", symbol: "BTC", network: .mainnet, decimalPlaces: btcDecimalPlaces, coinType: .btc, paymentAddressValidator: btcPaymentAddressValidator)
-    static let btct = Asset(name: "Bitcoin Testnet", symbol: "BTCT", network: .testnet, decimalPlaces: btcDecimalPlaces, coinType: .btct, paymentAddressValidator: btcPaymentAddressValidator)
+    static let btct = Asset(name: "Bitcoin Testnet", symbol: "BTCT", network: .testnet, decimalPlaces: btcDecimalPlaces, coinType: .testnet, paymentAddressValidator: btcPaymentAddressValidator)
     static let etc = Asset(name: "Ethereum Classic", symbol: "ETC", network: .mainnet, decimalPlaces: ethDecimalPlaces, coinType: .etc)
     static let eth = Asset(name: "Ethereum", symbol: "ETH", network: .mainnet, decimalPlaces: ethDecimalPlaces, coinType: .eth)
     static let ltc = Asset(name: "Litecoin", symbol: "LTC", network: .mainnet, decimalPlaces: btcDecimalPlaces, coinType: .ltc)

@@ -161,7 +161,7 @@ public func deriveHDPublicKey(path: BIP32Path) -> (_ key: HDKey) throws -> HDKey
 ///
 /// Performs the the derviation in brackets below:
 ///
-/// `[ m / purpose' / coin_type' / account' ]`
+/// `m / [ purpose' / coin_type' / account' ]`
 public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose? = nil, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
     return { masterKey in
         let vers = try masterKey |> version
