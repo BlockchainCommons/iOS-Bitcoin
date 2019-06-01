@@ -20,6 +20,10 @@
 
 import WolfCore
 
+//
+// See Docs/Derivations.pdf for diagrams of these derivations
+//
+
 public final class SeedDerivation {
     public let mnemonic: Mnemonic
     public let passphrase: String
