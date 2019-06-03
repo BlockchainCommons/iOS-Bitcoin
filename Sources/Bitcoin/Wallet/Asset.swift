@@ -61,6 +61,12 @@ public struct Asset: Codable {
     }
 }
 
+extension Asset: Equatable {
+    public static func == (lhs: Asset, rhs: Asset) -> Bool {
+        return lhs.symbol == rhs.symbol
+    }
+}
+
 private func btcPaymentAddressValidator(address: PaymentAddress, network: Network) -> String? {
     do {
         let wrappedData = try address |> addressDecode
