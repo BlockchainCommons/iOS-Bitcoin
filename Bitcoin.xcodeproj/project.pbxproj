@@ -119,6 +119,8 @@
 		031A625B235D583300CA9C4A /* Seed.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Seed.swift; sourceTree = "<group>"; };
 		031A62AA235D5AB800CA9C4A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist; path = Info.plist; sourceTree = SOURCE_ROOT; };
 		031A62C6235D6C1400CA9C4A /* CBitcoin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CBitcoin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0398AF7F235FAC5E00D2BF49 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = SOURCE_ROOT; };
+		0398AF80235FAC5F00D2BF49 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -138,6 +140,8 @@
 			isa = PBXGroup;
 			children = (
 				031A62AA235D5AB800CA9C4A /* Info.plist */,
+				0398AF7F235FAC5E00D2BF49 /* LICENSE.md */,
+				0398AF80235FAC5F00D2BF49 /* README.md */,
 				031A621E235D583300CA9C4A /* Bitcoin */,
 				031A6205235D57D000CA9C4A /* Products */,
 				031A62A3235D5A0400CA9C4A /* Frameworks */,
