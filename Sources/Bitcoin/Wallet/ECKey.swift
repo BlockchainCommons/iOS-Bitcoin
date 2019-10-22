@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfCore
+import Foundation
 
 public class ECKey: RawRepresentable, Codable {
     public let rawValue: Data

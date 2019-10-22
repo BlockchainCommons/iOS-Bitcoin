@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfCore
+import Foundation
 
 public enum LongHashTag { }
 public typealias LongHash = Tagged<LongHashTag, Data>

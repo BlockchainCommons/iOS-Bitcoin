@@ -5,6 +5,9 @@
       location = "group:Bitcoin.xcodeproj">
    </FileRef>
    <FileRef
-      location = "group:Pods/Pods.xcodeproj">
+      location = "group:BitcoinDemo.xcodeproj">
+   </FileRef>
+   <FileRef
+      location = "group:../CBitcoin/CBitcoin.xcodeproj">
    </FileRef>
 </Workspace>

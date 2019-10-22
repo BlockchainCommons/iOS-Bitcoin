@@ -348,7 +348,7 @@ class TestTransaction: XCTestCase {
     }
 
     func test_from_data__insufficient_version_bytes__failure() {
-        let data = Data(bytes: [2])
+        let data = Data([2])
         XCTAssertThrowsError(try data |> deserializeTransaction)
     }
 

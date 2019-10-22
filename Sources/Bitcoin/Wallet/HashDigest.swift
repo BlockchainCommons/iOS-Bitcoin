@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfCore
+import Foundation
 
 public enum HashDigestTag { }
 public typealias HashDigest = Tagged<HashDigestTag, Data>

@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfCore
+import Foundation
 
 //
 // See Docs/Derivations.pdf for diagrams of these derivations

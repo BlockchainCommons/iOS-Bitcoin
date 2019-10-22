@@ -20,6 +20,7 @@
 
 import CBitcoin
 import WolfCore
+import Foundation
 
 public enum WIFTag { }
 public typealias WIF = Tagged<WIFTag, String>

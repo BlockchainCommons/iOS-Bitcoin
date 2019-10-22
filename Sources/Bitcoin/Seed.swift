@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import Security
+import Foundation
 
 private var randomNumberGenerator = SecureRandomNumberGenerator()
 

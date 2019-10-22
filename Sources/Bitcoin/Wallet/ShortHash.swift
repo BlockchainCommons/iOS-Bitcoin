@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfCore
+import Foundation
 
 public enum ShortHashTag { }
 public typealias ShortHash = Tagged<ShortHashTag, Data>

@@ -19,6 +19,7 @@
 //  limitations under the License.
 
 import WolfCore
+import Foundation
 
 public enum EndorsementTag { }
 /// DER encoded signature with sighash byte for contract endorsement:
