@@ -1,7 +1,6 @@
 # Bitcoin
 
-[![License](https://img.shields.io/cocoapods/l/Bitcoin.svg?style=flat)](https://cocoapods.org/pods/Bitcoin)
-[![Platform](https://img.shields.io/cocoapods/p/Bitcoin.svg?style=flat)](https://cocoapods.org/pods/Bitcoin)
+Swift bindings for libbitcoin.
 
 ## Blog Post
 
@@ -30,6 +29,7 @@ git version 2.21.0
 
 The Bitcoin and CBitcoin project directories should be siblings in the same directory:
 
+```
 MyProjects
 |
 +—— CBitcoin
@@ -39,6 +39,7 @@ MyProjects
 +—— Bitcoin
     |
     +—— Bitcoin.xcodeproj
+```
 
 ```bash
 $ cd MyProjects
