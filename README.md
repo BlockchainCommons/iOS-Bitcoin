@@ -55,7 +55,8 @@ $ open Bitcoin.xcworkspace/
 
 Within Xcode:
 
-* Wait for the required Swift Packages to resolve, then Build the `Bitcoin` target for an available platform.
+* Wait for the required Swift Packages to resolve
+* Build the `Bitcoin` target for an available platform.
 
 ## Unit Tests
 
