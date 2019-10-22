@@ -19,12 +19,21 @@
 //  limitations under the License.
 
 import UIKit
+import Bitcoin
+import WolfCore
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {
     var window: UIWindow?
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
+        testBitcoin()
         return true
+    }
+
+    private func testBitcoin() {
+        // Should print "true" twice.
+        print("Nakomoto" |> toUTF8 |> signMessage(with: "KwE19y2Ud8EUEBjeUG4Uc4qWUJUUoZJxHR3xUfTpCSsJEDv2o8fu" |> tagWIF) == "HxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4=")
+        print("Nakomoto" |> toUTF8 |> validateMessage(paymentAddress: "1PeChFbhxDD9NLbU21DfD55aQBC4ZTR3tE", signature: "HxQp3cXgOIhBEGXks27sfeSQHVgNUeYgl5i5wG/dOUYaSIRnnzXR6NcyH+AfNAHtkWcyOD9rX4pojqmuQyH79K4="))
     }
 }

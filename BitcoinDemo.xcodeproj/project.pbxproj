@@ -9,8 +9,6 @@
 /* Begin PBXBuildFile section */
 		0309A6842182879F007E974E /* TestHash.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0309A6822182876C007E974E /* TestHash.swift */; };
 		0310E307221E24D7004BC9C3 /* TestSSS.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0310E305221E24B1004BC9C3 /* TestSSS.swift */; };
-		031A62D3235E231D00CA9C4A /* Bitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62D2235E231D00CA9C4A /* Bitcoin.framework */; };
-		031A62D4235E231D00CA9C4A /* Bitcoin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62D2235E231D00CA9C4A /* Bitcoin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		032FC9282190F6B4003A55D7 /* TestPaymentAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 032FC9272190F6B4003A55D7 /* TestPaymentAddress.swift */; };
 		0331067121922387000509BB /* TestWrapped.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331067021922387000509BB /* TestWrapped.swift */; };
 		0331068321937FDC000509BB /* TestScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331068221937FDC000509BB /* TestScript.swift */; };
@@ -18,6 +16,10 @@
 		0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC5218683CD001C12B5 /* TestRandom.swift */; };
 		0361BCC921877354001C12B5 /* TestHD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC72187733B001C12B5 /* TestHD.swift */; };
 		0369A1CC21AF3E0B0045AFC4 /* TestEllipticCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */; };
+		0398AF74235FA04600D2BF49 /* Bitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62D2235E231D00CA9C4A /* Bitcoin.framework */; };
+		0398AF75235FA04600D2BF49 /* Bitcoin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62D2235E231D00CA9C4A /* Bitcoin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		0398AF77235FA24200D2BF49 /* CBitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0398AF4B235F88F700D2BF49 /* CBitcoin.framework */; };
+		0398AF78235FA24200D2BF49 /* CBitcoin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0398AF4B235F88F700D2BF49 /* CBitcoin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D7102D2187979B00E70327 /* TestMnemonic.swift */; };
 		03D710372188ED4700E70327 /* TestEC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D710352188ED1B00E70327 /* TestEC.swift */; };
 		03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DD3E282199F36800E7D982 /* TestOutputPoint.swift */; };
@@ -43,13 +45,14 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
-		031A62D5235E231D00CA9C4A /* Embed Frameworks */ = {
+		0398AF76235FA04600D2BF49 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
 			dstPath = "";
 			dstSubfolderSpec = 10;
 			files = (
-				031A62D4235E231D00CA9C4A /* Bitcoin.framework in Embed Frameworks */,
+				0398AF75235FA04600D2BF49 /* Bitcoin.framework in Embed Frameworks */,
+				0398AF78235FA24200D2BF49 /* CBitcoin.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -68,6 +71,11 @@
 		0361BCC5218683CD001C12B5 /* TestRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRandom.swift; sourceTree = "<group>"; };
 		0361BCC72187733B001C12B5 /* TestHD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHD.swift; sourceTree = "<group>"; };
 		0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEllipticCurve.swift; sourceTree = "<group>"; };
+		0398AF4B235F88F700D2BF49 /* CBitcoin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CBitcoin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		0398AF4E235F894C00D2BF49 /* libsss.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libsss.framework; path = ../CBitcoin/Sources/Frameworks/libsss.framework; sourceTree = "<group>"; };
+		0398AF4F235F894C00D2BF49 /* libbitcoin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libbitcoin.framework; path = ../CBitcoin/Sources/Frameworks/libbitcoin.framework; sourceTree = "<group>"; };
+		0398AF50235F894C00D2BF49 /* libsecp256k1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libsecp256k1.framework; path = ../CBitcoin/Sources/Frameworks/libsecp256k1.framework; sourceTree = "<group>"; };
+		0398AF51235F894C00D2BF49 /* libboost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libboost.framework; path = ../CBitcoin/Sources/Frameworks/libboost.framework; sourceTree = "<group>"; };
 		03D7102D2187979B00E70327 /* TestMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMnemonic.swift; sourceTree = "<group>"; };
 		03D710352188ED1B00E70327 /* TestEC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEC.swift; sourceTree = "<group>"; };
 		03DD3E282199F36800E7D982 /* TestOutputPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOutputPoint.swift; sourceTree = "<group>"; };
@@ -91,7 +99,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				031A62D3235E231D00CA9C4A /* Bitcoin.framework in Frameworks */,
+				0398AF74235FA04600D2BF49 /* Bitcoin.framework in Frameworks */,
+				0398AF77235FA24200D2BF49 /* CBitcoin.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -183,7 +192,12 @@
 		BE176E76AD88DEA407240A15 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				0398AF4B235F88F700D2BF49 /* CBitcoin.framework */,
 				031A62D2235E231D00CA9C4A /* Bitcoin.framework */,
+				0398AF4E235F894C00D2BF49 /* libsss.framework */,
+				0398AF4F235F894C00D2BF49 /* libbitcoin.framework */,
+				0398AF50235F894C00D2BF49 /* libsecp256k1.framework */,
+				0398AF51235F894C00D2BF49 /* libboost.framework */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -198,7 +212,7 @@
 				607FACCC1AFB9204008FA782 /* Sources */,
 				607FACCD1AFB9204008FA782 /* Frameworks */,
 				607FACCE1AFB9204008FA782 /* Resources */,
-				031A62D5235E231D00CA9C4A /* Embed Frameworks */,
+				0398AF76235FA04600D2BF49 /* Embed Frameworks */,
 			);
 			buildRules = (
 			);
@@ -241,10 +255,11 @@
 						CreatedOnToolsVersion = 6.3.1;
 						DevelopmentTeam = 92TUA8H52D;
 						LastSwiftMigration = 0900;
+						ProvisioningStyle = Automatic;
 					};
 					607FACE41AFB9204008FA782 = {
 						CreatedOnToolsVersion = 6.3.1;
-						DevelopmentTeam = 92TUA8H52D;
+						DevelopmentTeam = P776N9776G;
 						LastSwiftMigration = 0900;
 						TestTargetID = 607FACCF1AFB9204008FA782;
 					};
@@ -463,13 +478,18 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92TUA8H52D;
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/../CBitcoin/Sources/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/BitcoinDemo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = blockchaincommons.BitcoinDemo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BitcoinDemo;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Debug;
 		};
@@ -477,20 +497,25 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_IDENTITY = "Apple Development";
+				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92TUA8H52D;
+				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/../CBitcoin/Sources/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/BitcoinDemo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
 				PRODUCT_BUNDLE_IDENTIFIER = blockchaincommons.BitcoinDemo;
-				PRODUCT_NAME = "$(TARGET_NAME)";
+				PRODUCT_NAME = BitcoinDemo;
+				PROVISIONING_PROFILE_SPECIFIER = "";
 				SWIFT_SWIFT3_OBJC_INFERENCE = Default;
+				TARGETED_DEVICE_FAMILY = "1,2";
 			};
 			name = Release;
 		};
 		607FACF31AFB9204008FA782 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = 92TUA8H52D;
+				DEVELOPMENT_TEAM = P776N9776G;
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
 					"$(inherited)",
@@ -507,7 +532,7 @@
 		607FACF41AFB9204008FA782 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				DEVELOPMENT_TEAM = 92TUA8H52D;
+				DEVELOPMENT_TEAM = P776N9776G;
 				INFOPLIST_FILE = "$(SRCROOT)/Tests/BitcoinDemo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks @loader_path/Frameworks";
 				PRODUCT_BUNDLE_IDENTIFIER = "blockchaincommons.$(PRODUCT_NAME:rfc1034identifier)";
