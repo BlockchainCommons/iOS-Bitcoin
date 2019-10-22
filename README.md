@@ -38,7 +38,7 @@ MyProjects
 |
 +—— Bitcoin
     |
-    +—— Bitcoin.xcodeproj
+    +—— Bitcoin.xcworkspace
 ```
 
 ```bash
@@ -48,8 +48,10 @@ $ git clone https://github.com/BlockchainCommons/iOS-Bitcoin.git Bitcoin
 $ cd CBitcoin/Sources
 $ unzip -q Frameworks.zip
 $ cd ../../Bitcoin
-$ open Bitcoin.xcodeproj/
+$ open Bitcoin.xcworkspace/
 ```
+
+⚠️Make sure you open `Bitcoin.xcworkspace` and not `Bitcoin.xcodeproj`.
 
 Within Xcode:
 
