@@ -334,7 +334,7 @@
 				};
 			};
 			buildConfigurationList = 031A61FE235D57D000CA9C4A /* Build configuration list for PBXProject "Bitcoin" */;
-			compatibilityVersion = "Xcode 10.0";
+			compatibilityVersion = "Xcode 11.0";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
