@@ -481,7 +481,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92TUA8H52D;
-				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/../CBitcoin/Sources/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/BitcoinDemo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
@@ -500,7 +499,6 @@
 				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				DEVELOPMENT_TEAM = 92TUA8H52D;
-				FRAMEWORK_SEARCH_PATHS = "\"$(SRCROOT)/../CBitcoin/Sources/Frameworks\"";
 				INFOPLIST_FILE = "$(SRCROOT)/Sources/BitcoinDemo/Info.plist";
 				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/Frameworks";
 				MODULE_NAME = ExampleApp;
