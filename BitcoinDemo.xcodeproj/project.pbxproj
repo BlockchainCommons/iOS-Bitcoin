@@ -20,6 +20,7 @@
 		0398AF75235FA04600D2BF49 /* Bitcoin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62D2235E231D00CA9C4A /* Bitcoin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
 		0398AF77235FA24200D2BF49 /* CBitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 0398AF4B235F88F700D2BF49 /* CBitcoin.framework */; };
 		0398AF78235FA24200D2BF49 /* CBitcoin.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = 0398AF4B235F88F700D2BF49 /* CBitcoin.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
+		03CC10C12374F9B9005CEF6B /* TestBech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10C02374F9B9005CEF6B /* TestBech32.swift */; };
 		03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D7102D2187979B00E70327 /* TestMnemonic.swift */; };
 		03D710372188ED4700E70327 /* TestEC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03D710352188ED1B00E70327 /* TestEC.swift */; };
 		03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03DD3E282199F36800E7D982 /* TestOutputPoint.swift */; };
@@ -76,6 +77,7 @@
 		0398AF4F235F894C00D2BF49 /* libbitcoin.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libbitcoin.framework; path = ../CBitcoin/Sources/Frameworks/libbitcoin.framework; sourceTree = "<group>"; };
 		0398AF50235F894C00D2BF49 /* libsecp256k1.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libsecp256k1.framework; path = ../CBitcoin/Sources/Frameworks/libsecp256k1.framework; sourceTree = "<group>"; };
 		0398AF51235F894C00D2BF49 /* libboost.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = libboost.framework; path = ../CBitcoin/Sources/Frameworks/libboost.framework; sourceTree = "<group>"; };
+		03CC10C02374F9B9005CEF6B /* TestBech32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestBech32.swift; sourceTree = "<group>"; };
 		03D7102D2187979B00E70327 /* TestMnemonic.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestMnemonic.swift; sourceTree = "<group>"; };
 		03D710352188ED1B00E70327 /* TestEC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEC.swift; sourceTree = "<group>"; };
 		03DD3E282199F36800E7D982 /* TestOutputPoint.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestOutputPoint.swift; sourceTree = "<group>"; };
@@ -175,6 +177,7 @@
 				0331068A2193F052000509BB /* TestTransaction.swift */,
 				0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */,
 				0310E305221E24B1004BC9C3 /* TestSSS.swift */,
+				03CC10C02374F9B9005CEF6B /* TestBech32.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
 			name = Tests;
@@ -325,6 +328,7 @@
 				03D7102E2187979B00E70327 /* TestMnemonic.swift in Sources */,
 				03DD3E2B219A0B1300E7D982 /* TestInput.swift in Sources */,
 				607FACEC1AFB9204008FA782 /* TestFormats.swift in Sources */,
+				03CC10C12374F9B9005CEF6B /* TestBech32.swift in Sources */,
 				0369A1CC21AF3E0B0045AFC4 /* TestEllipticCurve.swift in Sources */,
 				0309A6842182879F007E974E /* TestHash.swift in Sources */,
 				03DD3E292199F36800E7D982 /* TestOutputPoint.swift in Sources */,

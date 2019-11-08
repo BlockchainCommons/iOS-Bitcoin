@@ -61,6 +61,8 @@
 		031A6292235D583300CA9C4A /* Seed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031A625B235D583300CA9C4A /* Seed.swift */; };
 		031A62B0235D5D6100CA9C4A /* WolfCore in Frameworks */ = {isa = PBXBuildFile; productRef = 031A62AF235D5D6100CA9C4A /* WolfCore */; };
 		0398AF71235FA01E00D2BF49 /* CBitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62C6235D6C1400CA9C4A /* CBitcoin.framework */; };
+		03CC10BF2374F3B2005CEF6B /* Bech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10BE2374F3B2005CEF6B /* Bech32.swift */; };
+		03CC10C32374FCFA005CEF6B /* SegwitAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -121,6 +123,8 @@
 		031A62C6235D6C1400CA9C4A /* CBitcoin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CBitcoin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0398AF7F235FAC5E00D2BF49 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = SOURCE_ROOT; };
 		0398AF80235FAC5F00D2BF49 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		03CC10BE2374F3B2005CEF6B /* Bech32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bech32.swift; sourceTree = "<group>"; };
+		03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegwitAddress.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -184,6 +188,8 @@
 				031A6225235D583300CA9C4A /* Base64.swift */,
 				031A6226235D583300CA9C4A /* Base85.swift */,
 				031A6227235D583300CA9C4A /* Base58.swift */,
+				03CC10BE2374F3B2005CEF6B /* Bech32.swift */,
+				03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */,
 			);
 			path = Formats;
 			sourceTree = "<group>";
@@ -360,6 +366,7 @@
 				031A626E235D583300CA9C4A /* Signing.swift in Sources */,
 				031A6275235D583300CA9C4A /* SSSKeyShare.swift in Sources */,
 				031A626D235D583300CA9C4A /* Endorsement.swift in Sources */,
+				03CC10C32374FCFA005CEF6B /* SegwitAddress.swift in Sources */,
 				031A626A235D583300CA9C4A /* Transaction.swift in Sources */,
 				031A625D235D583300CA9C4A /* BitcoinHash.swift in Sources */,
 				031A6278235D583300CA9C4A /* ScriptPattern.swift in Sources */,
@@ -374,6 +381,7 @@
 				031A626F235D583300CA9C4A /* DERSignature.swift in Sources */,
 				031A6290235D583300CA9C4A /* BitcoinError.swift in Sources */,
 				031A6283235D583300CA9C4A /* PaymentAddress.swift in Sources */,
+				03CC10BF2374F3B2005CEF6B /* Bech32.swift in Sources */,
 				031A6276235D583300CA9C4A /* SplitRecoveryPhrase.swift in Sources */,
 				031A6292235D583300CA9C4A /* Seed.swift in Sources */,
 				031A6284235D583300CA9C4A /* HDKey.swift in Sources */,
