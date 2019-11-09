@@ -31,6 +31,13 @@ public func toData(_ bech32: Bech32) throws -> (hrp: String, data: Data) {
     return (hrp, data)
 }
 
+extension Character {
+    /// Returns true if the character is a valid Bech32 character, false otherwise.
+    public var isBech32: Bool {
+        return Bech32Impl._isBech32(String(self).asciiByte)
+    }
+}
+
 /// Bech32 checksum implementation
 fileprivate class Bech32Impl {
     private static let gen: [UInt32] = [0x3b6a57b2, 0x26508e6d, 0x1ea119fa, 0x3d4233dd, 0x2a1462b3]
@@ -49,6 +56,10 @@ fileprivate class Bech32Impl {
         -1, 29, -1, 24, 13, 25,  9,  8, 23, -1, 18, 22, 31, 27, 19, -1,
         1,  0,  3, 16, 11, 28, 12, 14,  6,  4,  2, -1, -1, -1, -1, -1
     ]
+
+    fileprivate static func _isBech32(_ c: UInt8) -> Bool {
+        return encCharset.contains(c)
+    }
 
     /// Find the polynomial with value coefficients mod the generator as 30-bit.
     private static func polymod(_ values: Data) -> UInt32 {

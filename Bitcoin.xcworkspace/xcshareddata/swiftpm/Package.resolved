@@ -42,8 +42,8 @@
         "repositoryURL": "https://github.com/wolfmcnally/WolfNesting",
         "state": {
           "branch": null,
-          "revision": "2b301ff45eaa8414a9630926f5671a1e421a38f5",
-          "version": "2.0.2"
+          "revision": "8aa2d08b0fffb689686225a8498ed3f5f0c86526",
+          "version": "2.0.3"
         }
       },
       {
@@ -60,8 +60,8 @@
         "repositoryURL": "https://github.com/wolfmcnally/WolfOSBridge",
         "state": {
           "branch": null,
-          "revision": "6aeb9ff200702d2b072a9351663db3b47741be1f",
-          "version": "2.0.1"
+          "revision": "0d7252f4906c8c131f365acb6b0b788113de74b9",
+          "version": "2.0.2"
         }
       },
       {
@@ -78,8 +78,8 @@
         "repositoryURL": "https://github.com/wolfmcnally/WolfStrings",
         "state": {
           "branch": null,
-          "revision": "8e17cbaa0c4d031a0da0676c0fff7b6b9bdd8af0",
-          "version": "2.0.6"
+          "revision": "8485c9e29268c4c5d927d0700a38e1cb8ebfb1d3",
+          "version": "2.1.0"
         }
       },
       {

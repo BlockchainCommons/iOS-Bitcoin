@@ -63,6 +63,7 @@
 		0398AF71235FA01E00D2BF49 /* CBitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62C6235D6C1400CA9C4A /* CBitcoin.framework */; };
 		03CC10BF2374F3B2005CEF6B /* Bech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10BE2374F3B2005CEF6B /* Bech32.swift */; };
 		03CC10C32374FCFA005CEF6B /* SegwitAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */; };
+		03CC10C523755D4A005CEF6B /* TxRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10C423755D4A005CEF6B /* TxRef.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -125,6 +126,7 @@
 		0398AF80235FAC5F00D2BF49 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
 		03CC10BE2374F3B2005CEF6B /* Bech32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bech32.swift; sourceTree = "<group>"; };
 		03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegwitAddress.swift; sourceTree = "<group>"; };
+		03CC10C423755D4A005CEF6B /* TxRef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxRef.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -190,6 +192,7 @@
 				031A6227235D583300CA9C4A /* Base58.swift */,
 				03CC10BE2374F3B2005CEF6B /* Bech32.swift */,
 				03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */,
+				03CC10C423755D4A005CEF6B /* TxRef.swift */,
 			);
 			path = Formats;
 			sourceTree = "<group>";
@@ -371,6 +374,7 @@
 				031A625D235D583300CA9C4A /* BitcoinHash.swift in Sources */,
 				031A6278235D583300CA9C4A /* ScriptPattern.swift in Sources */,
 				031A6286235D583300CA9C4A /* ECPublicKey.swift in Sources */,
+				03CC10C523755D4A005CEF6B /* TxRef.swift in Sources */,
 				031A6270235D583300CA9C4A /* ECSignature.swift in Sources */,
 				031A6273235D583300CA9C4A /* SSSMessage.swift in Sources */,
 				031A628F235D583300CA9C4A /* ECKey.swift in Sources */,
