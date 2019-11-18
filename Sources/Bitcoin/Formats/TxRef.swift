@@ -10,7 +10,7 @@ import Foundation
 import WolfCore
 
 ///
-/// Implemented from `Bech32 Encoded Tx Position References`
+/// Implemented from: *Bech32 Encoded Tx Position References*
 /// https://github.com/bitcoin/bips/blob/master/bip-0136.mediawiki
 ///
 
@@ -19,20 +19,20 @@ public typealias EncodedTxRef = Tagged<EncodedTxRefTag, String>
 public func tagEncodedTxRef(_ string: String) -> EncodedTxRef { return EncodedTxRef(rawValue: string) }
 
 public struct TxRef: Equatable {
-    public let isTest: Bool
+    public let network: Network
     public let blockHeight: Int
     public let txIndex: Int
     public let outIndex: Int?
 
-    public init(isTest: Bool, blockHeight: Int, txIndex: Int, outIndex: Int? = nil) {
-        self.isTest = isTest
+    public init(network: Network, blockHeight: Int, txIndex: Int, outIndex: Int? = nil) {
+        self.network = network
         self.blockHeight = blockHeight
         self.txIndex = txIndex
         self.outIndex = outIndex
     }
 }
 
-public func toEncodedTxRef(_ txRef: TxRef) -> EncodedTxRef {
+public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
     struct BitAggregator {
         private(set) var data: Data
         private var bitMask: UInt8
@@ -71,19 +71,20 @@ public func toEncodedTxRef(_ txRef: TxRef) -> EncodedTxRef {
 
         let magicCode: Int
         let hrp: String
-        if txRef.isTest {
-            hrp = "txtest"
-            if txRef.outIndex == nil {
-                magicCode = 6
-            } else {
-                magicCode = 7
-            }
-        } else {
+        switch txRef.network {
+        case .mainnet:
             hrp = "tx"
             if txRef.outIndex == nil {
                 magicCode = 3
             } else {
                 magicCode = 4
+            }
+        case .testnet:
+            hrp = "txtest"
+            if txRef.outIndex == nil {
+                magicCode = 6
+            } else {
+                magicCode = 7
             }
         }
 
@@ -126,7 +127,7 @@ public func toEncodedTxRef(_ txRef: TxRef) -> EncodedTxRef {
 //    return bech32® |> tagEncodedTxRef
 }
 
-public func toTxRef(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
+public func toDecoded(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
     final class BitEnumerator {
         private let data: Data
         private var byteIndex: Int
@@ -241,7 +242,9 @@ public func toTxRef(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
         outIndex = nil
     }
 
-    return TxRef(isTest: isTest, blockHeight: blockheight, txIndex: txIndex, outIndex: outIndex)
+    let network: Network = isTest ? .testnet : .mainnet
+
+    return TxRef(network: network, blockHeight: blockheight, txIndex: txIndex, outIndex: outIndex)
 }
 
 public enum TxRefError: LocalizedError {

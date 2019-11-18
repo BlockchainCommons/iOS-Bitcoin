@@ -20,7 +20,12 @@
 
 /// The value of the "change" or "chain type" field referred to in:
 /// https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
+///
+/// The value of `identity` has been suggested by Christopher Allen as a place to sequester value in use by BTCR DID documents.
+/// https://w3c-ccg.github.io/didm-btcr/
+
 public enum ChainType: Int {
     case external = 0
     case change = 1
+    case identity = 7
 }
