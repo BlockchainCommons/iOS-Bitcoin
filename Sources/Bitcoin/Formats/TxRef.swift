@@ -22,9 +22,9 @@ public struct TxRef: Equatable {
     public let network: Network
     public let blockHeight: Int
     public let txIndex: Int
-    public let outIndex: Int?
+    public let outIndex: Int
 
-    public init(network: Network, blockHeight: Int, txIndex: Int, outIndex: Int? = nil) {
+    public init(network: Network, blockHeight: Int, txIndex: Int, outIndex: Int = 0) {
         self.network = network
         self.blockHeight = blockHeight
         self.txIndex = txIndex
@@ -74,14 +74,14 @@ public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
         switch txRef.network {
         case .mainnet:
             hrp = "tx"
-            if txRef.outIndex == nil {
+            if txRef.outIndex == 0 {
                 magicCode = 3
             } else {
                 magicCode = 4
             }
         case .testnet:
             hrp = "txtest"
-            if txRef.outIndex == nil {
+            if txRef.outIndex == 0 {
                 magicCode = 6
             } else {
                 magicCode = 7
@@ -96,8 +96,8 @@ public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
         aggregator.append(bits: 24, of: txRef.blockHeight)
         aggregator.append(bits: 15, of: txRef.txIndex)
 
-        if let outIndex = txRef.outIndex {
-            aggregator.append(bits: 15, of: outIndex)
+        if txRef.outIndex != 0 {
+            aggregator.append(bits: 15, of: txRef.outIndex)
         }
 
         return aggregator.data |> toBech32(hrp)
@@ -231,15 +231,18 @@ public func toDecoded(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
         throw TxRefError.noTxIndex
     }
 
-    let outIndex: Int?
+    let outIndex: Int
     switch magicCode {
     case 4, 7: // has outpoint
         guard let i = enumerator.next(bits: 15) else {
             throw TxRefError.noOutIndex
         }
+        guard i > 0 else {
+            throw TxRefError.zeroOutIndex
+        }
         outIndex = i
     default:
-        outIndex = nil
+        outIndex = 0
     }
 
     let network: Network = isTest ? .testnet : .mainnet
@@ -258,6 +261,7 @@ public enum TxRefError: LocalizedError {
     case unknownHumanReadablePart
     case chainMismatch
     case invalidLength
+    case zeroOutIndex
 
     public var errorDescription: String? {
         switch self {
@@ -281,6 +285,8 @@ public enum TxRefError: LocalizedError {
             return "Human readable part does not match chain."
         case .invalidLength:
             return "String was invalid length."
+        case .zeroOutIndex:
+            return "Output index encoded as zero not allowed."
         }
     }
 }
