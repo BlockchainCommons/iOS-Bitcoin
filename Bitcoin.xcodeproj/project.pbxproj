@@ -61,6 +61,7 @@
 		031A6292235D583300CA9C4A /* Seed.swift in Sources */ = {isa = PBXBuildFile; fileRef = 031A625B235D583300CA9C4A /* Seed.swift */; };
 		031A62B0235D5D6100CA9C4A /* WolfCore in Frameworks */ = {isa = PBXBuildFile; productRef = 031A62AF235D5D6100CA9C4A /* WolfCore */; };
 		0398AF71235FA01E00D2BF49 /* CBitcoin.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 031A62C6235D6C1400CA9C4A /* CBitcoin.framework */; };
+		03B9E59C238B963B006ADDC5 /* Fee.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03B9E59B238B963B006ADDC5 /* Fee.swift */; };
 		03CC10BF2374F3B2005CEF6B /* Bech32.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10BE2374F3B2005CEF6B /* Bech32.swift */; };
 		03CC10C32374FCFA005CEF6B /* SegwitAddress.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */; };
 		03CC10C523755D4A005CEF6B /* TxRef.swift in Sources */ = {isa = PBXBuildFile; fileRef = 03CC10C423755D4A005CEF6B /* TxRef.swift */; };
@@ -124,6 +125,7 @@
 		031A62C6235D6C1400CA9C4A /* CBitcoin.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CBitcoin.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		0398AF7F235FAC5E00D2BF49 /* LICENSE.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = LICENSE.md; sourceTree = SOURCE_ROOT; };
 		0398AF80235FAC5F00D2BF49 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = SOURCE_ROOT; };
+		03B9E59B238B963B006ADDC5 /* Fee.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fee.swift; sourceTree = "<group>"; };
 		03CC10BE2374F3B2005CEF6B /* Bech32.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Bech32.swift; sourceTree = "<group>"; };
 		03CC10C22374FCF9005CEF6B /* SegwitAddress.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegwitAddress.swift; sourceTree = "<group>"; };
 		03CC10C423755D4A005CEF6B /* TxRef.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TxRef.swift; sourceTree = "<group>"; };
@@ -206,6 +208,7 @@
 				031A622D235D583300CA9C4A /* Input.swift */,
 				031A622E235D583300CA9C4A /* Script.swift */,
 				031A622F235D583300CA9C4A /* Transaction.swift */,
+				03B9E59B238B963B006ADDC5 /* Fee.swift */,
 			);
 			path = Chain;
 			sourceTree = "<group>";
@@ -402,6 +405,7 @@
 				031A6280235D583300CA9C4A /* HDKeyPurpose.swift in Sources */,
 				031A625C235D583300CA9C4A /* Constants.swift in Sources */,
 				031A628A235D583300CA9C4A /* Asset.swift in Sources */,
+				03B9E59C238B963B006ADDC5 /* Fee.swift in Sources */,
 				031A6274235D583300CA9C4A /* Crypto.swift in Sources */,
 				031A627D235D583300CA9C4A /* Derivations.swift in Sources */,
 				031A6260235D583300CA9C4A /* Base32.swift in Sources */,

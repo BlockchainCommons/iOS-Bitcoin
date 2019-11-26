@@ -119,3 +119,15 @@ public var assetsBySymbol: [String: Asset] = [
     "ETH": .eth,
     "LTC": .ltc
 ]
+
+public func toBase10(_ asset: Asset) -> (_ amount: Fragments) -> Base10 {
+    { amount in
+        amount |> toBase10(decimalPlaces: asset.decimalPlaces)
+    }
+}
+
+public func toFragments(_ asset: Asset, strict: Bool = true) -> (_ base10: Base10) throws -> Fragments {
+    { base10 in
+        try base10 |> toFragments(decimalPlaces: asset.decimalPlaces, strict: strict)
+    }
+}
