@@ -24,7 +24,9 @@
 /// The value of `identity` has been suggested by Christopher Allen as a place to sequester value in use by BTCR DID documents.
 /// https://w3c-ccg.github.io/didm-btcr/
 
-public enum ChainType: Int {
+import Foundation
+
+public enum ChainType: Int, Codable {
     case external = 0
     case change = 1
     case identity = 7

@@ -9,7 +9,7 @@
 import Foundation
 import WolfCore
 
-public struct FeeEstimate: Codable {
+public struct FeeRate: Codable {
     public let targetConfirmationMinutes: Int
     public let satoshisPerVbyte: Double
 
@@ -21,23 +21,23 @@ public struct FeeEstimate: Codable {
 
 public struct FeeSchedule: Codable {
     // Array of fee estimates sorted ascending by confirmation time.
-    public let feeEstimates: [FeeEstimate]
+    public let feeRates: [FeeRate]
 
-    public init(_ feeEstimates: [FeeEstimate]) {
-        self.feeEstimates = feeEstimates.sorted { $0.targetConfirmationMinutes < $1.targetConfirmationMinutes }
+    public init(_ feeEstimates: [FeeRate]) {
+        self.feeRates = feeEstimates.sorted { $0.targetConfirmationMinutes < $1.targetConfirmationMinutes }
     }
 
-    public var fastest: FeeEstimate {
-        return feeEstimates.first!
+    public var fastest: FeeRate {
+        return feeRates.first!
     }
 
-    public var cheapest: FeeEstimate {
-        return feeEstimates.last!
+    public var cheapest: FeeRate {
+        return feeRates.last!
     }
 }
 
 extension Transaction {
-    public func fee(with estimate: FeeEstimate) -> (fee: Satoshis, byteCount: Int) {
+    public func fee(with estimate: FeeRate) -> (fee: Satoshis, byteCount: Int) {
         let data = self |> serialize
         let byteCount = data.count
         let fee = Double(byteCount) * estimate.satoshisPerVbyte
