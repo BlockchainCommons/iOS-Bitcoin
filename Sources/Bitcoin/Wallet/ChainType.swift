@@ -26,7 +26,7 @@
 
 import Foundation
 
-public enum ChainType: Int, Codable {
+public enum ChainType: Int, Codable, CaseIterable {
     case external = 0
     case change = 1
     case identity = 7

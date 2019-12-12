@@ -44,7 +44,7 @@ public struct Asset: Codable {
         try container.encode(symbol)
     }
 
-    public func validatePaymentAddress(address: PaymentAddress, network: Network) -> String? {
+    public func validatePaymentAddress(_ address: PaymentAddress) -> String? {
         guard let validator = paymentAddressValidator else {
             return "I can't parse that kind of address yet."
         }
