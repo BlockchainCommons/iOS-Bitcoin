@@ -19,7 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
 
 public struct WrappedData: Encodable {
     public let prefix: UInt8

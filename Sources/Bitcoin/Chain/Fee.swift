@@ -7,7 +7,7 @@
 //
 
 import Foundation
-import WolfCore
+import WolfPipe
 
 public struct FeeRate: Codable {
     public let targetConfirmationMinutes: Int

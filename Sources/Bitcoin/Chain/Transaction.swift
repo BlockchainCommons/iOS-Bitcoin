@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 public struct Transaction: InstanceContainer, Encodable {
     var wrapped: WrappedInstance

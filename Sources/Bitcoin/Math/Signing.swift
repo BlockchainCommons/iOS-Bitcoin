@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 public func signMessage(with privateKey: ECPrivateKey) -> (_ message: Data) -> ECSignature {
     return { message in

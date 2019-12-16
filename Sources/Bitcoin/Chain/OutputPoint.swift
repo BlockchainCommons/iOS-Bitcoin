@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 /// An OutputPoint is a component of a transaction input, and specifies
 /// the output of the previous transaction that is being spent.

@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 public enum ScriptOpcode: UInt8 {
     case pushSize0 = 0        // is_version (pushes [] to the stack not 0)

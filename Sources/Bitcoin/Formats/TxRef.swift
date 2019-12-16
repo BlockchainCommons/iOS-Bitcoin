@@ -7,7 +7,9 @@
 //
 
 import Foundation
-import WolfCore
+import WolfPipe
+import WolfFoundation
+import WolfStrings
 
 ///
 /// Implemented from: *Bech32 Encoded Tx Position References*

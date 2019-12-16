@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 public enum MnemonicTag { }
 public typealias Mnemonic = Tagged<MnemonicTag, String>

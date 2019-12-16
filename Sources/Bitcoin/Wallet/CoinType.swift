@@ -18,8 +18,6 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-import WolfCore
-
 /// This is an extensible enumerated type. This means that additional members of `CoinType`
 /// can be added at compile-time by clients of this module by simply extending `CoinType`
 /// with additional `public` `static` members as seen below.
@@ -27,6 +25,9 @@ import WolfCore
 /// See also:
 ///   - Multi-Account Hierarchy for Deterministic Wallets
 ///   - https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki
+
+import WolfFoundation
+
 public struct CoinType: RawRepresentable, Hashable, Comparable, CustomStringConvertible {
     public let rawValue: Int
 

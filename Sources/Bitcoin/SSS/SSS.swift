@@ -19,7 +19,6 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
 
 public struct SSS {
     public static func randomBytes(count: Int) throws -> Data {

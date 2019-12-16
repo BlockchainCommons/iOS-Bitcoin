@@ -19,7 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfFoundation
 
 final class WrappedInstance {
     let instance: OpaquePointer

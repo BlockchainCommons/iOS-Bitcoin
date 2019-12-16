@@ -19,8 +19,9 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
 import Foundation
+import WolfFoundation
+import WolfPipe
 
 public enum WIFTag { }
 public typealias WIF = Tagged<WIFTag, String>

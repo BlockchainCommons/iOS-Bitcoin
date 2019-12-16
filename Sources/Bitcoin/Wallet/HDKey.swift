@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfFoundation
+import WolfPipe
 
 public enum HDKeyTag { }
 public typealias HDKey = Tagged<HDKeyTag, String>

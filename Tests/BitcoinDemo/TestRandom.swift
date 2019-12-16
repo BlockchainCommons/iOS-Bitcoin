@@ -20,7 +20,9 @@
 
 import XCTest
 import Bitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
+import WolfNumerics
 
 class TestRandom: XCTestCase {
     func testSeed() {

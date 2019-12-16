@@ -20,7 +20,8 @@
 
 import XCTest
 import Bitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 class TestEC: XCTestCase {
     func testECPrivateKeyNew() {

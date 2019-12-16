@@ -18,8 +18,9 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-import WolfCore
 import Foundation
+import WolfFoundation
+import WolfPipe
 
 public enum HashDigestTag { }
 public typealias HashDigest = Tagged<HashDigestTag, Data>

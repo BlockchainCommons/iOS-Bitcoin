@@ -19,7 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
 
 public func toRIPEMD160(_ data: Data) -> ShortHash {
     return data.withUnsafeBytes { dataBytes in

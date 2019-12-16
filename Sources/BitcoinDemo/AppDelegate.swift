@@ -20,7 +20,8 @@
 
 import UIKit
 import Bitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 @UIApplicationMain
 class AppDelegate: UIResponder, UIApplicationDelegate {

@@ -5,7 +5,7 @@
 //  Created by Wolf McNally on 2/2/19.
 //
 
-import WolfCore
+import WolfFoundation
 
 public struct HDKeyVersion {
     public let network: Network

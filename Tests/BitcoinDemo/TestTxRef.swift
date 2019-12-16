@@ -9,7 +9,8 @@
 import XCTest
 import Foundation
 import Bitcoin
-import WolfCore
+import WolfFoundation
+import WolfPipe
 
 ///
 /// Tests from `Bech32 Encoded Tx Position References`

@@ -14,7 +14,8 @@
 //  Inspired by Pieter Wuille C++ implementation
 
 import Foundation
-import WolfCore
+import WolfFoundation
+import WolfPipe
 
 public enum Bech32Tag { }
 public typealias Bech32 = Tagged<Bech32Tag, String>

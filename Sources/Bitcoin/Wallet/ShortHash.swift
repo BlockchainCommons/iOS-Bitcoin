@@ -18,8 +18,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-import WolfCore
 import Foundation
+import WolfFoundation
 
 public enum ShortHashTag { }
 public typealias ShortHash = Tagged<ShortHashTag, Data>

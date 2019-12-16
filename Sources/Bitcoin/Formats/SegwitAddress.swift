@@ -14,7 +14,7 @@
 //  Inspired by Pieter Wuille C++ implementation
 
 import Foundation
-import WolfCore
+import WolfPipe
 
 public struct SegwitAddress {
     public let version: Int

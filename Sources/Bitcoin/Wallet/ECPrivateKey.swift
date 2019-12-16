@@ -19,7 +19,7 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
 
 public let ecPrivateKeySize: Int = { return _ecPrivateKeySize() }()
 

@@ -20,7 +20,8 @@
 
 import XCTest
 @testable import Bitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 class TestSSS: XCTestCase {
     func testRandomBytes() throws {

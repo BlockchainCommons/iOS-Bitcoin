@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 public let ecCompressedPublicKeySize: Int = { return _ecCompressedPublicKeySize() }()
 public let ecUncompressedPublicKeySize: Int = { return _ecUncompressedPublicKeySize() }()

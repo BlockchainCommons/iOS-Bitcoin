@@ -19,7 +19,8 @@
 //  limitations under the License.
 
 import CBitcoin
-import WolfCore
+import WolfFoundation
+import WolfPipe
 
 public enum Base58Tag { }
 public typealias Base58 = Tagged<Base58Tag, String>

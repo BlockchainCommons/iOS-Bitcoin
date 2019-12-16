@@ -18,8 +18,8 @@
 //  See the License for the specific language governing permissions and
 //  limitations under the License.
 
-import WolfCore
 import CBitcoin
+import WolfPipe
 
 public struct SSSShare {
     private typealias `Self` = SSSShare

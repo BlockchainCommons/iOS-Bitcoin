@@ -20,7 +20,8 @@
 import XCTest
 import Foundation
 import Bitcoin
-import WolfCore
+import WolfPipe
+import WolfFoundation
 
 fileprivate typealias InvalidChecksum = (bech32: Bech32, error: Bech32Error)
 fileprivate typealias ValidAddressData = (address: Bech32, script: [UInt8])
