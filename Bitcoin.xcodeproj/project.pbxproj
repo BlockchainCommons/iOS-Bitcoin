@@ -75,9 +75,9 @@
 /* Begin PBXCopyFilesBuildPhase section */
 		0378F3BE23A6FB870050C2E4 /* Embed Frameworks */ = {
 			isa = PBXCopyFilesBuildPhase;
-			buildActionMask = 2147483647;
+			buildActionMask = 12;
 			dstPath = "";
-			dstSubfolderSpec = 10;
+			dstSubfolderSpec = 16;
 			files = (
 				0378F3DA23A700E40050C2E4 /* WolfPipe in Embed Frameworks */,
 				0378F3D723A700E40050C2E4 /* WolfFoundation in Embed Frameworks */,
