@@ -14,21 +14,25 @@ import WolfFoundation
 
 class TestBech32Bis: XCTestCase {
     func test1() throws {
-        let encodedTxRef = "tx1-rqqq-qqqq-qygr-lgl" |> tagEncodedTxRef
+        let string = "tx1:rqqq-qqqq-qygr-lgl"
+        let encodedTxRef = string |> tagEncodedTxRef
         let txRef = try encodedTxRef |> toDecoded(version: .bech32bis)
         XCTAssertEqual(txRef.network, .mainnet)
         XCTAssertEqual(txRef.blockHeight, 0)
         XCTAssertEqual(txRef.txIndex, 0)
         XCTAssertEqual(txRef.outIndex, 0)
+        XCTAssertEqual(txRef |> toEncoded(version: .bech32bis) |> rawValue, string)
     }
 
     func test2() throws {
-        let encodedTxRef = "txtest1-xjk0-uqay-zz5s-jae" |> tagEncodedTxRef
+        let string = "txtest1:xjk0-uqay-zz5s-jae"
+        let encodedTxRef = string |> tagEncodedTxRef
         let txRef = try encodedTxRef |> toDecoded(version: .bech32bis)
         XCTAssertEqual(txRef.network, .testnet)
         XCTAssertEqual(txRef.blockHeight, 466793)
         XCTAssertEqual(txRef.txIndex, 2205)
         XCTAssertEqual(txRef.outIndex, 0)
+        XCTAssertEqual(txRef |> toEncoded(version: .bech32bis) |> rawValue, string)
     }
 
     func test3() throws {
@@ -38,12 +42,14 @@ class TestBech32Bis: XCTestCase {
     }
 
     func test4() throws {
-        let encodedTxRef = "txtest1:8jk0-uqay-zu4x-z32g-ap" |> tagEncodedTxRef
+        let string = "txtest1:8jk0-uqay-zu4x-z32g-ap"
+        let encodedTxRef = string |> tagEncodedTxRef
         let txRef = try encodedTxRef |> toDecoded(version: .bech32bis)
         XCTAssertEqual(txRef.network, .testnet)
         XCTAssertEqual(txRef.blockHeight, 466793)
         XCTAssertEqual(txRef.txIndex, 2205)
         XCTAssertEqual(txRef.outIndex, 0x1ABC)
+        XCTAssertEqual(txRef |> toEncoded(version: .bech32bis) |> rawValue, string)
     }
 }
 
