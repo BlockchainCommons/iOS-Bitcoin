@@ -13,6 +13,7 @@
 		0331067121922387000509BB /* TestWrapped.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331067021922387000509BB /* TestWrapped.swift */; };
 		0331068321937FDC000509BB /* TestScript.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331068221937FDC000509BB /* TestScript.swift */; };
 		0331068B2193F052000509BB /* TestTransaction.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0331068A2193F052000509BB /* TestTransaction.swift */; };
+		034B2D7123DC131D00E40468 /* TestBech32Bis.swift in Sources */ = {isa = PBXBuildFile; fileRef = 034B2D6F23DC130400E40468 /* TestBech32Bis.swift */; };
 		0361BCC6218683CD001C12B5 /* TestRandom.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC5218683CD001C12B5 /* TestRandom.swift */; };
 		0361BCC921877354001C12B5 /* TestHD.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0361BCC72187733B001C12B5 /* TestHD.swift */; };
 		0369A1CC21AF3E0B0045AFC4 /* TestEllipticCurve.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */; };
@@ -113,6 +114,7 @@
 		0331067021922387000509BB /* TestWrapped.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestWrapped.swift; sourceTree = "<group>"; };
 		0331068221937FDC000509BB /* TestScript.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestScript.swift; sourceTree = "<group>"; };
 		0331068A2193F052000509BB /* TestTransaction.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestTransaction.swift; sourceTree = "<group>"; };
+		034B2D6F23DC130400E40468 /* TestBech32Bis.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestBech32Bis.swift; sourceTree = "<group>"; };
 		0361BCC5218683CD001C12B5 /* TestRandom.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestRandom.swift; sourceTree = "<group>"; };
 		0361BCC72187733B001C12B5 /* TestHD.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestHD.swift; sourceTree = "<group>"; };
 		0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TestEllipticCurve.swift; sourceTree = "<group>"; };
@@ -234,6 +236,7 @@
 				0369A1CB21AF3E0B0045AFC4 /* TestEllipticCurve.swift */,
 				0310E305221E24B1004BC9C3 /* TestSSS.swift */,
 				03CC10C02374F9B9005CEF6B /* TestBech32.swift */,
+				034B2D6F23DC130400E40468 /* TestBech32Bis.swift */,
 				03CC10C623756C7E005CEF6B /* TestTxRef.swift */,
 				607FACE91AFB9204008FA782 /* Supporting Files */,
 			);
@@ -421,6 +424,7 @@
 				03D710372188ED4700E70327 /* TestEC.swift in Sources */,
 				0331068321937FDC000509BB /* TestScript.swift in Sources */,
 				0331067121922387000509BB /* TestWrapped.swift in Sources */,
+				034B2D7123DC131D00E40468 /* TestBech32Bis.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

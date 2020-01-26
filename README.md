@@ -69,3 +69,9 @@ Wolf McNally, wolf@wolfmcnally.com
 ## License
 
 Bitcoin is available under the Apache 2 license. See the LICENSE file for more info.
+
+## Changes
+
+### 0.9.0
+
+Bech32 and TxRef functionality now support original Bech32 and Bech32Bis.

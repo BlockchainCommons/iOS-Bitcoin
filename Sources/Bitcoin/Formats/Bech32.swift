@@ -17,18 +17,49 @@ import Foundation
 import WolfFoundation
 import WolfPipe
 
+public enum Bech32Version {
+    case bech32
+    case bech32bis
+
+    // bech32bis
+    // See: https://gist.github.com/sipa/a9845b37c1b298a7301c33a04090b2eb
+    var m: UInt32 {
+        switch self {
+        case .bech32:
+            return 1
+        case .bech32bis:
+            return 0x3FFFFFFF
+        }
+    }
+}
+
 public enum Bech32Tag { }
 public typealias Bech32 = Tagged<Bech32Tag, String>
 public func tagBech32(_ string: String) -> Bech32 { return Bech32(rawValue: string) }
 
 public func toBech32(_ hrp: String) -> (_ data: Data) -> Bech32 {
     return { data in
-        Bech32Impl.encode(hrp, values: data) |> tagBech32
+        Bech32Impl.encode(hrp, values: data, version: .bech32) |> tagBech32
     }
 }
 
 public func toData(_ bech32: Bech32) throws -> (hrp: String, data: Data) {
-    let (hrp, data) = try Bech32Impl.decode(bech32®)
+    let (hrp, data) = try Bech32Impl.decode(bech32®, version: .bech32)
+    return (hrp, data)
+}
+
+public enum Bech32BisTag { }
+public typealias Bech32Bis = Tagged<Bech32BisTag, String>
+public func tagBech32Bis(_ string: String) -> Bech32Bis { return Bech32Bis(rawValue: string) }
+
+public func toBech32Bis(_ hrp: String) -> (_ data: Data) -> Bech32Bis {
+    return { data in
+        Bech32Impl.encode(hrp, values: data, version: .bech32bis) |> tagBech32Bis
+    }
+}
+
+public func toData(_ bech32Bis: Bech32Bis) throws -> (hrp: String, data: Data) {
+    let (hrp, data) = try Bech32Impl.decode(bech32Bis®, version: .bech32bis)
     return (hrp, data)
 }
 
@@ -88,18 +119,18 @@ fileprivate class Bech32Impl {
     }
 
     /// Verify checksum
-    private static func verifyChecksum(hrp: String, checksum: Data) -> Bool {
+    private static func verifyChecksum(hrp: String, checksum: Data, version: Bech32Version) -> Bool {
         var data = expandHrp(hrp)
         data.append(checksum)
-        return polymod(data) == 1
+        return polymod(data) == version.m
     }
 
     /// Create checksum
-    private static func createChecksum(hrp: String, values: Data) -> Data {
+    private static func createChecksum(hrp: String, values: Data, version: Bech32Version) -> Data {
         var enc = expandHrp(hrp)
         enc.append(values)
         enc.append(Data(repeating: 0x00, count: 6))
-        let mod: UInt32 = polymod(enc) ^ 1
+        let mod: UInt32 = polymod(enc) ^ version.m
         var ret: Data = Data(repeating: 0x00, count: 6)
         for i in 0..<6 {
             ret[i] = UInt8((mod >> (5 * (5 - i))) & 31)
@@ -108,8 +139,8 @@ fileprivate class Bech32Impl {
     }
 
     /// Encode Bech32 string
-    fileprivate static func encode(_ hrp: String, values: Data) -> String {
-        let checksum = createChecksum(hrp: hrp, values: values)
+    fileprivate static func encode(_ hrp: String, values: Data, version: Bech32Version) -> String {
+        let checksum = createChecksum(hrp: hrp, values: values, version: version)
         var combined = values
         combined.append(checksum)
         guard let hrpBytes = hrp.data(using: .utf8) else { return "" }
@@ -122,7 +153,7 @@ fileprivate class Bech32Impl {
     }
 
     /// Decode Bech32 string
-    fileprivate static func decode(_ str: String) throws -> (hrp: String, checksum: Data) {
+    fileprivate static func decode(_ str: String, version: Bech32Version) throws -> (hrp: String, checksum: Data) {
         guard let strBytes = str.data(using: .utf8) else {
             throw Bech32Error.nonUTF8String
         }
@@ -169,7 +200,7 @@ fileprivate class Bech32Impl {
             values[i] = UInt8(decInt)
         }
         let hrp = String(str[..<pos]).lowercased()
-        guard verifyChecksum(hrp: hrp, checksum: values) else {
+        guard verifyChecksum(hrp: hrp, checksum: values, version: version) else {
             throw Bech32Error.checksumMismatch
         }
         return (hrp, Data(values[..<(vSize-6)]))

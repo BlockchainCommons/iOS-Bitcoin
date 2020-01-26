@@ -34,7 +34,17 @@ public struct TxRef: Equatable {
     }
 }
 
+public func toEncoded(version: Bech32Version) -> (_ txRef: TxRef) -> EncodedTxRef {
+    { txRef in
+        toEncoded(txRef, version: version)
+    }
+}
+
 public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
+    toEncoded(txRef, version: .bech32)
+}
+
+public func toEncoded(_ txRef: TxRef, version: Bech32Version) -> EncodedTxRef {
     struct BitAggregator {
         private(set) var data: Data
         private var bitMask: UInt8
@@ -68,7 +78,7 @@ public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
         }
     }
 
-    func aggregate(_ txRef: TxRef) -> Bech32 {
+    func aggregate(_ txRef: TxRef) -> (data: Data, hrp: String) {
         var aggregator = BitAggregator()
 
         let magicCode: Int
@@ -102,11 +112,10 @@ public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
             aggregator.append(bits: 15, of: txRef.outIndex)
         }
 
-        return aggregator.data |> toBech32(hrp)
+        return (aggregator.data, hrp)
     }
 
-    func insertSeparators(_ bech32: Bech32) -> EncodedTxRef {
-        let inputString = bech32®
+    func insertSeparators(_ inputString: String) -> EncodedTxRef {
         let rawInputString: String
         let prefix: String
         if let txInputString = inputString.removingPrefix("tx1") {
@@ -124,12 +133,28 @@ public func toEncoded(_ txRef: TxRef) -> EncodedTxRef {
         return s |> tagEncodedTxRef
     }
 
-    let bech32 = txRef |> aggregate
-    return bech32 |> insertSeparators
-//    return bech32® |> tagEncodedTxRef
+    let (data, hrp) = txRef |> aggregate
+    switch version {
+    case .bech32:
+        let bech32 = data |> toBech32(hrp)
+        return bech32® |> insertSeparators
+    case .bech32bis:
+        let bech32bis = data |> toBech32Bis(hrp)
+        return bech32bis® |> insertSeparators
+    }
+}
+
+public func toDecoded(version: Bech32Version) -> (_ encodedTxRef: EncodedTxRef) throws -> TxRef {
+    { encodedTxRef in
+        try toDecoded(encodedTxRef, version: version)
+    }
 }
 
 public func toDecoded(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
+    try toDecoded(encodedTxRef, version: .bech32)
+}
+
+public func toDecoded(_ encodedTxRef: EncodedTxRef, version: Bech32Version) throws -> TxRef {
     final class BitEnumerator {
         private let data: Data
         private var byteIndex: Int
@@ -166,7 +191,7 @@ public func toDecoded(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
         }
     }
 
-    func stripSeparators(_ encodedTxRef: EncodedTxRef) throws -> Bech32 {
+    func stripSeparators(_ encodedTxRef: EncodedTxRef) throws -> String {
         let inputString = encodedTxRef®.lowercased()
         let rawInputString: String
         let prefix: String
@@ -181,10 +206,18 @@ public func toDecoded(_ encodedTxRef: EncodedTxRef) throws -> TxRef {
         }
 
         let filteredString = rawInputString.filter { $0.isBech32 }
-        return (prefix + filteredString) |> tagBech32
+        return prefix + filteredString
     }
 
-    let (hrp, bech32Data) = try encodedTxRef |> stripSeparators |> toData
+    let strippedString = try encodedTxRef |> stripSeparators
+    let hrp: String
+    let bech32Data: Data
+    switch version {
+    case .bech32:
+        (hrp, bech32Data) = try strippedString |> tagBech32 |> toData
+    case .bech32bis:
+        (hrp, bech32Data) = try strippedString |> tagBech32Bis |> toData
+    }
 
     let enumerator = BitEnumerator(data: bech32Data)
 
