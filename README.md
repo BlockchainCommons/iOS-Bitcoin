@@ -72,6 +72,11 @@ Bitcoin is available under the Apache 2 license. See the LICENSE file for more i
 
 ## Changes
 
+### 0.10.0
+
+* Improvements to BIP32Path to support Master key component.
+* Derivations now have a `path` attribute that retrieves the BIP32Path associated with the derivation.
+
 ### 0.9.0
 
-Bech32 and TxRef functionality now support original Bech32 and Bech32Bis.
+* Bech32 and TxRef functionality now support original Bech32 and Bech32Bis.

@@ -38,8 +38,8 @@ public struct HDKeyVersion {
     public var bip32Path: BIP32Path? {
         guard let purpose = purpose else { return nil }
         return [
-            .init(index: purpose®, isHardened: true),
-            .init(index: coinType®, isHardened: true)
+            .index(.init(purpose®, isHardened: true)),
+            .index(.init(coinType®, isHardened: true))
         ]
     }
 

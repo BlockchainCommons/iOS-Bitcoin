@@ -49,6 +49,7 @@ public final class BIP44AccountPrivateKeyDerivation {
     public let accountIndex: Int
     private var _network: Network!
     private var _masterHDKey: HDKey!
+    private var _path: BIP32Path!
     private var _accountPrivateKey: HDKey!
     private var _accountPublicKey: HDKey!
 
@@ -86,6 +87,13 @@ public final class BIP44AccountPrivateKeyDerivation {
             _accountPublicKey = try! accountPrivateKey |> toHDPublicKey
         }
         return _accountPublicKey
+    }
+
+    public var path: BIP32Path {
+        if _path == nil {
+            _path = try! hdAccountPrivateKeyDerivationPath(masterKey: masterHDKey, accountIndex: accountIndex)
+        }
+        return _path
     }
 }
 
@@ -130,6 +138,7 @@ public final class BIP44AddressPrivateKeyDerivation {
     private var _addressPrivateKey: HDKey!
     private var _addressPrivateECKey: ECPrivateKey!
     private var _addressPublicKey: HDKey!
+    private var _path: BIP32Path!
 
     public init(accountPrivateKey: HDKey, chainType: ChainType, addressIndex: Int) {
         self.accountPrivateKey = accountPrivateKey
@@ -156,6 +165,13 @@ public final class BIP44AddressPrivateKeyDerivation {
             _addressPublicKey = try! addressPrivateKey |> toHDPublicKey
         }
         return _addressPublicKey
+    }
+
+    public var path: BIP32Path {
+        if _path == nil {
+            _path = hdAddressPrivateKeyDerivationPath(chainType: chainType, addressIndex: addressIndex)
+        }
+        return _path
     }
 }
 
@@ -189,6 +205,7 @@ public final class BIP44SigningDerivation {
     private var _accountPrivateKeyDerivation: BIP44AccountPrivateKeyDerivation!
     private var _addressPrivateKeyDerivation: BIP44AddressPrivateKeyDerivation!
     private var _paymentAddressDerivation: BIP44PaymentAddressDerivation!
+    private var _path: BIP32Path!
 
     public init(seed: Data, asset: Asset, accountIndex: Int, addressIndex: Int, chainType: ChainType) {
         self.seed = seed
@@ -229,5 +246,12 @@ public final class BIP44SigningDerivation {
 
     public var inputPublicECKey: ECCompressedPublicKey {
         return paymentAddressDerivation.addressPublicECKey
+    }
+
+    public var path: BIP32Path {
+        if _path == nil {
+            _path = accountPrivateKeyDerivation.path.appending(addressPrivateKeyDerivation.path)
+        }
+        return _path
     }
 }

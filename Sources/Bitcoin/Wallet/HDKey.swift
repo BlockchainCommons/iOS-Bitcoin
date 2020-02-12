@@ -79,30 +79,41 @@ public func coinType(_ hdKey: HDKey) throws -> CoinType {
 }
 
 /// Derive a child HD (BIP32) private key from another HD private key.
-public func deriveHDPrivateKey(_ component: BIP32Path.PathComponent) -> (_ privateKey: HDKey) throws -> HDKey {
+public func deriveHDPrivateKey(_ component: BIP32Path.Component) -> (_ privateKey: HDKey) throws -> HDKey {
     return { privateKey in
-        return try privateKey®.withCString { privateKeyString in
-            var childKey: UnsafeMutablePointer<Int8>!
-            var childKeyLength = 0
-            if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, component.index, component.isHardened, &childKey, &childKeyLength)) {
-                throw error
+        switch component {
+        case .master:
+            return privateKey
+        case .index(let indexComponent):
+            return try privateKey®.withCString { privateKeyString in
+                var childKey: UnsafeMutablePointer<Int8>!
+                var childKeyLength = 0
+
+                if let error = BitcoinError(rawValue: _deriveHDPrivateKey(privateKeyString, indexComponent.index, indexComponent.isHardened, &childKey, &childKeyLength)) {
+                    throw error
+                }
+                return receiveString(bytes: childKey, count: childKeyLength) |> tagHDKey
             }
-            return receiveString(bytes: childKey, count: childKeyLength) |> tagHDKey
         }
     }
 }
 
 /// Derive a child HD (BIP32) public key from another HD public or private key.
-public func deriveHDPublicKey(_ component: BIP32Path.PathComponent) -> (_ parentKey: HDKey) throws -> HDKey {
+public func deriveHDPublicKey(_ component: BIP32Path.Component) -> (_ parentKey: HDKey) throws -> HDKey {
     return { parentKey in
-        return try parentKey®.withCString { parentKeyString in
-            var childPublicKey: UnsafeMutablePointer<Int8>!
-            var childPublicKeyLength = 0
-            let vers = try parentKey |> version
-            if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, component.index, component.isHardened, vers.publicVersion, vers.privateVersion, &childPublicKey, &childPublicKeyLength)) {
-                throw error
+        switch component {
+        case .master:
+            return parentKey
+        case .index(let indexComponent):
+            return try parentKey®.withCString { parentKeyString in
+                var childPublicKey: UnsafeMutablePointer<Int8>!
+                var childPublicKeyLength = 0
+                let vers = try parentKey |> version
+                if let error = BitcoinError(rawValue: _deriveHDPublicKey(parentKeyString, indexComponent.index, indexComponent.isHardened, vers.publicVersion, vers.privateVersion, &childPublicKey, &childPublicKeyLength)) {
+                    throw error
+                }
+                return receiveString(bytes: childPublicKey, count: childPublicKeyLength) |> tagHDKey
             }
-            return receiveString(bytes: childPublicKey, count: childPublicKeyLength) |> tagHDKey
         }
     }
 }
@@ -165,41 +176,51 @@ public func deriveHDPublicKey(path: BIP32Path) -> (_ key: HDKey) throws -> HDKey
 /// `m / [ purpose' / coin_type' / account' ]`
 public func deriveHDAccountPrivateKey(purpose: HDKeyPurpose? = nil, accountIndex: Int) -> (_ masterKey: HDKey) throws -> HDKey {
     return { masterKey in
-        let vers = try masterKey |> version
-        let effectivePurpose = purpose ?? vers.purpose!
-        let path: BIP32Path = [
-            .init(index: effectivePurpose®, isHardened: true),
-            .init(index: CoinType.index(for: vers.coinType, network: vers.network), isHardened: true),
-            .init(index: accountIndex, isHardened: true)
-        ]
+        let path = try hdAccountPrivateKeyDerivationPath(masterKey: masterKey, purpose: purpose, accountIndex: accountIndex)
         return try masterKey |> deriveHDPrivateKey(path: path)
     }
+}
+
+public func hdAccountPrivateKeyDerivationPath(masterKey: HDKey, purpose: HDKeyPurpose? = nil, accountIndex: Int) throws -> BIP32Path {
+    let vers = try masterKey |> version
+    let effectivePurpose = purpose ?? vers.purpose!
+    let path: BIP32Path = [
+        //.master,
+        .index(.init(effectivePurpose®, isHardened: true)),
+        .index(.init(CoinType.index(for: vers.coinType, network: vers.network), isHardened: true)),
+        .index(.init(accountIndex, isHardened: true))
+    ]
+    return path
 }
 
 /// Derives an "address private key" from the given account key, per BIP-0044:
 ///
 /// Performs the part of the derviation in brackets below:
 ///
-/// `m / purpose' / coin_type' / account' [ / change / address_index ]`
+/// `m / purpose' / coin_type' / account' [ / chain_type / address_index ]`
 public func deriveHDAddressPrivateKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
     return { accountKey in
-        return try accountKey |> deriveHDPrivateKey(path: [
-            .init(index: chainType®, isHardened: false),
-            .init(index: addressIndex, isHardened: false)
-            ])
+        let path = hdAddressPrivateKeyDerivationPath(chainType: chainType, addressIndex: addressIndex)
+        return try accountKey |> deriveHDPrivateKey(path: path)
     }
+}
+
+public func hdAddressPrivateKeyDerivationPath(chainType: ChainType, addressIndex: Int) -> BIP32Path {
+    let path: BIP32Path = [
+        .index(.init(chainType®, isHardened: false)),
+        .index(.init(addressIndex, isHardened: false))
+    ]
+    return path
 }
 
 /// Derives an "address public key" from the given account key, per BIP-0044:
 ///
 /// Performs the part of the derviation in brackets below:
 ///
-/// `m / purpose' / coin_type' / account' [ / change / address_index ]`
+/// `m / purpose' / coin_type' / account' [ / chain_type / address_index ]`
 public func deriveHDAddressPublicKey(chainType: ChainType, addressIndex: Int) -> (_ accountKey: HDKey) throws -> HDKey {
     return { accountKey in
-        return try accountKey |> deriveHDPublicKey(path: [
-            .init(index: chainType®, isHardened: false),
-            .init(index: addressIndex, isHardened: false)
-            ])
+        let path = hdAddressPrivateKeyDerivationPath(chainType: chainType, addressIndex: addressIndex)
+        return try accountKey |> deriveHDPublicKey(path: path)
     }
 }

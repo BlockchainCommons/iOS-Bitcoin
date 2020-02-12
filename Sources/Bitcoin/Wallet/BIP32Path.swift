@@ -6,26 +6,45 @@
 //
 
 public struct BIP32Path {
-    public let components: [PathComponent]
+    public let components: [Component]
 
-    public init(_ components: [PathComponent]) {
+    public init(_ components: [Component]) {
         self.components = components
     }
 
     public init(_ string: String) throws {
-        var componentStrings = string.split(separator: "/").map { String($0) }
+        let componentStrings = string.split(separator: "/").map { String($0) }
         guard !componentStrings.isEmpty else { throw BitcoinError.invalidFormat }
-        if componentStrings.first! == "m" {
-            componentStrings = Array(componentStrings.dropFirst())
+        components = try componentStrings.map { component in
+            guard let c = Component(component) else {
+                throw BitcoinError.invalidFormat
+            }
+            return c
         }
-        components = try componentStrings.map { try PathComponent($0) }
     }
 
-    public struct PathComponent {
+    public enum Component {
+        case master
+        case index(Index)
+
+        init?(_ string: String) {
+            if string == "m" {
+                self = .master
+            } else {
+                if let indexComponent = try? Index(string) {
+                    self = .index(indexComponent)
+                } else {
+                    return nil
+                }
+            }
+        }
+    }
+
+    public struct Index {
         public let index: Int
         public let isHardened: Bool
 
-        public init(index: Int, isHardened: Bool) {
+        public init(_ index: Int, isHardened: Bool) {
             self.index = index
             self.isHardened = isHardened
         }
@@ -44,6 +63,12 @@ public struct BIP32Path {
             index = i
         }
     }
+
+    public func appending(_ path: BIP32Path) -> BIP32Path {
+        var c = components
+        c.append(contentsOf: path.components)
+        return BIP32Path(c)
+    }
 }
 
 extension BIP32Path: CustomStringConvertible {
@@ -53,23 +78,28 @@ extension BIP32Path: CustomStringConvertible {
 }
 
 extension BIP32Path: ExpressibleByArrayLiteral {
-    public init(arrayLiteral: PathComponent...) {
+    public init(arrayLiteral: Component...) {
         self.init(arrayLiteral)
     }
 }
 
-extension BIP32Path.PathComponent: ExpressibleByStringLiteral {
+extension BIP32Path.Component: ExpressibleByStringLiteral {
     public init(stringLiteral: String) {
-        try! self.init(stringLiteral)
+        self.init(stringLiteral)!
     }
 }
 
-extension BIP32Path.PathComponent: CustomStringConvertible {
+extension BIP32Path.Component: CustomStringConvertible {
     public var description: String {
-        if isHardened {
-            return "\(index)'"
-        } else {
-            return "\(index)"
+        switch self {
+        case .master:
+            return "m"
+        case .index(let i):
+            if i.isHardened {
+                return "\(i.index)'"
+            } else {
+                return "\(i.index)"
+            }
         }
     }
 }
