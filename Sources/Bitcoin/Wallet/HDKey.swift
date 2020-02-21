@@ -185,7 +185,7 @@ public func hdAccountPrivateKeyDerivationPath(masterKey: HDKey, purpose: HDKeyPu
     let vers = try masterKey |> version
     let effectivePurpose = purpose ?? vers.purpose!
     let path: BIP32Path = [
-        //.master,
+        .master,
         .index(.init(effectivePurpose®, isHardened: true)),
         .index(.init(CoinType.index(for: vers.coinType, network: vers.network), isHardened: true)),
         .index(.init(accountIndex, isHardened: true))

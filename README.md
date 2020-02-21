@@ -72,6 +72,10 @@ Bitcoin is available under the Apache 2 license. See the LICENSE file for more i
 
 ## Changes
 
+### 0.10.1
+
+* Added master key component to hdAccountPrivateKeyDerivationPath()
+
 ### 0.10.0
 
 * Improvements to BIP32Path to support Master key component.
